@@ -1,0 +1,28 @@
+# Default name/description
+identity/nameSpeech = Nameless
+identity/nameDescription = a robot without a description
+
+~INCLUDE configurable.txt
+
+~INCLUDE field.txt
+~INCLUDE rules.txt
+
+~INCLUDE agent.txt
+~INCLUDE behaviors.txt
+~INCLUDE comm.txt
+~INCLUDE gameController.txt
+~INCLUDE vision/vision.txt
+~INCLUDE worldModel.txt
+
+~INCLUDE log.txt
+
+~INCLUDE camera.txt
+~INCLUDE physical.txt
+
+~INCLUDE motion/motion.txt
+~INCLUDE speechController.txt
+~INCLUDE ledController.txt
+
+~INCLUDE sensorThreshold.txt
+
+~INCLUDE identity.txt

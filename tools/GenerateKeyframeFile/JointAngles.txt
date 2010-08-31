@@ -1,0 +1,22 @@
+# Must follow naming system in Choregraphe, no duplicates allowed! Comment out with #
+#HeadYaw           
+#HeadPitch         
+LShoulderPitch  
+LShoulderRoll   
+LElbowYaw      
+LElbowRoll     
+LHipYawPitch 
+LHipRoll       
+LHipPitch     
+LKneePitch     
+LAnklePitch
+LAnkleRoll      
+RHipRoll     
+RHipPitch   
+RKneePitch  
+RAnklePitch 
+RAnkleRoll    
+RShoulderPitch
+RShoulderRoll 
+RElbowYaw  
+RElbowRoll

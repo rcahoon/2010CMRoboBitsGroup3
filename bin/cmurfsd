@@ -1,0 +1,45 @@
+#!/bin/sh
+
+case "$1" in
+  start)    
+    if [ nao = `whoami` ]; 
+    then /home/nao/cmurfs -d >/dev/null 2>&1;
+    else su -c "/home/nao/cmurfs -d" - nao >/dev/null 2>&1;
+    fi
+        
+    if [ $? -eq 0 ];
+    then echo "CMurfs daemon is started successfully"; 
+    else echo "CMurfs daemon is already running";
+    fi 
+    ;;
+
+  stop)
+    killall cmurfs 
+    while killall cmurfs >/dev/null ; do
+        echo waiting for CMurfs to shutdown
+        sleep 1
+    done
+    echo "CMurfs daemon is stopped" 
+    ;;
+
+   restart)
+    $0 stop
+    sleep 2
+    $0 start
+    ;;
+
+   status)
+    if [ $(pidof cmurfs) ]; 
+    then echo "CMurfs daemon is running"; 
+    else echo "CMurfs daemon is not running";
+    fi 
+    ;;    
+  *)
+    echo "Usage: /etc/init.d/cmurfsd {start|stop|restart|status}"
+    exit 1
+    ;;
+
+esac
+
+exit 0
+

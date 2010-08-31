@@ -1,0 +1,10 @@
+# Name/description
+identity/nameSpeech = athena
+identity/nameDescription = the goddess of wisdom
+
+scanline/panCorrectionTop       = 0
+scanline/panCorrectionBottom    = 0
+scanline/tiltCorrectionTop      = 0.055
+scanline/tiltCorrectionBottom   = 0.05
+
+motion/MotionLib = motion/athenaMotionLib.txt

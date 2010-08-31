@@ -1,0 +1,9 @@
+# This file is only read by the Visualizer, it does not affect how the robot
+# performs! Look at log.txt for those settings.
+
+# Should we write to file
+logToFile/enabled = 1
+logToFile/sslLogEnabled = 1
+# What filename we should write to
+logToFile/filename = ../log.log
+logToFile/sslLog   = ../sslLog.log

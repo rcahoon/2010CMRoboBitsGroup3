@@ -1,0 +1,5 @@
+# For how long after NaoQi starts should we wait before setting LEDs?
+ledController/startupTime = 15 # seconds
+
+# How often should we reset all LEDs while we are running?
+ledController/resetTime = 10 # seconds

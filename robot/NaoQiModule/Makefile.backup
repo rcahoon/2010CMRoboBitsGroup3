@@ -1,0 +1,92 @@
+VPATH = ../
+ROBOT_DIR=../
+
+EXTENSION=.cpp
+
+
+SOURCES?=$(shell find ./src -type f \( -name *.cc -or -name *.cpp \) )  
+SOURCES+=$(shell find $(ROBOT_DIR)/shared -type f \( -name *.cc -or -name *.cpp \) )  
+SOURCES+=$(shell find $(ROBOT_DIR)/Agent -type f \( -name *.cc -or -name *.cpp \) )  
+SOURCES+=$(shell find $(ROBOT_DIR)/Factory -type f \( -name *.cc -or -name *.cpp \) )  
+SOURCES+=$(shell find $(ROBOT_DIR)/Behaviors -type f \( -name *.cc -or -name *.cpp \) )  
+SOURCES+=$(shell find $(ROBOT_DIR)/Comm -type f \( -name *.cc -or -name *.cpp \) )  
+SOURCES+=$(shell find $(ROBOT_DIR)/GameController -type f \( -name *.cc -or -name *.cpp \) )  
+SOURCES+=$(shell find $(ROBOT_DIR)/Log -type f \( -name *.cc -or -name *.cpp \) )  
+SOURCES+=$(shell find $(ROBOT_DIR)/Localization -type f \( -name *.cc -or -name *.cpp \) )  
+SOURCES+=$(shell find $(ROBOT_DIR)/Motion -type f \( -name *.cc -or -name *.cpp \) )  
+SOURCES+=$(shell find $(ROBOT_DIR)/Vision -type f \( -name *.cc -or -name *.cpp \) )  
+SOURCES+=$(shell find $(ROBOT_DIR)/WorldModel -type f \( -name *.cc -or -name *.cpp \) )  
+
+SRCS=$(patsubst $(ROBOT_DIR)/%, %, $(SOURCES) )
+
+HEADERS?=$(shell find ./src -type f -name *.h )
+HEADERS+=$(shell find ../ -type f -name *.h )
+
+CFLAGS= --sysroot $(CTC_DIR)/staging/geode-linux/ -Wall -g -fPIC -march=geode
+
+LFLAGS=--sysroot $(CTC_DIR)/staging/geode-linux/ \
+	-lgcc -L$(CTC_DIR)/cross/geode/i586-linux/lib/ -lc -lstdc++ -ldl -lrt -lpthread -lz \
+	-Wl,--sysroot $(CTC_DIR)/staging/geode-linux/
+
+
+INCLUDES=  \
+	-I$(CTC_DIR)/staging/geode-linux/usr/include/ \
+	-I$(CTC_DIR)/staging/geode-linux/usr/include/libthread/ \
+	-I$(CTC_DIR)/staging/geode-linux/usr/include/alvalue/ \
+	-I$(CTC_DIR)/staging/geode-linux/usr/include/alfactory/ \
+	-I$(CTC_DIR)/cross/geode/lib/gcc/i586-linux/4.3.3/include/ \
+	-I$(CTC_DIR)/cross/geode/i586-linux/include/c++/ \
+	-I$(CTC_DIR)/cross/geode/i586-linux/include/c++/i586-linux/ \
+	-I$(CTC_DIR)/staging/geode-linux/usr/include/c++/ \
+	-I$(CTC_DIR)/staging/geode-linux/usr/include/c++/i486-linux/ \
+	-I$(CTC_DIR)/staging/geode-linux/usr/include/python2.5/ \
+	-I$(AL_DIR)/include/alcommon \
+	-I$(AL_DIR)/include/altools \
+	-I$(AL_DIR)/include/alcore \
+	-I$(AL_DIR)/include/alproxies \
+	-I$(ROBOT_DIR)
+
+LIBS= \
+	-rdynamic -L$(AL_DIR)/lib \
+	-L$(CTC_DIR)/staging/geode-linux/usr/lib \
+	-L$(AL_DIR)/lib \
+	-L$(AL_DIR)/lib/static \
+	-Wl,-Bstatic -ltinyxml -Wl,-Bdynamic -llibcore -lalcommon -lalvalue -lpthread -llibthread -Wl,-Bstatic -Wl,-Bdynamic -lboost_signals-mt -lboost_serialization-mt -lpython2.6 \
+	-Wl,-rpath,$(AL_DIR)/lib:$(CTC_DIR)/staging/geode-linux/usr/lib:$(AL_DIR)/lib
+
+CXX=${CTC_DIR}/cross/geode/bin/i586-linux-g++
+
+OBJS = $(patsubst %$(EXTENSION),%.o,$(filter %$(EXTENSION),$(SRCS)))
+OBJS_OUT = $(addprefix build/, $(OBJS))
+
+build/%.o: %$(EXTENSION) $(HEADERS) $(DEPENDS)
+	@mkdir -p $(dir $@)
+	$(CXX) $(CFLAGS) $(INCLUDES) -o $@ -c $< $(DEFINES)
+
+
+DEPENDS=
+
+LIB=bin/libcmurfs.so
+
+$(LIB): $(OBJS_OUT) $(DEPENDS)
+	rm -rf ./bin
+	mkdir ./bin
+	$(CXX) -shared -Wl,--no-undefined $(LFLAGS) -o $(LIB) $(OBJS_OUT) $(LIBS)
+	@echo =========================================
+	@echo ====== CMurfs NaoQi Module Created ======
+	@echo =========================================
+
+all: $(LIB)
+
+clean: 
+	rm -f $(OBJS_OUT)
+	rm -rf ./bin
+	rm -rf ./build
+	rm -f $(LIB)
+
+localinstall: $(LIB)
+	cp $(LIB) $(AL_DIR)/lib/naoqi/
+
+install: $(LIB)
+	scp $(LIB) nao@$(NAO_IP):/home/nao/naoqi/lib/naoqi/
+

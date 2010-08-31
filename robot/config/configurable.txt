@@ -1,0 +1,14 @@
+# Configurable settings
+# ---------------------
+configurable/behaviors      = Null
+configurable/gameController = AlwaysPlaying
+configurable/localization   = Null
+configurable/vision         = Null
+configurable/worldModel     = Null
+
+configurable/comm/useCommPlayer = 1
+configurable/comm/useCommRemote = 1
+
+configurable/log/useLogToRemote = 1
+configurable/log/useLogToText   = 1
+configurable/log/useLogToFile   = 0

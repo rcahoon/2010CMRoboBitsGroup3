@@ -1,0 +1,78 @@
+motion/stiffness/body = 0.8
+motion/stiffness/head = 0.8
+
+# What stiffness should we set the body to play keyframes
+motion/stiffness/keyframe = 1
+
+# At what speed should we move the head by default?
+motion/defaultHeadSpeed = 0.8
+
+# What is the maximum speed of the head when not performing keyframes?
+motion/maxHeadSpeed = 1
+
+# What is the maximum speed of the head when performing keyframes?
+motion/keyframeMaxHeadSpeed = 0.25
+
+# What is the minimum angle the pan/tilt have to change before we actually
+# move the head?
+motion/minPanDelta  = 1 # degrees
+motion/minTiltDelta = 1 # degrees
+
+motion/velocitymapping/x/a    = 0.1091
+motion/velocitymapping/x/b    = 0
+
+motion/velocitymapping/y/a    = 0.1581
+motion/velocitymapping/y/b    = 0
+
+motion/velocitymapping/turn/a = 1.312
+motion/velocitymapping/turn/b = 0
+
+motion/velocity/max/x         = 9.165 
+motion/velocity/max/y         = 6.325
+motion/velocity/max/turn      = 1.276
+
+motion/MotionLib = motion/motionLib.txt
+motion/distWeight = 0.5
+motion/angleWeight = 1000  # angle difference only goes from 0 to at most pi
+motion/ballDistWeight = 5.0
+
+# How accurate must the kick be in order to be executed?
+motion/angleThresh = 25 # degrees
+
+motion/footstepSizeForward = 4 # cm
+motion/footstepSizeSideToLeft = 3.9 # cm
+motion/footstepSizeSideToRight = 4 # cm
+motion/maxWalkToSteps = 4
+# in degrees
+motion/turnAngle = 45
+
+# How long should we wait after NaoQi starts up, before initializing?
+# (We have to wait some time, otherwise subscription to sonar may not work)
+motion/waitForNaoqiTime = 5 # seconds
+motion/waitForNaoqiSonarTime = 30 # seconds
+
+motion/cmurfsTimeout = 1 # seconds
+
+# How often should we update the desired joint angles while CMurfs main process
+# is offline? This prevents the joints from "jumping" when CMurfs starts up.
+motion/cmurfsOfflineUpdateAnglePeriod = 1 # seconds
+
+# How far should the feet be apart to require stepping forward when doing a
+# stand neutral?
+# Normally, the y dist is around 9.5cm
+motion/feetTogetherDistX = 1 # cm
+motion/feetTogetherDistY = 10 # cm
+
+# Settings for normal walk
+motion/maxTrapezoidNormal = 4.5 # degrees
+# Settings for walk to (sidestep/forward)
+motion/maxTrapezoidWalkTo = 7 # degrees
+
+# Settings for normal walk
+motion/maxThetaNormal = 20 # degrees
+# Settings for walk to (turning)
+motion/maxThetaWalkTo = 45 # degrees
+
+# We multiply the angle to orbit of non-forward kicks by a certain amount, in
+# order to favor forward kicks
+motion/motionLib/nonForwardKickOrbitWeightMultiplier = 1.5

@@ -1,0 +1,49 @@
+# Visualizer
+# -----------
+visualizer/windowTitle = CMurfs Visualizer
+visualizer/screenWidth         = 986
+visualizer/screenHeight        = 486
+
+
+visualizer/fieldScreenWidth    = 666
+visualizer/fieldScreenHeight   = 486
+visualizer/imageWidth          = 320
+visualizer/imageHeight         = 240
+visualizer/horizontalImageSep  = 6
+visualizer/ballDisplayDiameter = 25
+visualizer/fieldColor          = 0x006400
+visualizer/ballColor           = 0xFF0000
+visualizer/blueGoalPostColor   = 0x0032FF
+visualizer/yellowGoalPostColor = 0xFFFF00
+visualizer/goalPostLength      = 20
+visualizer/goalPostWidth       = 5
+visualizer/robotDisplayDiameter= 25
+visualizer/fieldLineWidth      = 5
+visualizer/penaltyPointLength  = 10
+
+visualizer/connector/socketTimeout = 0.1      # How long to wait each time we read the socket (in seconds)
+visualizer/connector/bufferSize    = 1000000  # Number of bytes for the maximum message
+
+# SSL Config
+visualizer/minSSLBallConfidence    = 0.0
+visualizer/minSSLRobotConfidence   = 0.0
+visualizer/sslBallFillColor        = 0xFF0000
+visualizer/sslBallRadius           = 10
+visualizer/sslBlueRobotFillColor   = 0x0000FF
+visualizer/sslYellowRobotFillColor = 0xFFFF00
+visualizer/sslRobotRadius          = 10
+    
+# For field length, positions of markers, etc
+~INCLUDE field.txt
+
+# For the remote port on the robot
+~INCLUDE comm.txt
+
+# For image width and height
+~INCLUDE vision/vision.txt
+
+# Log Writer settings
+~INCLUDE logToFile.txt
+
+# SSL Network settings
+~INCLUDE sslVision.txt

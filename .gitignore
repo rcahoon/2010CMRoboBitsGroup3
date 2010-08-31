@@ -1,0 +1,13 @@
+Release
+*.o
+*.swp
+*.log
+tools/Visualizer/bin
+tools/Visualizer/temp
+tools/CMVEdit/CMVEdit
+tools/CMVEdit/pc_build
+tools/GenerateKeyframeFile/bin/
+tools/Deployer/bin/
+robot/NaoQiModule/build/
+robot/Main/build/
+

@@ -1,0 +1,4 @@
+# SSL Vision
+# -----------
+sslVision/address         = 224.5.23.2
+sslVision/port            = 10002

@@ -1,0 +1,10 @@
+# You can comment out an entire line with a # or add a comment at the end of
+# each line with a #.
+# Note that each line is read by separating each field with spaces in between.
+# Please do not name identify file with spaces in between the file name.
+# Robot Name	IP Address	     Identify File
+athena          192.168.8.54    athena.txt
+apollo          192.168.8.51    apollo.txt
+artemis         192.168.8.53    artemis.txt
+ares            192.168.8.52    ares.txt
+

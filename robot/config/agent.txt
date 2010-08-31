@@ -1,0 +1,3 @@
+# Agent
+# -----
+agent/frameRateFactor = 0.95

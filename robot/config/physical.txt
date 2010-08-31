@@ -1,0 +1,17 @@
+# Physical characteristics of the robot
+
+# Physical settings of the camera
+physical/camera/horizontalFieldOfView = 46 # degrees
+physical/camera/verticalFieldOfView   = 34 # degrees
+
+physical/camera/top/XOffsetFromNeck    = 5.39  # cm
+physical/camera/top/YOffsetFromNeck    = 0     # cm
+physical/camera/top/ZOffsetFromNeck    = 6.79  # cm
+physical/camera/bottom/XOffsetFromNeck = 4.88  # cm
+physical/camera/bottom/YOffsetFromNeck = 0     # cm
+physical/camera/bottom/ZOffsetFromNeck = 2.381 # cm
+
+physical/camera/top/angleRotation    = 0  # degrees, positive means rotate down
+physical/camera/bottom/angleRotation = 40 # degrees, positive means rotate down 
+
+physical/distFromTorsoToNeck = 12.65 # cm

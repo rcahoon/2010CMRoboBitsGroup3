@@ -1,0 +1,10 @@
+vision/colorsPath    = vision/colors.txt
+vision/thresholdPath = vision/threshold.tmap.gz
+
+vision/thresholdYBits = 4
+vision/thresholdUBits = 8
+vision/thresholdVBits = 8
+
+vision/imageWidth  = 320
+vision/imageHeight = 240
+vision/imagePitch  = 640

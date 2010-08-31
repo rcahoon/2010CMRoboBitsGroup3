@@ -1,0 +1,7 @@
+# Game Controller
+# ---------------
+gameController/stateChangePeriod   = 3 # seconds
+gameController/teamChangePeriod    = 1 # seconds
+gameController/kickoffChangePeriod = 1 # seconds
+# Set 1 to be on the blue team, 0 to be on the yellow team
+gameController/isBlueTeam          = 1

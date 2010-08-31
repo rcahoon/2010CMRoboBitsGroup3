@@ -1,0 +1,26 @@
+behaviors/defaultUseBottomCamera = 0
+
+naoImage/gvmName          = NaoImageCapture
+naoImage/cameraResolution = 320x240
+naoImage/cameraColorSpace = YUV422
+naoImage/cameraFPS        = 15
+
+# Camera settings
+naoImage/autoGain         = 0
+naoImage/autoWhiteBalance = 0
+naoImage/autoExposition   = 0
+# 79
+naoImage/exposure         = 200
+naoImage/gain             = 97
+naoImage/blueChroma       = 136
+naoImage/redChroma        = 88
+naoImage/brightness       = 151
+naoImage/contrast         = 45
+naoImage/saturation       = 113
+naoImage/hue              = 0
+naoImage/lensCorrectionX  = 0
+naoImage/lensCorrectionY  = 0
+
+vision/imageWidth  = 320
+vision/imageHeight = 240
+vision/imagePitch  = 640

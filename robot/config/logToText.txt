@@ -1,0 +1,24 @@
+# Possible colors for the different log levels
+# 0  = Default
+# 1  = Black
+# 2  = Red
+# 3  = Green
+# 4  = Yellow
+# 5  = Blue
+# 6  = Magenta
+# 7  = Cyan
+# 8  = White
+# 9  = BoldBlack
+# 10 = BoldRed
+# 11 = BoldGreen
+# 12 = BoldYellow
+# 13 = BoldBlue
+# 14 = BoldMagenta
+# 15 = BoldCyan
+# 16 = BoldWhite
+
+logToText/traceColor = 7
+logToText/debugColor = 3
+logToText/infoColor  = 5
+logToText/warnColor  = 2
+logToText/errorColor = 10

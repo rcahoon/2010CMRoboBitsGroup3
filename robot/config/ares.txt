@@ -1,0 +1,10 @@
+# Name/description
+identity/nameSpeech = eiries
+identity/nameDescription = the god of war
+
+scanline/panCorrectionTop       = 0
+scanline/panCorrectionBottom    = -0.01
+scanline/tiltCorrectionTop      = 0.0
+scanline/tiltCorrectionBottom   = 0.1
+
+motion/MotionLib = motion/aresMotionLib.txt

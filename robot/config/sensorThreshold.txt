@@ -1,0 +1,15 @@
+# Sensor Threshold
+# -----------------
+# If set to true, then FSRs are not used for detecting lift-up
+sensorThreshold/ignoreFSR = 0
+
+sensorThreshold/FSRSensorThreshold = 0.4
+
+sensorThreshold/obstacleFilter/USHistoryWindowSize = 6
+sensorThreshold/obstacleFilter/Weightage = 0.55
+
+# The values are in cm
+sensorThreshold/ultrasound/leftUSThreshold = 45
+sensorThreshold/ultrasound/rightUSThreshold = 45
+sensorThreshold/ultrasound/ignoreLeftUSThreshold = 15
+sensorThreshold/ultrasound/ignoreRightUSThreshold = 15

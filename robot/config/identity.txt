@@ -1,0 +1,7 @@
+# Identity settings
+# -----------------
+team/teamNumber = 8
+team/playerNumber = 2
+
+# Overriden for each robot by the Deployer tool
+#~INCLUDE robotName.txt

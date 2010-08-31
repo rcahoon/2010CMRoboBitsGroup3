@@ -1,0 +1,32 @@
+camera/deviceName             = /dev/video0
+camera/i2cdeviceName          = /dev/i2c-0
+camera/imageWidth             = 320
+camera/imageHeight            = 240 
+camera/fps                    = 30
+
+# 0: top, 1: bottom
+camera/defaultCamera          = 0
+
+camera/top/autoGain           = 0
+camera/top/autoWhiteBalance   = 0
+camera/top/autoExposure       = 0
+
+camera/top/exposure           = 200 
+camera/top/gain               = 97
+camera/top/blueChroma         = 136 
+camera/top/redChroma          = 88
+camera/top/brightness         = 151 
+camera/top/contrast           = 45
+camera/top/saturation         = 113 
+camera/top/hue                = 0
+camera/top/exposureCorrection = 0
+camera/top/hFlip              = 1
+camera/top/vFlip              = 1
+
+#if necessary, put the different settings for the bottom camera here
+
+camera/bottom/hFlip            = 0
+camera/bottom/vFlip            = 0
+
+# How many frames should we ignore when switching cameras?
+camera/numFramesToIgnoreWhenSwitchingCameras = 2

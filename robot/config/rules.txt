@@ -1,0 +1,16 @@
+# Rules
+# -----
+rules/numberOfPlayersPerTeam = 3
+
+rules/initialChestColor   = 0x000000
+rules/readyChestColor     = 0x0000FF
+rules/setChestColor       = 0xFFFF00
+rules/playingChestColor   = 0x00FF00
+rules/finishedChestColor  = 0x000000
+rules/penalisedChestColor = 0xFF0000
+rules/blueTeamFootColor   = 0x0000FF
+rules/redTeamFootColor    = 0xFF0000
+rules/kickoffFootColor    = 0xFFFFFF
+rules/noKickoffFootColor  = 0x000000
+
+rules/readyTime = 45

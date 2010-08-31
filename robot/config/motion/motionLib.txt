@@ -1,0 +1,39 @@
+# Each line will consist of all the fields for one motion, separated by spaces. Below is a list of fields with description.
+# StaticAction::StaticActionType type: An integer that corresponds to the enum StaticActionType in Agent/Command/MotionCommand/BodyCommand/StaticAction.h 
+# minX: In cm stating the minimum X value the robot can execute the motion successfully
+# maxX: In cm stating the maximum X value the robot can execute the motion successfully 
+# minY: In cm stating the minimum Y value the robot can execute the motion successfully
+# maxY: In cm stating the maximum Y value the robot can execute the motion successfully 
+# odometryX: In cm stating the changes in odometry X value  
+# odometryY: In cm stating the changes in odometry Y value 
+# odometryTheta: In degrees stating the changes in odometry angle value
+# resultR: In cm stating the distance the ball will travel
+# resultTheta: In degrees stating the angle the ball will travel
+# deviationResultR: In cm stating the deviation in distance the ball will travel
+# deviationResultTheta: In degrees stating the angle the ball will travel
+# timeToExecute: In seconds stating the duration of the motion
+# motionType: 1 for forward kick using left foot, -1 for forward kick right foot, 
+#             2 for side kicks, 3 for oblique kicks and 0 for none-kicks
+
+# Note: motion types MUST be in order!
+
+# Type    minX    maxX    minY    maxY    odometryX   odometryY   odometryTheta   resultR   resultTheta   deviationResultR    deviationResultTheta    timeToExecute     motionType  Name
+  1       15.0    18.5   -3.0     -9.0    2           0           0               90.0      -0            0                   0                       4.1               -1          #actForwardDribbleRight
+  2       15.0    18.5    3.0     9.0     2           0          0               90.0      0             0                   0                       4.1               1           #actForwardDribbleLeft
+  3       15.0    18.5   -3.0     -9.0    1           0           -5              175.0     -0            0                   0                       4.1               -1          #actForwardKickRight
+  4       15.0    18.5    3.0     9.0     1           0          -5              175.0     0             0                   0                       4.1               1           #actForwardKickLeft
+  5       15.0    18.5   -3.0     -7.0    2           0           15               400.0     -0            0                   0                       4.2               -1          #actForwardStrongRight
+  6       15.0    18.5    3.0     7.0     2           0          -15               400.0     0             0                   0                       4.2               1           #actForwardStrongLeft
+  7       15.0    16.0    1.0     5.0     0           0           0               85.0      -80           0                   0                       4.5               2           #actSideMiniToRightIn 
+  8       15.0    16.0    -1.0    -5.0    0           0           0               85.0      80            0                   0                       4.5               2           #actSideMiniToLeftIn
+  9      15.0    18.5    2.0     8.0     0           0           5               150.0     -80           0                   0                       5.0               2           #actSideStrongToRightIn 
+  10      15.0    18.5    -2.0    -8.0    0           0           -10              150.0     80            0                   0                       5.0               2           #actSideStrongToLeftIn 
+  11      16.0    18.5    -10.0   -12.0   0           0           0               90.0      -80           0                   0                       3.2               2           #actSideKickToRightOut 
+  12      16.0    18.5    10.0    12.0    0           0           0               90.0      80            0                   0                       3.2               2           #actSideKickToLeftOut
+  13      0       0       0       0       0           0           0               0         0             0                   0                       1.0               0           #actSpreadOut
+  14      0       0       0       0       20.0        0           0               0         0             0                   0                       7.1               0           #actGetUpFromFront 
+  15      0       0       0       0       20.0        0           0               0         0             0                   0                       8.5               0           #actGetUpFromBack 
+  16      0       0       0       0       0           0           0               0         0             0                   0                       2                 0           #stand up
+  17      0       0       0       0       0           0           0               0         0             0                   0                       2                 0           #sit down
+  18      0       0       0       0       0           0           0               0         0             0                   0                       0                 0           #test
+				

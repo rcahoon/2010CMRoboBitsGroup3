@@ -1,0 +1,9 @@
+# Comm
+# ----
+comm/gameControllerPort      = 3838
+comm/playerPort              = 5234
+comm/maxPacketSize           = 1024  # bytes (sent to the robot)
+comm/socketTimeout           = 0.1   # seconds
+comm/remoteListenPort        = 10000
+comm/remoteMaxClientQueue    = 2
+comm/robotMessageHeaderSize  = 5     # bytes (type, then size)

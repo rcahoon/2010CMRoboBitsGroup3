@@ -1,0 +1,12 @@
+# Field
+# -----
+field/carpetLength             = 740  # cm
+field/carpetWidth              = 540  # cm
+field/fieldLength              = 600  # cm
+field/fieldWidth               = 400  # cm
+field/penaltyBoxLength         = 60   # cm
+field/penaltyBoxWidth          = 220  # cm
+field/goalWidth                = 140  # cm
+field/centerCircleRadius       = 60   # cm
+field/distCenterToPenaltyPoint = 120  # cm
+

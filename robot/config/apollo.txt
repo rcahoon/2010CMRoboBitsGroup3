@@ -1,0 +1,13 @@
+# Name/description
+identity/nameSpeech = apollo
+identity/nameDescription = the god of light
+
+scanline/panCorrectionTop       = 0
+scanline/panCorrectionBottom    = 0
+scanline/tiltCorrectionTop      = 0.05
+scanline/tiltCorrectionBottom   = 0.05
+
+motion/MotionLib = motion/apolloMotionLib.txt
+
+# We don't detect lifted on Apollo
+sensorThreshold/ignoreFSR = 1
