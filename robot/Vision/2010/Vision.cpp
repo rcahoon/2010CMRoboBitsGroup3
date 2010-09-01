@@ -82,8 +82,6 @@ bool Vision::run(const RobotState & robotState,
 
   // Insert object detectors here
 
-  cmv.
-
 #ifdef LOG_TRACE_ACTIVE
   startTime = log.getTimestamp();
 #endif
