@@ -181,7 +181,7 @@ bool LowVision::close()
 
   return(true);
 }
-LOG_SHAPE_ENABLED
+
 unsigned checksum(char *buf,int len)
 {
   unsigned u;
@@ -292,7 +292,6 @@ bool LowVision::processFrame(vision_image &img)
             
 
             /*
-  int i,j,s;
             //needed when RUNSTEP > 2
             if ( x < IMAGEWIDTH )
             {
@@ -312,7 +311,7 @@ bool LowVision::processFrame(vision_image &img)
                             x = kkk;
                         }
                     }
-                }since we do not have an API for the code
+                }
             }
             */
             

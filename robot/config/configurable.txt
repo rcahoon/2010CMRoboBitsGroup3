@@ -3,7 +3,7 @@
 configurable/behaviors      = Null
 configurable/gameController = AlwaysPlaying
 configurable/localization   = Null
-configurable/vision         = Null
+configurable/vision         = 2010
 configurable/worldModel     = Null
 
 configurable/comm/useCommPlayer = 1

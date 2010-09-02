@@ -68,6 +68,7 @@ public:
   bool saveColorizedImage(const char *filename,rgb *reg_color);
   inline void classifyPixel(int pos);
 
+
   const SegmentedImage & getSegmentedImage();
 
   const Region *getRegions(int c)
