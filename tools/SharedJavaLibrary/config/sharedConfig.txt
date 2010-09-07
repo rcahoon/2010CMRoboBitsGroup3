@@ -1,0 +1,2 @@
+tools/shared/connector/socketTimeout = 0.1 # seconds
+tools/shared/connector/bufferSize    = 1000000 # bytes

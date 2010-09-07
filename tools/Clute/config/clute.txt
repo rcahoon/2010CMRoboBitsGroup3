@@ -1,0 +1,56 @@
+tools/clute/imageWidth  = 320
+tools/clute/imageHeight = 240
+
+tools/clute/thresholdPath = threshold.tmap.gz
+tools/clute/colorsPath    = colors.txt
+
+tools/clute/windowName = Color Lookup-Table Editor
+
+tools/clute/localSettingsFilename = localSettings.txt
+
+tools/clute/windowWidth  = 800
+tools/clute/windowHeight = 600
+
+tools/clute/imageScreenWidth  = 640
+tools/clute/imageScreenHeight = 480
+tools/clute/imageScreenPosX   = 0
+tools/clute/imageScreenPosY   = 50
+
+tools/clute/thresholdScreenWidth  = 255
+tools/clute/thresholdScreenHeight = 255
+tools/clute/thresholdScreenPosX   = 650
+tools/clute/thresholdScreenPosY   = 50
+
+tools/clute/minZoom = 100
+tools/clute/maxZoom = 1000
+tools/clute/zoomMultiplier = 1.1
+
+tools/clute/colorComboBoxWidth = 150
+tools/clute/colorComboBoxHeight = 40
+tools/clute/colorComboBoxPosX = 0
+tools/clute/colorComboBoxPosY = 0
+
+tools/clute/saveButtonWidth = 200
+tools/clute/saveButtonHeight = 40
+tools/clute/saveButtonPosX = 200
+tools/clute/saveButtonPosY = 0
+
+tools/clute/alphaScrollBarWidth = 640
+tools/clute/alphaScrollBarHeight = 20
+tools/clute/alphaScrollBarPosX = 0
+tools/clute/alphaScrollBarPosY = 530
+tools/clute/alphaScrollBarThickness = 5
+
+tools/clute/pauseButtonWidth = 200
+tools/clute/pauseButtonHeight = 40
+tools/clute/pauseButtonPosX = 0
+tools/clute/pauseButtonPosY = 550
+
+tools/clute/autoSegmentButtonWidth = 200
+tools/clute/autoSegmentButtonHeight = 40
+tools/clute/autoSegmentButtonPosX = 250
+tools/clute/autoSegmentButtonPosY = 550
+
+tools/clute/reconnectSleepTime = 0.1 # seconds
+
+~INCLUDE ../../SharedJavaLibrary/config/sharedConfig.txt

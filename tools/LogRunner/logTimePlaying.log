@@ -1,0 +1,804 @@
+TimeStamp 	3334548261
+Thresholding took 11 ms.
+	Connect and extract and sort regions took 0 ms. 
+	Ball detector took 0 ms 		
+TimeStamp 	3334548428
+Thresholding took 1 ms.
+	Connect and extract and sort regions took 0 ms. 
+	Ball detector took 0 ms 		
+TimeStamp 	3334548587
+Thresholding took 1 ms.
+	Connect and extract and sort regions took 0 ms. 
+	FOUND BALL: (57.4895, 2.84261) distance (from cam) 57.5597 confidence 0.873446	Ball detector took 0 ms 		
+TimeStamp 	3334548909
+Thresholding took 1 ms.
+	Connect and extract and sort regions took 0 ms. 
+	FOUND BALL: (58.2059, 2.95234) distance (from cam) 58.2807 confidence 0.769409	Ball detector took 0 ms 		
+TimeStamp 	3334549151
+Thresholding took 1 ms.
+	Connect and extract and sort regions took 1 ms. 
+	FOUND BALL: (59.6172, 3.03078) distance (from cam) 59.6942 confidence 0.771937	Ball detector took 0 ms 		
+TimeStamp 	3334549374
+Thresholding took 1 ms.
+	Connect and extract and sort regions took 0 ms. 
+	FOUND BALL: (56.7027, 3.04366) distance (from cam) 56.7843 confidence 0.668492	Ball detector took 0 ms 		
+TimeStamp 	3334549655
+Thresholding took 1 ms.
+	Connect and extract and sort regions took 0 ms. 
+	FOUND BALL: (57.0315, 3.00432) distance (from cam) 57.1105 confidence 0.657942	Ball detector took 0 ms 		
+TimeStamp 	3334549942
+Thresholding took 1 ms.
+	Connect and extract and sort regions took 0 ms. 
+	FOUND BALL: (58.5871, 2.97046) distance (from cam) 58.6624 confidence 0.705068	Ball detector took 0 ms 		
+TimeStamp 	3334550183
+Thresholding took 0 ms.
+	Connect and extract and sort regions took 0 ms. 
+	FOUND BALL: (59.4673, 2.95339) distance (from cam) 59.5406 confidence 0.789405	Ball detector took 3 ms 		
+TimeStamp 	3334550444
+Thresholding took 1 ms.
+	Connect and extract and sort regions took 0 ms. 
+	FOUND BALL: (59.4575, 2.78579) distance (from cam) 59.5227 confidence 0.843992	Ball detector took 0 ms 		
+TimeStamp 	3334550721
+Thresholding took 1 ms.
+	Connect and extract and sort regions took 0 ms. 
+	FOUND BALL: (57.3352, 2.57468) distance (from cam) 57.393 confidence 0.656451	Ball detector took 0 ms 		
+TimeStamp 	3334550952
+Thresholding took 1 ms.
+	Connect and extract and sort regions took 0 ms. 
+	FOUND BALL: (59.4951, 2.46052) distance (from cam) 59.5459 confidence 0.75707	Ball detector took 0 ms 		
+TimeStamp 	3334551221
+Thresholding took 0 ms.
+	Connect and extract and sort regions took 0 ms. 
+	FOUND BALL: (59.1145, 2.28347) distance (from cam) 59.1586 confidence 0.807143	Ball detector took 1 ms 		
+TimeStamp 	3334551471
+Thresholding took 0 ms.
+	Connect and extract and sort regions took 0 ms. 
+	FOUND BALL: (59.4587, 1.90585) distance (from cam) 59.4892 confidence 0.949175	Ball detector took 1 ms 		
+TimeStamp 	3334551713
+Thresholding took 0 ms.
+	Connect and extract and sort regions took 0 ms. 
+	FOUND BALL: (59.5341, 1.81556) distance (from cam) 59.5618 confidence 0.941797	Ball detector took 1 ms 		
+TimeStamp 	3334551941
+Thresholding took 1 ms.
+	Connect and extract and sort regions took 0 ms. 
+	FOUND BALL: (59.7323, 1.71109) distance (from cam) 59.7568 confidence 0.932432	Ball detector took 0 ms 		
+TimeStamp 	3334552283
+Thresholding took 1 ms.
+	Connect and extract and sort regions took 0 ms. 
+	FOUND BALL: (59.6088, 1.64143) distance (from cam) 59.6314 confidence 0.962883	Ball detector took 8 ms 		
+TimeStamp 	3334552651
+Thresholding took 1 ms.
+	Connect and extract and sort regions took 0 ms. 
+	blend=0.306544, far_dist=65.172470, near_dist=65.481890	FOUND BALL: (59.8005, 1.39404) distance (from cam) 59.8168 confidence 1	Ball detector took 0 ms 		
+TimeStamp 	3334552935
+Thresholding took 1 ms.
+	Connect and extract and sort regions took 0 ms. 
+	blend=0.327030, far_dist=66.985245, near_dist=65.717766	FOUND BALL: (60.0743, 1.41938) distance (from cam) 60.091 confidence 1	Ball detector took 0 ms 		
+TimeStamp 	3334553271
+Thresholding took 1 ms.
+	Connect and extract and sort regions took 0 ms. 
+	blend=0.317553, far_dist=65.716700, near_dist=66.038600	FOUND BALL: (59.7272, 1.52133) distance (from cam) 59.7465 confidence 0.997436	Ball detector took 1 ms 		
+TimeStamp 	3334553568
+Thresholding took 1 ms.
+	Connect and extract and sort regions took 0 ms. 
+	blend=0.319575, far_dist=65.683751, near_dist=66.273778	FOUND BALL: (59.6867, 1.41748) distance (from cam) 59.7036 confidence 1	Ball detector took 3 ms 		
+TimeStamp 	3334553849
+Thresholding took 0 ms.
+	Connect and extract and sort regions took 0 ms. 
+	blend=0.342629, far_dist=67.564003, near_dist=66.698868	FOUND BALL: (60.1202, 1.24174) distance (from cam) 60.133 confidence 1	Ball detector took 1 ms 		
+TimeStamp 	3334554134
+Thresholding took 0 ms.
+	Connect and extract and sort regions took 0 ms. 
+	blend=0.345160, far_dist=67.622342, near_dist=66.893661	FOUND BALL: (60.2192, 1.08426) distance (from cam) 60.2289 confidence 1	Ball detector took 1 ms 		
+TimeStamp 	3334554412
+Thresholding took 1 ms.
+	Connect and extract and sort regions took 0 ms. 
+	blend=0.346471, far_dist=67.555064, near_dist=67.092056	FOUND BALL: (59.9703, 0.736581) distance (from cam) 59.9749 confidence 1	Ball detector took 1 ms 		
+TimeStamp 	3334554719
+Thresholding took 0 ms.
+	Connect and extract and sort regions took 0 ms. 
+	blend=0.356128, far_dist=68.281514, near_dist=67.331235	FOUND BALL: (60.4125, 1.14289) distance (from cam) 60.4233 confidence 1	Ball detector took 1 ms 		
+TimeStamp 	3334555002
+Thresholding took 1 ms.
+	Connect and extract and sort regions took 0 ms. 
+	blend=0.361317, far_dist=68.678370, near_dist=67.453372	FOUND BALL: (60.2501, 1.03287) distance (from cam) 60.259 confidence 1	Ball detector took 1 ms 		
+TimeStamp 	3334555265
+Thresholding took 0 ms.
+	Connect and extract and sort regions took 0 ms. 
+	blend=0.374476, far_dist=69.628159, near_dist=67.819458	FOUND BALL: (60.6194, 0.991504) distance (from cam) 60.6275 confidence 1	Ball detector took 1 ms 		
+TimeStamp 	3334555518
+Thresholding took 1 ms.
+	Connect and extract and sort regions took 0 ms. 
+	blend=0.368066, far_dist=68.880798, near_dist=67.925774	FOUND BALL: (60.3896, 1.14802) distance (from cam) 60.4006 confidence 1	Ball detector took 0 ms 		
+TimeStamp 	3334555748
+Thresholding took 1 ms.
+	Connect and extract and sort regions took 0 ms. 
+	blend=0.373234, far_dist=69.159162, near_dist=68.164263	FOUND BALL: (60.4444, 1.1158) distance (from cam) 60.4547 confidence 1	Ball detector took 1 ms 		
+TimeStamp 	3334555970
+Thresholding took 1 ms.
+	Connect and extract and sort regions took 0 ms. 
+	blend=0.361607, far_dist=68.722898, near_dist=67.437770	FOUND BALL: (59.6315, 1.1799) distance (from cam) 59.6432 confidence 1	Ball detector took 0 ms 		
+TimeStamp 	3334556258
+Thresholding took 1 ms.
+	Connect and extract and sort regions took 0 ms. 
+	blend=0.383207, far_dist=70.460464, near_dist=67.860229	FOUND BALL: (60.3151, 1.42697) distance (from cam) 60.332 confidence 1	Ball detector took 0 ms 		
+TimeStamp 	3334556461
+Thresholding took 1 ms.
+	Connect and extract and sort regions took 0 ms. 
+	blend=0.373497, far_dist=69.041972, near_dist=68.307770	FOUND BALL: (60.2385, 1.11001) distance (from cam) 60.2487 confidence 1	Ball detector took 1 ms 		
+TimeStamp 	3334556686
+Thresholding took 1 ms.
+	Connect and extract and sort regions took 0 ms. 
+	blend=0.372290, far_dist=69.018743, near_dist=68.210258	FOUND BALL: (60.1008, 1.21819) distance (from cam) 60.1131 confidence 1	Ball detector took 0 ms 		
+TimeStamp 	3334556915
+Thresholding took 1 ms.
+	Connect and extract and sort regions took 0 ms. 
+	blend=0.374863, far_dist=69.560061, near_dist=67.926203	FOUND BALL: (59.9106, 1.2748) distance (from cam) 59.9241 confidence 1	Ball detector took 0 ms 		
+TimeStamp 	3334557126
+Thresholding took 1 ms.
+	Connect and extract and sort regions took 0 ms. 
+	blend=0.390344, far_dist=70.484113, near_dist=68.550285	FOUND BALL: (60.4856, 1.35401) distance (from cam) 60.5007 confidence 1	Ball detector took 0 ms 		
+TimeStamp 	3334557356
+Thresholding took 0 ms.
+	Connect and extract and sort regions took 0 ms. 
+	blend=0.386168, far_dist=70.296883, near_dist=68.319885	FOUND BALL: (60.2531, 1.22468) distance (from cam) 60.2655 confidence 1	Ball detector took 1 ms 		
+TimeStamp 	3334557591
+Thresholding took 1 ms.
+	Connect and extract and sort regions took 0 ms. 
+	blend=0.369472, far_dist=68.442688, near_dist=68.504555	FOUND BALL: (59.7163, 1.28486) distance (from cam) 59.7302 confidence 1	Ball detector took 0 ms 		
+TimeStamp 	3334557868
+Thresholding took 1 ms.
+	Connect and extract and sort regions took 0 ms. 
+	blend=0.378643, far_dist=69.254186, near_dist=68.610120	FOUND BALL: (60.0636, 1.36914) distance (from cam) 60.0792 confidence 1	Ball detector took 0 ms 		
+TimeStamp 	3334558141
+Thresholding took 0 ms.
+	Connect and extract and sort regions took 1 ms. 
+	blend=0.377091, far_dist=69.278122, near_dist=68.430995	FOUND BALL: (59.6952, 1.19818) distance (from cam) 59.7072 confidence 1	Ball detector took 0 ms 		
+TimeStamp 	3334558352
+Thresholding took 1 ms.
+	Connect and extract and sort regions took 0 ms. 
+	blend=0.367769, far_dist=68.465988, near_dist=68.310944	FOUND BALL: (59.5192, 1.28098) distance (from cam) 59.5329 confidence 1	Ball detector took 0 ms 		
+TimeStamp 	3334558595
+Thresholding took 1 ms.
+	Connect and extract and sort regions took 0 ms. 
+	blend=0.351079, far_dist=66.665733, near_dist=68.442179	FOUND BALL: (59.1861, 1.29576) distance (from cam) 59.2003 confidence 1	Ball detector took 0 ms 		
+TimeStamp 	3334558869
+Thresholding took 1 ms.
+	Connect and extract and sort regions took 0 ms. 
+	blend=0.393646, far_dist=70.579425, near_dist=68.785144	FOUND BALL: (59.9487, 1.21089) distance (from cam) 59.9609 confidence 1	Ball detector took 0 ms 		
+TimeStamp 	3334559206
+Thresholding took 0 ms.
+	Connect and extract and sort regions took 0 ms. 
+	blend=0.399170, far_dist=70.484113, near_dist=69.432879	FOUND BALL: (59.9909, 2.41161) distance (from cam) 60.0394 confidence 1	Ball detector took 1 ms 		
+TimeStamp 	3334559528
+Thresholding took 1 ms.
+	Connect and extract and sort regions took 0 ms. 
+	blend=0.404721, far_dist=70.627518, near_dist=69.844610	FOUND BALL: (59.2799, 4.43018) distance (from cam) 59.4452 confidence 1	Ball detector took 0 ms 		
+TimeStamp 	3334559788
+Thresholding took 1 ms.
+	Connect and extract and sort regions took 0 ms. 
+	blend=0.406266, far_dist=71.164202, near_dist=69.462387	FOUND BALL: (60.2718, 4.09816) distance (from cam) 60.411 confidence 1	Ball detector took 0 ms 		
+TimeStamp 	3334560103
+Thresholding took 1 ms.
+	Connect and extract and sort regions took 0 ms. 
+	blend=0.383291, far_dist=69.768161, near_dist=68.560954	FOUND BALL: (59.0196, 2.54751) distance (from cam) 59.0745 confidence 1	Ball detector took 0 ms 		
+TimeStamp 	3334560429
+Thresholding took 1 ms.
+	Connect and extract and sort regions took 0 ms. 
+	blend=0.386135, far_dist=69.582817, near_dist=69.030708	FOUND BALL: (59.4309, 2.59233) distance (from cam) 59.4874 confidence 1	Ball detector took 0 ms 		
+TimeStamp 	3334560711
+Thresholding took 1 ms.
+	Connect and extract and sort regions took 0 ms. 
+	blend=0.375657, far_dist=69.254186, near_dist=68.311465	FOUND BALL: (58.1302, 2.62842) distance (from cam) 58.1896 confidence 1	Ball detector took 0 ms 		
+TimeStamp 	3334560943
+Thresholding took 0 ms.
+	Connect and extract and sort regions took 0 ms. 
+	blend=0.385095, far_dist=70.389941, near_dist=68.119548	FOUND BALL: (58.3765, 0.270921) distance (from cam) 58.3771 confidence 1	Ball detector took 1 ms 		
+TimeStamp 	3334561193
+Thresholding took 1 ms.
+	Connect and extract and sort regions took 0 ms. 
+	blend=0.359523, far_dist=67.925229, near_dist=68.027084	FOUND BALL: (57.9121, 0.74267) distance (from cam) 57.9168 confidence 1	Ball detector took 0 ms 		
+TimeStamp 	3334561484
+Thresholding took 1 ms.
+	Connect and extract and sort regions took 0 ms. 
+	blend=0.358358, far_dist=68.056915, near_dist=67.778880	FOUND BALL: (57.6314, 0.170802) distance (from cam) 57.6316 confidence 1	Ball detector took 0 ms 		
+TimeStamp 	3334561733
+Thresholding took 1 ms.
+	Connect and extract and sort regions took 0 ms. 
+	blend=0.348086, far_dist=68.304337, near_dist=66.504283	FOUND BALL: (55.5556, -2.86937) distance (from cam) 55.6297 confidence 1	Ball detector took 0 ms 		
+TimeStamp 	3334561986
+Thresholding took 1 ms.
+	Connect and extract and sort regions took 0 ms. 
+	blend=0.344320, far_dist=67.795771, near_dist=66.636258	FOUND BALL: (55.9944, -3.18932) distance (from cam) 56.0852 confidence 1	Ball detector took 0 ms 		
+TimeStamp 	3334562220
+Thresholding took 1 ms.
+	Connect and extract and sort regions took 0 ms. 
+	blend=0.315669, far_dist=65.827619, near_dist=65.739273	FOUND BALL: (56.029, -4.20972) distance (from cam) 56.1869 confidence 1	Ball detector took 1 ms 		
+TimeStamp 	3334562548
+Thresholding took 1 ms.
+	Connect and extract and sort regions took 0 ms. 
+	blend=0.335269, far_dist=67.947021, near_dist=65.579871	FOUND BALL: (53.8694, -7.34308) distance (from cam) 54.3675 confidence 1	Ball detector took 0 ms 		
+TimeStamp 	3334562814
+Thresholding took 1 ms.
+	Connect and extract and sort regions took 0 ms. 
+	blend=0.301452, far_dist=64.962629, near_dist=65.182612	FOUND BALL: (54.0634, -7.3541) distance (from cam) 54.5613 confidence 1	Ball detector took 0 ms 		
+TimeStamp 	3334563073
+Thresholding took 1 ms.
+	Connect and extract and sort regions took 0 ms. 
+	blend=0.305761, far_dist=65.502752, near_dist=65.073335	FOUND BALL: (54.9656, -8.17175) distance (from cam) 55.5697 confidence 1	Ball detector took 0 ms 		
+TimeStamp 	3334563405
+Thresholding took 1 ms.
+	Connect and extract and sort regions took 0 ms. 
+	blend=0.321275, far_dist=67.460960, near_dist=64.666566	FOUND BALL: (52.1912, -11.7677) distance (from cam) 53.5014 confidence 1	Ball detector took 0 ms 		
+TimeStamp 	3334563645
+Thresholding took 1 ms.
+	Connect and extract and sort regions took 0 ms. 
+	blend=0.295693, far_dist=65.287359, near_dist=64.281957	FOUND BALL: (52.9337, -11.5571) distance (from cam) 54.1806 confidence 1	Ball detector took 0 ms 		
+TimeStamp 	3334563895
+Thresholding took 1 ms.
+	Connect and extract and sort regions took 0 ms. 
+	blend=0.284649, far_dist=64.594447, near_dist=63.870491	FOUND BALL: (52.3839, -12.4497) distance (from cam) 53.843 confidence 1	Ball detector took 0 ms 		
+TimeStamp 	3334564230
+Thresholding took 1 ms.
+	Connect and extract and sort regions took 0 ms. 
+	blend=0.290695, far_dist=65.062642, near_dist=64.006851	FOUND BALL: (50.3771, -12.8788) distance (from cam) 51.9972 confidence 1	Ball detector took 0 ms 		
+TimeStamp 	3334564486
+Thresholding took 1 ms.
+	Connect and extract and sort regions took 0 ms. 
+	blend=0.274022, far_dist=64.298154, near_dist=63.104019	FOUND BALL: (51.3964, -12.2845) distance (from cam) 52.8441 confidence 1	Ball detector took 1 ms 		
+TimeStamp 	3334564753
+Thresholding took 1 ms.
+	Connect and extract and sort regions took 0 ms. 
+	blend=0.266562, far_dist=63.730148, near_dist=62.926036	FOUND BALL: (50.7837, -13.3097) distance (from cam) 52.4989 confidence 1	Ball detector took 0 ms 		
+TimeStamp 	3334565000
+Thresholding took 1 ms.
+	Connect and extract and sort regions took 0 ms. 
+	blend=0.278770, far_dist=64.061796, near_dist=63.815229	FOUND BALL: (49.5433, -13.2858) distance (from cam) 51.2938 confidence 1	Ball detector took 0 ms 		
+TimeStamp 	3334565255
+Thresholding took 0 ms.
+	Connect and extract and sort regions took 1 ms. 
+	blend=0.254276, far_dist=63.045431, near_dist=62.382211	FOUND BALL: (48.7277, -15.1024) distance (from cam) 51.0144 confidence 1	Ball detector took 0 ms 		
+TimeStamp 	3334565504
+Thresholding took 1 ms.
+	Connect and extract and sort regions took 0 ms. 
+	blend=0.243965, far_dist=62.653440, near_dist=61.743014	FOUND BALL: (50.1284, -13.2487) distance (from cam) 51.8496 confidence 1	Ball detector took 0 ms 		
+TimeStamp 	3334565829
+Thresholding took 1 ms.
+	Connect and extract and sort regions took 0 ms. 
+	blend=0.272494, far_dist=64.463328, near_dist=62.786059	FOUND BALL: (48.2115, -13.2922) distance (from cam) 50.0103 confidence 1	Ball detector took 0 ms 		
+TimeStamp 	3334566088
+Thresholding took 1 ms.
+	Connect and extract and sort regions took 0 ms. 
+	blend=0.254210, far_dist=63.841287, near_dist=61.579671	FOUND BALL: (47.6353, -14.741) distance (from cam) 49.864 confidence 1	Ball detector took 0 ms 		
+TimeStamp 	3334566335
+Thresholding took 1 ms.
+	Connect and extract and sort regions took 0 ms. 
+	blend=0.214801, far_dist=61.072992, near_dist=60.407101	FOUND BALL: (48.6326, -12.0008) distance (from cam) 50.0914 confidence 1	Ball detector took 1 ms 		
+TimeStamp 	3334566556
+Thresholding took 0 ms.
+	Connect and extract and sort regions took 0 ms. 
+	blend=0.222426, far_dist=61.066992, near_dist=61.175565	FOUND BALL: (46.9546, -11.8165) distance (from cam) 48.4186 confidence 1	Ball detector took 1 ms 		
+TimeStamp 	3334566795
+Thresholding took 1 ms.
+	Connect and extract and sort regions took 0 ms. 
+	blend=0.233177, far_dist=62.222740, near_dist=61.095002	FOUND BALL: (47.1815, -12.1899) distance (from cam) 48.7307 confidence 1	Ball detector took 0 ms 		
+TimeStamp 	3334567054
+Thresholding took 1 ms.
+	Connect and extract and sort regions took 0 ms. 
+	blend=0.195725, far_dist=59.468705, near_dist=60.103784	FOUND BALL: (47.5646, -9.96702) distance (from cam) 48.5976 confidence 1	Ball detector took 1 ms 		
+TimeStamp 	3334567273
+Thresholding took 1 ms.
+	Connect and extract and sort regions took 0 ms. 
+	blend=0.196993, far_dist=59.513719, near_dist=60.185561	FOUND BALL: (47.8565, -10.1771) distance (from cam) 48.9267 confidence 1	Ball detector took 0 ms 		
+TimeStamp 	3334567508
+Thresholding took 1 ms.
+	Connect and extract and sort regions took 0 ms. 
+	blend=0.227655, far_dist=61.750345, near_dist=61.015203	FOUND BALL: (46.2066, -10.5244) distance (from cam) 47.39 confidence 1	Ball detector took 1 ms 		
+TimeStamp 	3334567767
+Thresholding took 0 ms.
+	Connect and extract and sort regions took 0 ms. 
+	blend=0.213271, far_dist=61.784342, near_dist=59.542731	FOUND BALL: (45.741, -11.7298) distance (from cam) 47.2211 confidence 1	Ball detector took 0 ms 		
+TimeStamp 	3334568014
+Thresholding took 0 ms.
+	Connect and extract and sort regions took 1 ms. 
+	blend=0.166591, far_dist=58.168410, near_dist=58.490645	FOUND BALL: (46.8729, -8.91942) distance (from cam) 47.714 confidence 1	Ball detector took 0 ms 		
+TimeStamp 	3334568221
+Thresholding took 1 ms.
+	Connect and extract and sort regions took 0 ms. 
+	blend=0.190328, far_dist=59.773047, near_dist=59.259763	FOUND BALL: (45.6741, -8.89261) distance (from cam) 46.5317 confidence 1	Ball detector took 0 ms 		
+TimeStamp 	3334568489
+Thresholding took 1 ms.
+	Connect and extract and sort regions took 0 ms. 
+	blend=0.198022, far_dist=60.906090, near_dist=58.896109	FOUND BALL: (45.3134, -9.64286) distance (from cam) 46.3281 confidence 1	Ball detector took 0 ms 		
+TimeStamp 	3334568742
+Thresholding took 1 ms.
+	Connect and extract and sort regions took 0 ms. 
+	blend=0.166265, far_dist=58.519382, near_dist=58.107095	FOUND BALL: (45.2818, -7.90459) distance (from cam) 45.9666 confidence 1	Ball detector took 0 ms 		
+TimeStamp 	3334568954
+Thresholding took 1 ms.
+	Connect and extract and sort regions took 0 ms. 
+	blend=0.165639, far_dist=58.505530, near_dist=58.058346	FOUND BALL: (45.3676, -8.49366) distance (from cam) 46.1558 confidence 1	Ball detector took 0 ms 		
+TimeStamp 	3334569192
+Thresholding took 1 ms.
+	Connect and extract and sort regions took 0 ms. 
+	blend=0.190585, far_dist=60.320691, near_dist=58.737796	FOUND BALL: (44.0922, -8.31636) distance (from cam) 44.8696 confidence 1	Ball detector took 0 ms 		
+TimeStamp 	3334569431
+Thresholding took 1 ms.
+	Connect and extract and sort regions took 0 ms. 
+	blend=0.151947, far_dist=57.875623, near_dist=57.319083	FOUND BALL: (43.2126, -9.58609) distance (from cam) 44.2631 confidence 1	Ball detector took 0 ms 		
+TimeStamp 	3334569648
+Thresholding took 1 ms.
+	Connect and extract and sort regions took 0 ms. 
+	blend=0.113939, far_dist=55.768326, near_dist=55.625601	FOUND BALL: (42.2543, -7.3322) distance (from cam) 42.8857 confidence 1	Ball detector took 0 ms 		
+TimeStamp 	3334569860
+Thresholding took 1 ms.
+	Connect and extract and sort regions took 0 ms. 
+	blend=0.096582, far_dist=54.438395, near_dist=55.219767	FOUND BALL: (41.9611, -6.27461) distance (from cam) 42.4276 confidence 1	Ball detector took 0 ms 		
+TimeStamp 	3334570076
+Thresholding took 1 ms.
+	Connect and extract and sort regions took 0 ms. 
+	Ball detector took 0 ms 		
+TimeStamp 	3334570208
+Thresholding took 1 ms.
+	Connect and extract and sort regions took 0 ms. 
+	Ball detection is disabled.	
+TimeStamp 	3334570351
+Thresholding took 0 ms.
+	Connect and extract and sort regions took 0 ms. 
+	Ball detection is disabled.	
+TimeStamp 	3334570612
+Thresholding took 1 ms.
+	Connect and extract and sort regions took 0 ms. 
+	Ball detection is disabled.	
+TimeStamp 	3334570796
+Thresholding took 0 ms.
+	Connect and extract and sort regions took 0 ms. 
+	Ball detection is disabled.	
+TimeStamp 	3334570988
+Thresholding took 1 ms.
+	Connect and extract and sort regions took 0 ms. 
+	Ball detection is disabled.	
+TimeStamp 	3334571187
+Thresholding took 1 ms.
+	Connect and extract and sort regions took 0 ms. 
+	Ball detection is disabled.	
+TimeStamp 	3334571466
+Thresholding took 1 ms.
+	Connect and extract and sort regions took 0 ms. 
+	Ball detection is disabled.	
+TimeStamp 	3334571665
+Thresholding took 1 ms.
+	Connect and extract and sort regions took 0 ms. 
+	Ball detection is disabled.	
+TimeStamp 	3334571851
+Thresholding took 1 ms.
+	Connect and extract and sort regions took 0 ms. 
+	Ball detection is disabled.	
+TimeStamp 	3334572023
+Thresholding took 0 ms.
+	Connect and extract and sort regions took 1 ms. 
+	Ball detection is disabled.	
+TimeStamp 	3334572192
+Thresholding took 1 ms.
+	Connect and extract and sort regions took 0 ms. 
+	Ball detection is disabled.	
+TimeStamp 	3334572411
+Thresholding took 0 ms.
+	Connect and extract and sort regions took 1 ms. 
+	Ball detection is disabled.	
+TimeStamp 	3334572627
+Thresholding took 1 ms.
+	Connect and extract and sort regions took 0 ms. 
+	Ball detection is disabled.	
+TimeStamp 	3334572867
+Thresholding took 1 ms.
+	Connect and extract and sort regions took 0 ms. 
+	Ball detection is disabled.	
+TimeStamp 	3334572976
+Thresholding took 1 ms.
+	Connect and extract and sort regions took 0 ms. 
+	Ball detection is disabled.	
+TimeStamp 	3334573094
+Thresholding took 0 ms.
+	Connect and extract and sort regions took 0 ms. 
+	Ball detection is disabled.	
+TimeStamp 	3334573322
+Thresholding took 1 ms.
+	Connect and extract and sort regions took 0 ms. 
+	Ball detection is disabled.	
+TimeStamp 	3334573583
+Thresholding took 1 ms.
+	Connect and extract and sort regions took 0 ms. 
+	Ball detection is disabled.	
+TimeStamp 	3334573831
+Thresholding took 0 ms.
+	Connect and extract and sort regions took 0 ms. 
+	Ball detection is disabled.	
+TimeStamp 	3334574060
+Thresholding took 1 ms.
+	Connect and extract and sort regions took 0 ms. 
+	Ball detection is disabled.	
+TimeStamp 	3334574287
+Thresholding took 1 ms.
+	Connect and extract and sort regions took 0 ms. 
+	Ball detection is disabled.	
+TimeStamp 	3334574529
+Thresholding took 1 ms.
+	Connect and extract and sort regions took 0 ms. 
+	Ball detection is disabled.	
+TimeStamp 	3334574763
+Thresholding took 1 ms.
+	Connect and extract and sort regions took 0 ms. 
+	Ball detection is disabled.	
+TimeStamp 	3334574985
+Thresholding took 1 ms.
+	Connect and extract and sort regions took 0 ms. 
+	Ball detection is disabled.	
+TimeStamp 	3334575291
+Thresholding took 0 ms.
+	Connect and extract and sort regions took 0 ms. 
+	Ball detection is disabled.	
+TimeStamp 	3334575605
+Thresholding took 1 ms.
+	Connect and extract and sort regions took 0 ms. 
+	Ball detection is disabled.	
+TimeStamp 	3334575836
+Thresholding took 1 ms.
+	Connect and extract and sort regions took 0 ms. 
+	Ball detection is disabled.	
+TimeStamp 	3334576114
+Thresholding took 1 ms.
+	Connect and extract and sort regions took 0 ms. 
+	Ball detection is disabled.	
+TimeStamp 	3334576348
+Thresholding took 1 ms.
+	Connect and extract and sort regions took 0 ms. 
+	Ball detection is disabled.	
+TimeStamp 	3334576586
+Thresholding took 1 ms.
+	Connect and extract and sort regions took 0 ms. 
+	Ball detection is disabled.	
+TimeStamp 	3334576852
+Thresholding took 1 ms.
+	Connect and extract and sort regions took 0 ms. 
+	Ball detection is disabled.	
+TimeStamp 	3334577103
+Thresholding took 1 ms.
+	Connect and extract and sort regions took 0 ms. 
+	Ball detection is disabled.	
+TimeStamp 	3334577345
+Thresholding took 1 ms.
+	Connect and extract and sort regions took 0 ms. 
+	Ball detection is disabled.	
+TimeStamp 	3334577573
+Thresholding took 0 ms.
+	Connect and extract and sort regions took 0 ms. 
+	Ball detection is disabled.	
+TimeStamp 	3334577816
+Thresholding took 0 ms.
+	Connect and extract and sort regions took 1 ms. 
+	Ball detection is disabled.	
+TimeStamp 	3334578094
+Thresholding took 1 ms.
+	Connect and extract and sort regions took 0 ms. 
+	Ball detection is disabled.	
+TimeStamp 	3334578385
+Thresholding took 1 ms.
+	Connect and extract and sort regions took 0 ms. 
+	Ball detection is disabled.	
+TimeStamp 	3334578630
+Thresholding took 1 ms.
+	Connect and extract and sort regions took 0 ms. 
+	Ball detection is disabled.	
+TimeStamp 	3334578870
+Thresholding took 1 ms.
+	Connect and extract and sort regions took 0 ms. 
+	Ball detection is disabled.	
+TimeStamp 	3334579107
+Thresholding took 0 ms.
+	Connect and extract and sort regions took 1 ms. 
+	Ball detection is disabled.	
+TimeStamp 	3334579360
+Thresholding took 1 ms.
+	Connect and extract and sort regions took 0 ms. 
+	Ball detection is disabled.	
+TimeStamp 	3334579631
+Thresholding took 1 ms.
+	Connect and extract and sort regions took 0 ms. 
+	Ball detection is disabled.	
+TimeStamp 	3334579906
+Thresholding took 1 ms.
+	Connect and extract and sort regions took 0 ms. 
+	Ball detection is disabled.	
+TimeStamp 	3334580123
+Thresholding took 0 ms.
+	Connect and extract and sort regions took 0 ms. 
+	Ball detection is disabled.	
+TimeStamp 	3334580371
+Thresholding took 1 ms.
+	Connect and extract and sort regions took 0 ms. 
+	Ball detection is disabled.	
+TimeStamp 	3334580612
+Thresholding took 1 ms.
+	Connect and extract and sort regions took 0 ms. 
+	Ball detection is disabled.	
+TimeStamp 	3334580873
+Thresholding took 0 ms.
+	Connect and extract and sort regions took 1 ms. 
+	Ball detection is disabled.	
+TimeStamp 	3334581110
+Thresholding took 1 ms.
+	Connect and extract and sort regions took 0 ms. 
+	Ball detection is disabled.	
+TimeStamp 	3334581352
+Thresholding took 1 ms.
+	Connect and extract and sort regions took 0 ms. 
+	Ball detection is disabled.	
+TimeStamp 	3334581628
+Thresholding took 1 ms.
+	Connect and extract and sort regions took 0 ms. 
+	Ball detection is disabled.	
+TimeStamp 	3334581904
+Thresholding took 1 ms.
+	Connect and extract and sort regions took 0 ms. 
+	Ball detection is disabled.	
+TimeStamp 	3334582186
+Thresholding took 1 ms.
+	Connect and extract and sort regions took 0 ms. 
+	Ball detection is disabled.	
+TimeStamp 	3334582444
+Thresholding took 0 ms.
+	Connect and extract and sort regions took 1 ms. 
+	Ball detection is disabled.	
+TimeStamp 	3334582663
+Thresholding took 1 ms.
+	Connect and extract and sort regions took 0 ms. 
+	Ball detection is disabled.	
+TimeStamp 	3334582889
+Thresholding took 1 ms.
+	Connect and extract and sort regions took 0 ms. 
+	Ball detection is disabled.	
+TimeStamp 	3334583165
+Thresholding took 1 ms.
+	Connect and extract and sort regions took 0 ms. 
+	Ball detection is disabled.	
+TimeStamp 	3334583420
+Thresholding took 1 ms.
+	Connect and extract and sort regions took 0 ms. 
+	Ball detection is disabled.	
+TimeStamp 	3334583660
+Thresholding took 1 ms.
+	Connect and extract and sort regions took 0 ms. 
+	Ball detection is disabled.	
+TimeStamp 	3334583909
+Thresholding took 1 ms.
+	Connect and extract and sort regions took 0 ms. 
+	blend=0.000000, far_dist=40.601042, near_dist=41.196026	FOUND BALL: (16.3055, -2.44955) distance (from cam) 16.4885 confidence 1	Ball detector took 1 ms 		
+TimeStamp 	3334584176
+Thresholding took 1 ms.
+	Connect and extract and sort regions took 0 ms. 
+	blend=0.000000, far_dist=42.304775, near_dist=41.792938	FOUND BALL: (15.8042, -1.49613) distance (from cam) 15.8749 confidence 1	Ball detector took 0 ms 		
+TimeStamp 	3334584428
+Thresholding took 1 ms.
+	Connect and extract and sort regions took 0 ms. 
+	blend=0.000000, far_dist=42.567221, near_dist=42.544292	FOUND BALL: (15.9098, -3.58378) distance (from cam) 16.3085 confidence 1	Ball detector took 1 ms 		
+TimeStamp 	3334584705
+Thresholding took 1 ms.
+	Connect and extract and sort regions took 0 ms. 
+	blend=0.000000, far_dist=42.642298, near_dist=41.871487	FOUND BALL: (16.7177, -3.66971) distance (from cam) 17.1157 confidence 1	Ball detector took 0 ms 		
+TimeStamp 	3334584955
+Thresholding took 0 ms.
+	Connect and extract and sort regions took 1 ms. 
+	blend=0.000000, far_dist=42.895699, near_dist=41.916157	FOUND BALL: (16.8221, -3.48549) distance (from cam) 17.1794 confidence 1	Ball detector took 0 ms 		
+TimeStamp 	3334585166
+Thresholding took 1 ms.
+	Connect and extract and sort regions took 0 ms. 
+	blend=0.000000, far_dist=41.834565, near_dist=41.714728	FOUND BALL: (16.8295, -3.51987) distance (from cam) 17.1936 confidence 1	Ball detector took 0 ms 		
+TimeStamp 	3334585396
+Thresholding took 0 ms.
+	Connect and extract and sort regions took 1 ms. 
+	blend=0.000000, far_dist=41.421850, near_dist=41.655703	FOUND BALL: (16.7498, -3.44875) distance (from cam) 17.1011 confidence 1	Ball detector took 0 ms 		
+TimeStamp 	3334585656
+Thresholding took 0 ms.
+	Connect and extract and sort regions took 1 ms. 
+	blend=0.000000, far_dist=41.540298, near_dist=41.579013	FOUND BALL: (16.6777, -3.58008) distance (from cam) 17.0576 confidence 1	Ball detector took 0 ms 		
+TimeStamp 	3334585881
+Thresholding took 1 ms.
+	Connect and extract and sort regions took 0 ms. 
+	blend=0.000000, far_dist=46.750037, near_dist=42.582536	FOUND BALL: (16.8392, -3.65557) distance (from cam) 17.2314 confidence 0.825067	Ball detector took 1 ms 		
+TimeStamp 	3334586189
+Thresholding took 0 ms.
+	Connect and extract and sort regions took 0 ms. 
+	blend=0.000000, far_dist=45.460003, near_dist=42.544192	FOUND BALL: (16.9699, -3.63522) distance (from cam) 17.3549 confidence 0.940708	Ball detector took 0 ms 		
+TimeStamp 	3334586471
+Thresholding took 1 ms.
+	Connect and extract and sort regions took 0 ms. 
+	blend=0.000000, far_dist=45.961374, near_dist=42.879316	FOUND BALL: (17.4741, -2.46807) distance (from cam) 17.6475 confidence 0.973874	Ball detector took 1 ms 		
+TimeStamp 	3334586702
+Thresholding took 1 ms.
+	Connect and extract and sort regions took 0 ms. 
+	blend=0.000000, far_dist=47.912884, near_dist=43.249880	FOUND BALL: (17.6171, -2.3277) distance (from cam) 17.7702 confidence 0.949057	Ball detector took 0 ms 		
+TimeStamp 	3334586949
+Thresholding took 1 ms.
+	Connect and extract and sort regions took 0 ms. 
+	blend=0.026757, far_dist=57.026049, near_dist=45.649614	FOUND BALL: (18.7806, -0.555786) distance (from cam) 18.7888 confidence 0.684504	Ball detector took 0 ms 		
+TimeStamp 	3334587190
+Thresholding took 1 ms.
+	Connect and extract and sort regions took 0 ms. 
+	blend=0.000000, far_dist=50.329171, near_dist=44.106182	FOUND BALL: (17.9336, 1.25982) distance (from cam) 17.9778 confidence 0.818099	Ball detector took 0 ms 		
+TimeStamp 	3334587413
+Thresholding took 0 ms.
+	Connect and extract and sort regions took 0 ms. 
+	blend=0.358414, far_dist=91.612156, near_dist=44.229279	Ball detector took 0 ms 		
+TimeStamp 	3334587668
+Thresholding took 0 ms.
+	Connect and extract and sort regions took 0 ms. 
+	Ball detector took 0 ms 		
+TimeStamp 	3334587792
+Thresholding took 0 ms.
+	Connect and extract and sort regions took 0 ms. 
+	Ball detector took 0 ms 		
+TimeStamp 	3334587918
+Thresholding took 1 ms.
+	Connect and extract and sort regions took 0 ms. 
+	Ball detector took 0 ms 		
+TimeStamp 	3334588181
+Thresholding took 1 ms.
+	Connect and extract and sort regions took 0 ms. 
+	Ball detector took 0 ms 		
+TimeStamp 	3334588494
+Thresholding took 1 ms.
+	Connect and extract and sort regions took 0 ms. 
+	Ball detector took 0 ms 		
+TimeStamp 	3334588729
+Thresholding took 6 ms.
+	Connect and extract and sort regions took 0 ms. 
+	blend=0.889692, far_dist=103.780477, near_dist=85.188766	FOUND BALL: (23.309, 101.384) distance (from cam) 104.029 confidence 1	Ball detector took 1 ms 		
+TimeStamp 	3334588964
+Thresholding took 1 ms.
+	Connect and extract and sort regions took 0 ms. 
+	blend=1.000000, far_dist=120.625343, near_dist=98.836240	FOUND BALL: (22.2846, 123.751) distance (from cam) 125.741 confidence 0.97825	Ball detector took 8 ms 		
+TimeStamp 	3334589206
+Thresholding took 1 ms.
+	Connect and extract and sort regions took 0 ms. 
+	blend=1.000000, far_dist=137.115616, near_dist=102.364693	FOUND BALL: (26.5924, 142.372) distance (from cam) 144.834 confidence 0.949	Ball detector took 0 ms 		
+TimeStamp 	3334589442
+Thresholding took 7 ms.
+	Connect and extract and sort regions took 0 ms. 
+	blend=1.000000, far_dist=159.880157, near_dist=125.843117	FOUND BALL: (22.9988, 166.62) distance (from cam) 168.2 confidence 0.913507	Ball detector took 0 ms 		
+TimeStamp 	3334589695
+Thresholding took 1 ms.
+	Connect and extract and sort regions took 0 ms. 
+	blend=1.000000, far_dist=179.297328, near_dist=144.347168	FOUND BALL: (17.0562, 180.805) distance (from cam) 181.608 confidence 0.887217	Ball detector took 0 ms 		
+TimeStamp 	3334589921
+Thresholding took 1 ms.
+	Connect and extract and sort regions took 0 ms. 
+	Ball detector took 1 ms 		
+TimeStamp 	3334590107
+Thresholding took 1 ms.
+	Connect and extract and sort regions took 0 ms. 
+	Ball detector took 0 ms 		
+TimeStamp 	3334590329
+Thresholding took 1 ms.
+	Connect and extract and sort regions took 0 ms. 
+	blend=1.000000, far_dist=229.411275, near_dist=131.802444	FOUND BALL: (11.364, 222.421) distance (from cam) 222.711 confidence 0.886	Ball detector took 1 ms 		
+TimeStamp 	3334590623
+Thresholding took 0 ms.
+	Connect and extract and sort regions took 1 ms. 
+	blend=1.000000, far_dist=262.430974, near_dist=156.687149	FOUND BALL: (8.51418, 255.681) distance (from cam) 255.823 confidence 0.876948	Ball detector took 0 ms 		
+TimeStamp 	3334590860
+Thresholding took 6 ms.
+	Connect and extract and sort regions took 0 ms. 
+	blend=1.000000, far_dist=276.493886, near_dist=173.586365	FOUND BALL: (6.47429, 269.664) distance (from cam) 269.742 confidence 0.87625	Ball detector took 1 ms 		
+TimeStamp 	3334591106
+Thresholding took 1 ms.
+	Connect and extract and sort regions took 0 ms. 
+	blend=1.000000, far_dist=292.286489, near_dist=226.452606	FOUND BALL: (25.1909, 286.219) distance (from cam) 287.325 confidence 0.857172	Ball detector took 0 ms 		
+TimeStamp 	3334591349
+Thresholding took 1 ms.
+	Connect and extract and sort regions took 0 ms. 
+	blend=1.000000, far_dist=293.780039, near_dist=146.295517	Ball removed due to distance above or below ground, height -43.0705.	Ball detector took 1 ms 		
+TimeStamp 	3334591554
+Thresholding took 1 ms.
+	Connect and extract and sort regions took 0 ms. 
+	blend=1.000000, far_dist=275.264414, near_dist=158.798676	FOUND BALL: (3.59222, 274.112) distance (from cam) 274.135 confidence 0.785597	Ball detector took 1 ms 		
+TimeStamp 	3334591788
+Thresholding took 1 ms.
+	Connect and extract and sort regions took 0 ms. 
+	blend=1.000000, far_dist=315.608592, near_dist=197.494812	FOUND BALL: (43.1181, 309.177) distance (from cam) 312.169 confidence 0.812103	Ball detector took 1 ms 		
+TimeStamp 	3334592027
+Thresholding took 1 ms.
+	Connect and extract and sort regions took 0 ms. 
+	blend=1.000000, far_dist=304.548777, near_dist=206.827118	FOUND BALL: (69.9777, 290.776) distance (from cam) 299.078 confidence 0.853475	Ball detector took 1 ms 		
+TimeStamp 	3334592250
+Thresholding took 1 ms.
+	Connect and extract and sort regions took 0 ms. 
+	blend=1.000000, far_dist=310.393962, near_dist=176.853973	FOUND BALL: (86.6177, 297.539) distance (from cam) 309.89 confidence 0.777905	Ball detector took 0 ms 		
+TimeStamp 	3334592486
+Thresholding took 1 ms.
+	Connect and extract and sort regions took 0 ms. 
+	blend=1.000000, far_dist=348.521657, near_dist=168.295364	Ball removed due to distance above or below ground, height -46.0891.	Ball detector took 0 ms 		
+TimeStamp 	3334592732
+Thresholding took 1 ms.
+	Connect and extract and sort regions took 0 ms. 
+	blend=1.000000, far_dist=321.772695, near_dist=246.099884	FOUND BALL: (166.982, 272.464) distance (from cam) 319.561 confidence 0.812017	Ball detector took 1 ms 		
+TimeStamp 	3334592944
+Thresholding took 1 ms.
+	Connect and extract and sort regions took 0 ms. 
+	blend=1.000000, far_dist=317.544332, near_dist=211.551651	FOUND BALL: (185.763, 256.24) distance (from cam) 316.491 confidence 0.812057	Ball detector took 0 ms 		
+TimeStamp 	3334593162
+Thresholding took 0 ms.
+	Connect and extract and sort regions took 0 ms. 
+	blend=1.000000, far_dist=321.772695, near_dist=185.363144	FOUND BALL: (187.582, 263.311) distance (from cam) 323.295 confidence 0.812017	Ball detector took 1 ms 		
+TimeStamp 	3334593383
+Thresholding took 1 ms.
+	Connect and extract and sort regions took 0 ms. 
+	blend=1.000000, far_dist=317.544332, near_dist=187.612183	FOUND BALL: (232.102, 213.054) distance (from cam) 315.061 confidence 0.812057	Ball detector took 12 ms 		
+TimeStamp 	3334593593
+Thresholding took 1 ms.
+	Connect and extract and sort regions took 0 ms. 
+	blend=1.000000, far_dist=339.656799, near_dist=232.444397	FOUND BALL: (263.291, 210.528) distance (from cam) 337.112 confidence 0.734189	Ball detector took 1 ms 		
+TimeStamp 	3334593804
+Thresholding took 1 ms.
+	Connect and extract and sort regions took 0 ms. 
+	blend=1.000000, far_dist=313.777517, near_dist=215.838806	FOUND BALL: (255.78, 184.099) distance (from cam) 315.144 confidence 0.803524	Ball detector took 1 ms 		
+TimeStamp 	3334594015
+Thresholding took 1 ms.
+	Connect and extract and sort regions took 0 ms. 
+	blend=1.000000, far_dist=353.314240, near_dist=187.243317	FOUND BALL: (288.025, 205.389) distance (from cam) 353.756 confidence 0.854255	Ball detector took 1 ms 		
+TimeStamp 	3334594251
+Thresholding took 1 ms.
+	Connect and extract and sort regions took 0 ms. 
+	blend=1.000000, far_dist=324.090830, near_dist=178.575668	FOUND BALL: (293.443, 128.267) distance (from cam) 320.252 confidence 0.812025	Ball detector took 1 ms 		
+TimeStamp 	3334594465
+Thresholding took 1 ms.
+	Connect and extract and sort regions took 0 ms. 
+	blend=1.000000, far_dist=353.314240, near_dist=219.089752	FOUND BALL: (327.181, 127.078) distance (from cam) 350.993 confidence 0.854255	Ball detector took 1 ms 		
+TimeStamp 	3334594673
+Thresholding took 1 ms.
+	Connect and extract and sort regions took 0 ms. 
+	blend=1.000000, far_dist=285.293020, near_dist=203.116425	FOUND BALL: (270.853, 93.369) distance (from cam) 286.494 confidence 0.87175	Ball detector took 0 ms 		
+TimeStamp 	3334594908
+Thresholding took 0 ms.
+	Connect and extract and sort regions took 1 ms. 
+	blend=1.000000, far_dist=283.540222, near_dist=190.411987	FOUND BALL: (269.503, 89.5014) distance (from cam) 283.976 confidence 0.735604	Ball detector took 0 ms 		
+TimeStamp 	3334595128
+Thresholding took 1 ms.
+	Connect and extract and sort regions took 4 ms. 
+	blend=1.000000, far_dist=279.158681, near_dist=186.345490	FOUND BALL: (273.891, 48.592) distance (from cam) 278.168 confidence 0.87475	Ball detector took 1 ms 		
+TimeStamp 	3334595343
+Thresholding took 1 ms.
+	Connect and extract and sort regions took 0 ms. 
+	blend=1.000000, far_dist=295.347666, near_dist=212.104172	FOUND BALL: (293.55, 33.4899) distance (from cam) 295.454 confidence 0.865421	Ball detector took 0 ms 		
+TimeStamp 	3334595555
+Thresholding took 4 ms.
+	Connect and extract and sort regions took 0 ms. 
+	blend=1.000000, far_dist=310.393962, near_dist=183.756638	FOUND BALL: (308.473, 23.0277) distance (from cam) 309.332 confidence 0.777905	Ball detector took 0 ms 		
+TimeStamp 	3334595771
+Thresholding took 0 ms.
+	Connect and extract and sort regions took 1 ms. 
+	blend=1.000000, far_dist=283.644999, near_dist=183.849869	FOUND BALL: (282.7, 10.6405) distance (from cam) 282.9 confidence 0.8725	Ball detector took 18 ms 		
+TimeStamp 	3334595992
+Thresholding took 1 ms.
+	Connect and extract and sort regions took 0 ms. 
+	blend=1.000000, far_dist=289.499563, near_dist=190.418152	FOUND BALL: (287.351, -24.1797) distance (from cam) 288.367 confidence 0.833364	Ball detector took 1 ms 		
+TimeStamp 	3334596212
+Thresholding took 1 ms.
+	Connect and extract and sort regions took 1 ms. 
+	blend=1.000000, far_dist=277.796895, near_dist=200.477402	FOUND BALL: (276.864, -36.2489) distance (from cam) 279.227 confidence 0.8755	Ball detector took 0 ms 		
+TimeStamp 	3334596426
+Thresholding took 1 ms.
+	Connect and extract and sort regions took 0 ms. 
+	blend=1.000000, far_dist=274.282857, near_dist=184.914642	FOUND BALL: (271.993, -37.7344) distance (from cam) 274.598 confidence 0.844965	Ball detector took 1 ms 		
+TimeStamp 	3334596633
+Thresholding took 1 ms.
+	Connect and extract and sort regions took 0 ms. 
+	blend=1.000000, far_dist=276.493886, near_dist=183.572113	FOUND BALL: (271.315, -45.8819) distance (from cam) 275.167 confidence 0.87625	Ball detector took 0 ms 		
+TimeStamp 	3334596875
+Thresholding took 0 ms.
+	Connect and extract and sort regions took 1 ms. 
+	blend=1.000000, far_dist=246.514181, near_dist=199.698639	FOUND BALL: (240.69, -61.9954) distance (from cam) 248.546 confidence 0.866357	Ball detector took 0 ms 		
+TimeStamp 	3334597096
+Thresholding took 1 ms.
+	Connect and extract and sort regions took 0 ms. 
+	blend=1.000000, far_dist=258.223480, near_dist=199.308670	FOUND BALL: (249.322, -73.798) distance (from cam) 260.014 confidence 0.834413	Ball detector took 0 ms 		
