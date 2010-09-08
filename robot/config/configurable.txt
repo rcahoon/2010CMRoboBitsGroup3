@@ -1,6 +1,6 @@
 # Configurable settings
 # ---------------------
-configurable/behaviors      = Null
+configurable/behaviors      = Test
 configurable/gameController = AlwaysPlaying
 configurable/localization   = Null
 configurable/vision         = 2010

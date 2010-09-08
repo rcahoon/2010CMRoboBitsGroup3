@@ -1,5 +1,6 @@
 #include "BehaviorsConfigurable.h"
 #include "Behaviors/Null/NullBehaviors.h"
+#include "Behaviors/Test/BehaviorsTest.h"
 #include "shared/ConfigFile/ConfigFile.h"
 
 #define COMPONENT BEHAVIORS
@@ -17,6 +18,10 @@ BehaviorsConfigurable::BehaviorsConfigurable(ConfigFile & configFile,
   if (name.compare("Null") == 0) {
     behaviors = new NullBehaviors();
   }
+  // Should we use TestBehaviors?
+   if (name.compare("Test") == 0) {
+     behaviors = new RoboCup2010::BehaviorsTest(configFile,_log,field);
+   }
   else {
     LOG_WARN("Configurable Behaviors was not defined.");
   }
