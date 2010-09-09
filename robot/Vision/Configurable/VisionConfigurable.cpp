@@ -3,6 +3,7 @@
 #include "shared/ConfigFile/ConfigFile.h"
 
 #include "Vision/2010/Vision.h"
+#include "Vision/rcahoon/Vision.h"
 
 #define COMPONENT VISION
 //#define CLASS_LOG_LEVEL LOG_LEVEL_DEBUG
@@ -17,8 +18,11 @@ VisionConfigurable::VisionConfigurable(ConfigFile & configFile, Log & _log)
   if (name.compare("Null") == 0) {
     vision = new NullVision();
   }
-  if (name.compare("2010") == 0) {
+  else if (name.compare("2010") == 0) {
     vision = new RoboCup2010::Vision(configFile, _log);
+  }
+  else if (name.compare("RCahoon") == 0) {
+    vision = new RCahoon::Vision(configFile, _log);
   }
   else {
     LOG_WARN("Configurable Vision was not defined.");

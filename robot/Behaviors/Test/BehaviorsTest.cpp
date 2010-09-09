@@ -33,7 +33,7 @@ bool BehaviorsTest::run(BEHAVIOR_PARAMS){
 
     if (robotState.getLeftFootButton()) {
     	startTime = robotState.getTimestamp();
-    	command.getMotionCommand().walk(10, 0, 0);
+    	command.getMotionCommand().walk(0, 10, 0);
     }
     if (robotState.getTimestamp() - startTime > 5000) {
     	command.getMotionCommand().stopWalk();

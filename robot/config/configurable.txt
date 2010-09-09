@@ -3,7 +3,7 @@
 configurable/behaviors      = Test
 configurable/gameController = AlwaysPlaying
 configurable/localization   = Null
-configurable/vision         = 2010
+configurable/vision         = RCahoon
 configurable/worldModel     = Null
 
 configurable/comm/useCommPlayer = 1
