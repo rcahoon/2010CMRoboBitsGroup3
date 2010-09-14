@@ -6,7 +6,7 @@ log/maxTextLength = 255                     # bytes
 # if n = 0, they will not be logged
 # Warning: logging robot state slows down the frame rate significantly!
 log/logRemote/logRobotStatePeriod     = 0
-log/logRemote/logOriginalImagePeriod  = 15
+log/logRemote/logOriginalImagePeriod  = 1
 log/logRemote/logSegmentedImagePeriod = 1
 
 # This is the logfile created on the robot

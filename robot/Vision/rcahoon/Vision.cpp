@@ -2,6 +2,7 @@
 #include <ios>
 
 #include "Vision/rcahoon/Vision.h"
+//#include "Vision/rcahoon/shared/cameraconstants.h"
 #include "Agent/RobotState.h"
 #include "Vision/VisionFeatures.h"
 #include "Vision/VisionObject/VisionObject.h"
@@ -38,6 +39,8 @@ static RGB colors[] = {
 	classes[B_Goal].color
 };
 
+int Color_Map[Y_SIZE][U_SIZE][V_SIZE];
+
 Vision::Vision(ConfigFile & configFile, Log & _log)
 	: imageWidth(configFile.getInt("vision/imageWidth")),
 	  rowStep(imageWidth/2),
@@ -54,7 +57,7 @@ Vision::Vision(ConfigFile & configFile, Log & _log)
 	//std::string colors    = configFile.getPath("vision/colorsPath");
 	//std::string threshold = configFile.getPath("vision/thresholdPath");
 	
-	printf("Size: %d bytes\n", sizeof(Vision) + sizeof(pixel_run)*imageWidth*processHeight/MIN_RUN_LENGTH + sizeof(int)*(processHeight+1));
+	//LOG_INFO("Vision Memory Usage: %d bytes\n", sizeof(Vision) + sizeof(pixel_run)*imageWidth*processHeight/MIN_RUN_LENGTH + sizeof(int)*(processHeight+1));
 	
 	initMap();
 
@@ -112,11 +115,12 @@ bool Vision::run(const RobotState & robotState,
 	startTime = log.getTimestamp();
 #endif
 	// Threshold the image
+	for(int i=0; i<300; i++)
 	computeRLE();
 #ifdef LOG_TRACE_ACTIVE
 	elapsed = log.getTimestamp() - startTime;
 #endif
-	LOG_TRACE("Thresholding took %d ms.", elapsed);
+	LOG_TRACE("Thresholding took %f ms.", elapsed*60.0f/300.0f);
 	
 	LOG_INFO("Found %d runs.", row_starts[processHeight]);
 
@@ -139,6 +143,8 @@ bool Vision::run(const RobotState & robotState,
 	elapsed = log.getTimestamp() - startTime;
 #endif
 	LOG_TRACE("Retrieving transformation matrix from RobotState took %d ms.", elapsed);
+
+	//printf("Head: %f %f\n", robotState.getHeadPan(), robotState.getHeadTilt());
 
 #ifdef LOG_TRACE_ACTIVE
 	startTime = log.getTimestamp();
@@ -164,6 +170,11 @@ bool Vision::run(const RobotState & robotState,
 	return false;
 }
 
+static inline int classify(pixel *p)
+{
+	return Color_Map[p->y>>(8-Y_BITS)][p->u>>(8-U_BITS)][p->v>>(8-V_BITS)];
+}
+
 void Vision::computeRLE()
 {
 	pixel* data = frame;
@@ -177,29 +188,43 @@ void Vision::computeRLE()
 		
 		row_starts[j] = k;
 		
-		for(int i=0; i < imageWidth; )
+		int i;
+		for(i=0; i < imageWidth; i+=RUNSTEP)
 		{
-			for(; (t == last) && (i < imageWidth); i+=RUNSTEP) {
-				pixel p = data[i/2];
-				t = Color_Map[p.y>>(8-Y_BITS)][p.u>>(8-U_BITS)][p.v>>(8-V_BITS)];
-				
-#ifdef LOG_SEGMENTEDIMAGE_ENABLED
-				labeled_image[i+j*imageWidth] = t;
-				labeled_image[i+j*imageWidth+1] = t;
-#endif
-			}
+			t = classify(&data[i/2]);
 			
-			if (last && (i-start > MIN_RUN_LENGTH))
+			if (t==last) continue;
+			
+			int end = (classify(&data[i/2-RUNSTEP/4])==last) ? i-RUNSTEP/2 : i-RUNSTEP;
+			
+			if (last && (end-start > MIN_RUN_LENGTH))
 			{
-				rle[k++].set(last, start-RUNSTEP, i-RUNSTEP, j);
-				//printf("%d: (%d,%d) - (%d,%d)\n", last, start, j, i, j);
+				rle[k++].set(last, start, end, j);
+				//printf("%d: (%d,%d) - (%d,%d)\n", last, start, j, end, j);
 			}
 			
-			start = i;
+			start = end;
 			last = t;
+		}
+		
+		if (last && (imageWidth-start > MIN_RUN_LENGTH))
+		{
+			rle[k++].set(last, start, imageWidth, j);
+			//printf("%d: (%d,%d) - (%d,%d)\n", last, start, j, imageWidth, j);
 		}
 	}
 	row_starts[processHeight] = k;
+
+#ifdef LOG_SEGMENTEDIMAGE_ENABLED
+	memset(labeled_image, 0, imageWidth*imageHeight);
+	for(int k=0; k < row_starts[processHeight]; k++)
+	{
+		int nextStart = rle[k].start+rle[k].y1*imageWidth;
+		int nextEnd = rle[k].end+rle[k].y1*imageWidth;
+		int nextColor = rle[k].ob_class;
+		memset(labeled_image+nextStart, nextColor, nextEnd-nextStart);
+	}
+#endif
 }
 
 void Vision::segmentImage()
@@ -239,12 +264,32 @@ void Vision::segmentImage()
 	}
 }
 
-Vector2D cameraToWorld(const HMatrix cameraBodyTransform, const Vector2D& cameraCoords)
+// camera pseudo-focal length
+#define HORZ_F  1.05f  // = tan(H_FOV)
+#define VERT_F  0.695f // = tan(V_FOV)
+#define H_SCALE 0.4f
+#define V_SCALE 0.6f
+// note: HORZ_F*H_SCALE = VERT_F*V_SCALE = 0.42
+
+Vector2D Vision::cameraToWorld(const HMatrix* cameraBodyTransform, const Vector2D& imageCoords)
 {
-	return cameraCoords;
+	Vector3D T = cameraBodyTransform->mulNew(Vector3D(0,0,0));
+	Vector3D cameraCoords = Vector3D(1.0f, -(imageCoords[0]/imageWidth-0.5f)*HORZ_F*H_SCALE,
+	                                       -(imageCoords[1]/imageHeight-0.5f)*VERT_F*V_SCALE);
+	//printf("Camera: %f,%f\n", cameraCoords[1], cameraCoords[2]/*+0.035f*/);
+	Vector3D ray = cameraBodyTransform->mulNew(cameraCoords) - T;
+	//ray.normalize(); printf("Object Heading: (%f %f %f)\n", ray[0], ray[1], ray[2]);
+	
+	HMatrix A_1;
+	A_1.set(0,2, -ray[0]/ray[2]);
+	A_1.set(1,2, -ray[1]/ray[2]);
+	
+	A_1.mul(T);
+
+	return Vector2D(A_1.get(0,0), A_1.get(1,0));
 }
 
-void Vision::findObjects(const HMatrix transform, VisionFeatures & outputVisionFeatures)
+void Vision::findObjects(const HMatrix* transform, VisionFeatures & outputVisionFeatures)
 {
 	for(int k = 0; k < row_starts[processHeight]; k++)
 	{
@@ -254,12 +299,13 @@ void Vision::findObjects(const HMatrix transform, VisionFeatures & outputVisionF
 		
 			float cen_x = rle[k].wcen_x/rle[k].area;
 			float cen_y = rle[k].wcen_y/rle[k].area;
+			Vector2D position = cameraToWorld(transform, Vector2D(cen_x, rle[k].y2));
 			
-			LOG_INFO("#%d %s: (%d,%d)-(%d,%d) c(%f,%f) a%d",
+			LOG_INFO("#%d %s: (%d,%d)-(%d,%d) @i(%f,%f) @w(%f,%f) a%d",
 				k, classes[rle[k].ob_class].name,
 				rle[k].x1, rle[k].y1, rle[k].x2, rle[k].y2,
-				cen_x, cen_y, rle[k].area);
-			LOG_SHAPE(Log::SegmentedImageScreen, Rectangle(Vector2D(rle[k].x1, rle[k].y1), Vector2D(rle[k].x2, rle[k].y2), 0x00FFFF, 1));
+				cen_x, cen_y, position[0], position[1], rle[k].area);
+			LOG_SHAPE(Log::OriginalImageScreen, Rectangle(Vector2D(rle[k].x1, rle[k].y1), Vector2D(rle[k].x2, rle[k].y2), 0x00FFFF, 1));
 			
 			switch(rle[k].ob_class)
 			{
@@ -274,7 +320,7 @@ void Vision::findObjects(const HMatrix transform, VisionFeatures & outputVisionF
 				obj = new VisionObject(log, VisionObject::Unknown);
 			}
 			
-			obj->setPosition(cameraToWorld(transform, Vector2D(cen_x, cen_y)));
+			obj->setPosition(position);
 			obj->setConfidence(rle[k].area);
 			obj->setBoundingBox(rle[k].x1, rle[k].y1, rle[k].x2, rle[k].y2);
 			

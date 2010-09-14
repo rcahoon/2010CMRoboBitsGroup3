@@ -24,7 +24,7 @@ struct pixel_run {
 	float wcen_x,wcen_y; // weighted centroid position (i.e. centroid position * area)
 	int area;            // occupied area in pixels
 	
-	pixel_run& set(short _ob_class, short _start, short _end, short _row)
+	void set(short _ob_class, short _start, short _end, short _row)
 	{
 		ob_class = _ob_class;
 		x1 = start = _start;
@@ -35,8 +35,6 @@ struct pixel_run {
 		wcen_y = area*_row;
 		rank = 0;
 		region = this;
-		
-		return *this;
 	}
 	
 	pixel_run& doUnion(pixel_run& r)

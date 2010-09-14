@@ -8,12 +8,13 @@
 #define V_BITS  6
 #define V_SIZE  64
 
-#define RUNSTEP  2
+#define RUNSTEP  4
 #define MIN_RUN_LENGTH  4
 
 #include "Vision/Vision.h"
 #include "Vision/rcahoon/vis_types.h"
 #include "Vision/SegmentedImage/SegmentedImage.h"
+#include "shared/Vector/Vector2D.h"
 
 class RobotState;
 class ConfigFile;
@@ -41,7 +42,8 @@ private:
 	void initMap();
 	void computeRLE();
 	void segmentImage();
-	void findObjects(const HMatrix transformationFromCamera, VisionFeatures & outputVisionFeatures);
+	void findObjects(const HMatrix* transformationFromCamera, VisionFeatures & outputVisionFeatures);
+	Vector2D cameraToWorld(const HMatrix* cameraBodyTransform, const Vector2D& imageCoords);
 
 	int imageWidth;
 	int rowStep;
@@ -52,8 +54,6 @@ private:
 
 	char* labeled_image;
 	SegmentedImage seg_img;
-
-	int Color_Map[Y_SIZE][U_SIZE][V_SIZE];
 
 	pixel_run *rle;
 	int *row_starts;
