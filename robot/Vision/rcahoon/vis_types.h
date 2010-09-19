@@ -73,9 +73,6 @@ struct pixel_run {
 };
 
 struct ColorClass {
-	// class name
-	const char* name;
-
 	// label color
 	RGB color;
 	
@@ -93,8 +90,10 @@ struct ColorClass {
 	// VisionObject Type
 	VisionObject::Type vobj;
 	
-	ColorClass(const char* _name, int _yl, int _yu, int _ul, int _uu, int _vl, int _vu, int _r, int _g, int _b, int _min_size, VisionObject::Type _vobj)
-		: name(_name), color(_r, _g, _b),
+	ColorClass() {}
+	
+	ColorClass(int _yl, int _yu, int _ul, int _uu, int _vl, int _vu, int _r, int _g, int _b, int _min_size, VisionObject::Type _vobj)
+		: color(_r, _g, _b),
 		  yl(_yl>>(8-Y_BITS)), yu(_yu>>(8-Y_BITS)),
 		  ul(_ul>>(8-U_BITS)), uu(_uu>>(8-U_BITS)),
 		  vl(_vl>>(8-V_BITS)), vu(_vu>>(8-V_BITS)),

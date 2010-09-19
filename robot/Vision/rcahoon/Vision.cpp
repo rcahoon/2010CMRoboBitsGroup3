@@ -15,64 +15,71 @@
 
 namespace RCahoon {
 
-#define NUM_CLASSES  4
-ColorClass classes[] = {
-	//        class name     threshold values     label color        parameters
-	//                    yl  yu  ul  uu  vl  vu  red grn blu  min size  VisionObject Type
-	ColorClass("Bkgnd",    0,256,  0,256,  0,256,   0,255,  0,   0,     VisionObject::Unknown),        // Background
-	ColorClass("Ball",    48,256, 80,136,166,256, 255,  0,  0,   8,     VisionObject::Ball),           // Ball
-	ColorClass("Y Goal",  64,128, 72,108,144,166, 255,255,  0, 400,     VisionObject::YellowGoalPost), // Yellow Goal
-	ColorClass("B Goal",  48,256,132,176, 72,166,   0,  0,255, 400,     VisionObject::BlueGoalPost)    // Blue Goal
-};
-
-static RGB colors[NUM_CLASSES];
-int Color_Map[Y_SIZE][U_SIZE][V_SIZE];
-
 Vision::Vision(ConfigFile & configFile, Log & _log)
 	: imageWidth(configFile.getInt("vision/imageWidth")),
 	  rowStep(imageWidth/2),
 	  imageHeight(configFile.getInt("vision/imageHeight")),
 	  processHeight(imageHeight-4),
 	  frame(NULL),
+	  num_classes(configFile.getInt("vision/numClasses")),
+	  classes(new ColorClass[num_classes]),
+	  colors(new RGB[num_classes]),
 	  labeled_image(new char[imageWidth*imageHeight+1]),
 	  seg_img(configFile),
 	  rle(new pixel_run[imageWidth*processHeight/MIN_RUN_LENGTH]),
 	  row_starts(new int[processHeight+1]()), // zero-initialized
 	  log(_log)
 {
-	// Retrieve constants from the config file
-	//std::string colors    = configFile.getPath("vision/colorsPath");
-	//std::string threshold = configFile.getPath("vision/thresholdPath");
+	//LOG_INFO("Vision Memory Usage: %d bytes\n", sizeof(Vision) + sizeof(ColorClass)*num_classes + size(RGB)*num_classes + sizeof(pixel_run)*imageWidth*processHeight/MIN_RUN_LENGTH + sizeof(int)*(processHeight+1));
 	
-	//LOG_INFO("Vision Memory Usage: %d bytes\n", sizeof(Vision) + sizeof(int)*Y_SIZE*U_SIZE*V_SIZE + sizeof(pixel_run)*imageWidth*processHeight/MIN_RUN_LENGTH + sizeof(int)*(processHeight+1));
-	
-	initMap();
+	initMap(configFile);
 
-	seg_img.setRGB(colors, NUM_CLASSES);
+	seg_img.setIndices(labeled_image);
+	seg_img.setRGB(colors, num_classes);
 }
 
-void Vision::initMap()
+void Vision::initMap(ConfigFile & configFile)
 {
+	for(int i=0; i < num_classes; i++)
+	{
+		std::string path = "vision/classes/"; path += (char)(i+'0');
+		classes[i] = ColorClass(
+			configFile.getInt(path + "/yl"),
+			configFile.getInt(path + "/yu"),
+			configFile.getInt(path + "/ul"),
+			configFile.getInt(path + "/uu"),
+			configFile.getInt(path + "/vl"),
+			configFile.getInt(path + "/vu"),
+			configFile.getInt(path + "/red"),
+			configFile.getInt(path + "/green"),
+			configFile.getInt(path + "/blue"),
+			configFile.getInt(path + "/minSize"),
+			(VisionObject::Type)configFile.getInt(path + "/type")
+		);
+		printf("%s  Type: %d   (%d,%d,%d)-(%d,%d,%d)  (%d,%d,%d)  %d\n", path.c_str(), classes[i].vobj, classes[i].yl, classes[i].ul, classes[i].vl, classes[i].yu,
+																	classes[i].uu, classes[i].vu, classes[i].color.getRed(), classes[i].color.getGreen(),
+																	classes[i].color.getBlue(), classes[i].min_size);
+		colors[i] = classes[i].color;
+	}
+
 	for(int y=0; y < Y_SIZE; y++)
 	for(int u=0; u < U_SIZE; u++)
 	for(int v=0; v < V_SIZE; v++)
 	{
-		for(int c=NUM_CLASSES-1; c >= 0; c--)
+		for(int c=0; c < num_classes; c++)
 		{
+			// last class defined will take precedence on overlapping ranges
 			if (classes[c].match(y,u,v))
 			{
 				Color_Map[y][u][v] = c;
-				break;
 			}
 		}
-	}
-	for(int i=0; i < NUM_CLASSES; i++)
-	{
-		colors[i] = classes[i].color;
 	}
 }
 
 Vision::~Vision() {
+	delete[] classes;
+	delete[] colors;
 	delete[] labeled_image;
 	delete[] rle;
 	delete[] row_starts;
@@ -167,7 +174,7 @@ bool Vision::run(const RobotState & robotState,
 	return false;
 }
 
-static inline int classify(pixel *p)
+inline int Vision::classify(pixel *p)
 {
 	return Color_Map[p->y>>(8-Y_BITS)][p->u>>(8-U_BITS)][p->v>>(8-V_BITS)];
 }
@@ -215,17 +222,6 @@ void Vision::computeRLE()
 		}
 	}
 	row_starts[processHeight] = k;
-
-#ifdef LOG_SEGMENTEDIMAGE_ENABLED
-	memset(labeled_image, 0, imageWidth*imageHeight);
-	for(int k=0; k < row_starts[processHeight]; k++)
-	{
-		int nextStart = rle[k].start+rle[k].y1*imageWidth;
-		int nextEnd = rle[k].end+rle[k].y1*imageWidth;
-		int nextColor = rle[k].ob_class;
-		memset(labeled_image+nextStart, nextColor, nextEnd-nextStart);
-	}
-#endif
 }
 
 void Vision::segmentImage()
@@ -287,6 +283,16 @@ Vector2D Vision::cameraToWorld(const HMatrix* cameraBodyTransform, const Vector2
 	return Vector2D(x, y);
 }
 
+static const char * object_name(VisionObject::Type typ) {
+	switch(typ)
+	{
+		case VisionObject::Ball: return "Ball";
+		case VisionObject::YellowGoalPost: return "B_GOAL";
+		case VisionObject::BlueGoalPost: return "Y_GOAL";
+		default: return "Unknown";
+	}
+}
+
 void Vision::findObjects(const HMatrix* transform, VisionFeatures & outputVisionFeatures)
 {
 	for(int k = 0; k < row_starts[processHeight]; k++)
@@ -300,7 +306,7 @@ void Vision::findObjects(const HMatrix* transform, VisionFeatures & outputVision
 			Vector2D position = cameraToWorld(transform, Vector2D(cen_x, rle[k].y2));
 			
 			LOG_INFO("#%d %s: (%d,%d)-(%d,%d) @i(%f,%f) @w(%f,%f) a%d",
-				k, classes[rle[k].ob_class].name,
+				k, object_name(classes[rle[k].ob_class].vobj),
 				rle[k].x1, rle[k].y1, rle[k].x2, rle[k].y2,
 				cen_x, cen_y, position[0], position[1], rle[k].area);
 			LOG_SHAPE(Log::OriginalImageScreen, Rectangle(Vector2D(rle[k].x1, rle[k].y1), Vector2D(rle[k].x2, rle[k].y2), 0x00FFFF, 1));
@@ -316,7 +322,15 @@ void Vision::findObjects(const HMatrix* transform, VisionFeatures & outputVision
 }
 
 const SegmentedImage & Vision::getSegmentedImage() {
-	seg_img.setIndices(labeled_image);
+	memset(labeled_image, 0, imageWidth*imageHeight);
+	for(int k=0; k < row_starts[processHeight]; k++)
+	{
+		int nextStart = rle[k].start+rle[k].y1*imageWidth;
+		int nextEnd = rle[k].end+rle[k].y1*imageWidth;
+		int nextColor = rle[k].ob_class;
+		memset(labeled_image+nextStart, nextColor, nextEnd-nextStart);
+	}
+	
 	return seg_img;
 }
 

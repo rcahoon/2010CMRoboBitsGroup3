@@ -39,11 +39,12 @@ public:
 private:
 	PREVENT_COPY_AND_ASSIGNMENT(Vision);
 
-	void initMap();
+	void initMap(ConfigFile & configFile);
 	void computeRLE();
 	void segmentImage();
 	void findObjects(const HMatrix* transformationFromCamera, VisionFeatures & outputVisionFeatures);
 	Vector2D cameraToWorld(const HMatrix* cameraBodyTransform, const Vector2D& imageCoords);
+	inline int classify(pixel *p);
 
 	int imageWidth;
 	int rowStep;
@@ -51,6 +52,11 @@ private:
 	int processHeight;
 
 	pixel* frame; // camera frame
+	
+	int num_classes;
+	ColorClass* classes;
+	RGB* colors;
+	int Color_Map[Y_SIZE][U_SIZE][V_SIZE];
 
 	char* labeled_image;
 	SegmentedImage seg_img;

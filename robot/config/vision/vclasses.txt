@@ -1,0 +1,54 @@
+vision/numClasses = 4
+
+# Unknown
+vision/classes/0/type = 0
+vision/classes/0/yl = 0
+vision/classes/0/yu = 256
+vision/classes/0/ul = 0
+vision/classes/0/uu = 256
+vision/classes/0/vl = 0
+vision/classes/0/vu = 256
+vision/classes/0/red = 0
+vision/classes/0/green = 255
+vision/classes/0/blue = 0
+vision/classes/0/minSize = 0
+
+# YellowGoalPost
+vision/classes/1/type = 3
+vision/classes/1/yl = 64
+vision/classes/1/yu = 128
+vision/classes/1/ul = 72
+vision/classes/1/uu = 108
+vision/classes/1/vl = 144
+vision/classes/1/vu = 128
+vision/classes/1/red = 255
+vision/classes/1/green = 255
+vision/classes/1/blue = 0
+vision/classes/1/minSize = 400
+
+# BlueGoalPost
+vision/classes/2/type = 2
+vision/classes/2/yl = 48
+vision/classes/2/yu = 256
+vision/classes/2/ul = 132
+vision/classes/2/uu = 176
+vision/classes/2/vl = 72
+vision/classes/2/vu = 256
+vision/classes/2/red = 0
+vision/classes/2/green = 0
+vision/classes/2/blue = 255
+vision/classes/2/minSize = 400
+
+# Ball
+vision/classes/3/type = 1
+vision/classes/3/yl = 48
+vision/classes/3/yu = 256
+vision/classes/3/ul = 80
+vision/classes/3/uu = 136
+vision/classes/3/vl = 166
+vision/classes/3/vu = 256
+vision/classes/3/red = 255
+vision/classes/3/green = 0
+vision/classes/3/blue = 0
+vision/classes/3/minSize = 8
+
