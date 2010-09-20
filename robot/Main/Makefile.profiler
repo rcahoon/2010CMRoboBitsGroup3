@@ -93,11 +93,11 @@ $(TARGET): $(OBJS_OUT) $(DEPENDS)
 	@mkdir ./bin
 	@echo "$(BLUE_COLOR)Linking ...$(NO_COLOR)"
 	@$(CXX) -o $@ $^ $(LFLAGS) $(LIBS)
-	@echo "$(CYAN_COLOR)===============================================$(NO_COLOR)"
+	@echo "$(CYAN_COLOR)==========================================================$(NO_COLOR)"
 	@echo -n "$(CYAN_COLOR)====== $(NO_COLOR)"
-	@echo -n "$(RED_COLOR)CMurfs Main Executable is Created $(NO_COLOR)"
+	@echo -n "$(RED_COLOR)CMurfs Main Executable (Profiler) is Created $(NO_COLOR)"
 	@echo "$(CYAN_COLOR)====== $(NO_COLOR)"
-	@echo "$(CYAN_COLOR)===============================================$(NO_COLOR)"
+	@echo "$(CYAN_COLOR)==========================================================$(NO_COLOR)"
 
 all: $(TARGET)
 

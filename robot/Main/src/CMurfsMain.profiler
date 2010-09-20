@@ -20,9 +20,6 @@
 
 #include "Log/LogSettings.h"
 
-#include "Vision/2009/cmvision/vision.h"
-
-
 //Shared memory related definitions
 SharedInformation* sharedInfo = (SharedInformation*) MAP_FAILED;
 sem_t* semaphore = SEM_FAILED;
@@ -142,7 +139,6 @@ int main( int argc, const char* argv[] )
 		tcsetattr(fd,TCSANOW,&tcflags);
 	}
 
-    
   // How many frames should we run?
   int maxFrames = 1000;
   int inputFrames = 0;

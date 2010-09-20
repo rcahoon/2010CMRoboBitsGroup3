@@ -20,9 +20,6 @@
 
 #include "Log/LogSettings.h"
 
-#include "Vision/2009/cmvision/vision.h"
-
-
 //Shared memory related definitions
 SharedInformation* sharedInfo = (SharedInformation*) MAP_FAILED;
 sem_t* semaphore = SEM_FAILED;
