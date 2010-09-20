@@ -125,9 +125,9 @@ public class Threshedit implements Runnable, MessageFromRobotListener {
       originalImage = new YUV422Image(bytes, IMAGE_WIDTH, IMAGE_HEIGHT);
       BufferedImage originalbufferedImage = originalImage.toBufferedImage();
       
-      imageCanvas.setOriginalImage(originalbufferedImage);
-      
       segmentImage();
+      
+      imageCanvas.setOriginalImage(originalbufferedImage);
     }
 //    else if (message instanceof SegmentedImageMessage) {
 //      SegmentedImageMessage segmentedImageMessage = (SegmentedImageMessage)message;
@@ -178,8 +178,7 @@ public class Threshedit implements Runnable, MessageFromRobotListener {
     
     try {
       SegmentedImage segmentedImage = new SegmentedImage(indices, IMAGE_WIDTH, IMAGE_HEIGHT, classes);
-      BufferedImage segmentedBufferedImage = segmentedImage.toBufferedImage();
-      imageCanvas.setSegmentedImage(segmentedBufferedImage);
+      imageCanvas.setSegmentedImage(segmentedImage.toBufferedImage());
     }
     catch (Exception e) {
     }
