@@ -3,6 +3,21 @@ ROBOT_DIR=../
 
 EXTENSION=.cpp
 
+NO_COLOR=\033[0m
+GREEN_COLOR=\033[32m
+BLUE_COLOR=\033[34m
+RED_COLOR=\033[31m
+YELLOW_COLOR=\033[33m
+MAGENTA_COLOR=\033[35m
+CYAN_COLOR=\033[36m
+
+#NO_COLOR='\e[0m'
+#GREEN_COLOR='\e[1;32m'
+#BLUE_COLOR='\e[1;34m'
+#RED_COLOR='\e[1;31m'
+#YELLOW_COLOR='\e[1;33m'
+#MAGENTA_COLOR='\e[1;35m'
+#CYAN_COLOR='\e[1;36m'
 
 SOURCES?=$(shell find ./src -type f \( -name *.cc -or -name *.cpp \) )  
 SOURCES+=$(shell find $(ROBOT_DIR)/shared -type f \( -name *.cc -or -name *.cpp \) )  
@@ -13,7 +28,7 @@ SOURCES+=$(shell find $(ROBOT_DIR)/Comm -type f \( -name *.cc -or -name *.cpp \)
 SOURCES+=$(shell find $(ROBOT_DIR)/GameController -type f \( -name *.cc -or -name *.cpp \) )  
 SOURCES+=$(shell find $(ROBOT_DIR)/Log -type f \( -name *.cc -or -name *.cpp \) )  
 SOURCES+=$(shell find $(ROBOT_DIR)/Localization -type f \( -name *.cc -or -name *.cpp \) )  
-SOURCES+=$(shell find $(ROBOT_DIR)/Motion -type f \( -name *.cc -or -name *.cpp \) )  
+SOURCES+=$(shell find $(ROBOT_DIR)/Motion/MotionLib -type f \( -name *.cc -or -name *.cpp \) )  
 SOURCES+=$(shell find $(ROBOT_DIR)/Vision -type f \( -name *.cc -or -name *.cpp \) )  
 SOURCES+=$(shell find $(ROBOT_DIR)/WorldModel -type f \( -name *.cc -or -name *.cpp \) )  
 
@@ -22,11 +37,12 @@ SRCS=$(patsubst $(ROBOT_DIR)/%, %, $(SOURCES) )
 HEADERS?=$(shell find ./src -type f -name *.h )
 HEADERS+=$(shell find ../ -type f -name *.h )
 
-CFLAGS= --sysroot $(CTC_DIR)/staging/geode-linux/ -Wall -g -fPIC -march=geode
+CFLAGS= --sysroot $(CTC_DIR)/staging/geode-linux/ -Wall -g -fPIC -march=geode -O3 -fprefetch-loop-arrays -funroll-loops -pg
+#CFLAGS= --sysroot $(CTC_DIR)/staging/geode-linux/ -Wall -g -fPIC -march=geode -O3
 
 LFLAGS=--sysroot $(CTC_DIR)/staging/geode-linux/ \
 	-lgcc -L$(CTC_DIR)/cross/geode/i586-linux/lib/ -lc -lstdc++ -ldl -lrt\
-	-Wl,--sysroot $(CTC_DIR)/staging/geode-linux/
+	-Wl,--sysroot $(CTC_DIR)/staging/geode-linux/ -pg
 
 
 INCLUDES=  \
@@ -59,29 +75,55 @@ CXX=${CTC_DIR}/cross/geode/bin/i586-linux-g++
 OBJS = $(patsubst %$(EXTENSION),%.o,$(filter %$(EXTENSION),$(SRCS)))
 OBJS_OUT = $(addprefix build/, $(OBJS))
 
-build/%.o: %$(EXTENSION) $(HEADERS) $(DEPENDS)
+DEPS = $(patsubst %$(EXTENSION),%.d,$(filter %$(EXTENSION),$(SRCS)))
+DEPS_OUT = $(addprefix build/, $(DEPS))
+
+build/%.o: %$(EXTENSION) $(DEPENDS)
 	@mkdir -p $(dir $@)
-	$(CXX) $(CFLAGS) $(INCLUDES) -o $@ -c $< $(DEFINES)
+	@echo "$(BLUE_COLOR)Compiling: $(GREEN_COLOR)$(patsubst build/%.o,%$(EXTENSION),$@)$(NO_COLOR)"
+	@$(CXX) -MD $(CFLAGS) $(INCLUDES) -c -o $@ $< $(DEFINES)
+	@sed -i 's,\(build/$*\.o\)[ :]*\(.*\),$@ : $$\(wildcard \2\)\n\1 : \2,g' build/$*.d
 
 DEPENDS=
 
 TARGET=bin/cmurfs
 
 $(TARGET): $(OBJS_OUT) $(DEPENDS)
-	rm -rf ./bin
-	mkdir ./bin
-	$(CXX) -o $@ $^ $(LFLAGS) $(LIBS)
-	@echo ===============================================
-	@echo ====== CMurfs Main Executable is Created ======
-	@echo ===============================================
+	@rm -rf ./bin
+	@mkdir ./bin
+	@echo "$(BLUE_COLOR)Linking ...$(NO_COLOR)"
+	@$(CXX) -o $@ $^ $(LFLAGS) $(LIBS)
+	@echo "$(CYAN_COLOR)===============================================$(NO_COLOR)"
+	@echo -n "$(CYAN_COLOR)====== $(NO_COLOR)"
+	@echo -n "$(RED_COLOR)CMurfs Main Executable is Created $(NO_COLOR)"
+	@echo "$(CYAN_COLOR)====== $(NO_COLOR)"
+	@echo "$(CYAN_COLOR)===============================================$(NO_COLOR)"
 
 all: $(TARGET)
 
 clean:
-	rm -f $(OBJS_OUT)
-	rm -rf ./bin
-	rm -rf ./build
-	rm -f $(TARGET)
+	@echo "$(BLUE_COLOR)Cleaning up build/ and bin/ ...$(NO_COLOR)"
+	@rm -rf ./bin
+	@rm -rf ./build
 
 install: $(TARGET)
-	scp $(TARGET) nao@$(NAO_IP):/home/nao/
+	@echo "Copying $(BLUE_COLOR)$(TARGET) $(NO_COLOR)to $(RED_COLOR)$(NAO_IP)$(NO_COLOR)" 
+	@scp $(TARGET) nao@$(NAO_IP):/home/nao/
+
+artemis: $(TARGET)
+	@echo "Copying $(BLUE_COLOR)$(TARGET) $(NO_COLOR)to $(RED_COLOR)artemis$(NO_COLOR)" 
+	@scp $(TARGET) nao@artemis:/home/nao/
+
+apollo: $(TARGET)
+	@echo "Copying $(BLUE_COLOR)$(TARGET) $(NO_COLOR)to $(RED_COLOR)apollo$(NO_COLOR)" 
+	@scp $(TARGET) nao@apollo:/home/nao/
+
+ares: $(TARGET)
+	@echo "Copying $(BLUE_COLOR)$(TARGET) $(NO_COLOR)to $(RED_COLOR)ares$(NO_COLOR)" 
+	@scp $(TARGET) nao@ares:/home/nao/
+
+athena: $(TARGET)
+	@echo "Copying $(BLUE_COLOR)$(TARGET) $(NO_COLOR)to $(RED_COLOR)athena$(NO_COLOR)" 
+	@scp $(TARGET) nao@athena:/home/nao/
+
+-include $(DEPS_OUT)

@@ -1,0 +1,241 @@
+#include <iostream>
+#include <sstream>
+#include <fstream>
+#include <sys/types.h>
+#include <sys/mman.h>
+#include <sys/file.h>
+#include <fcntl.h>
+#include <semaphore.h>
+#include <unistd.h>
+#include <termios.h>
+
+#include "../../Agent/SharedInformation.h"
+#include "../../Agent/Agent.h"
+#include "NaoV4L.h"
+#include <Log/Log.h>
+#include <shared/ConfigFile/ConfigFile.h>
+#include <Factory/Factory.h>
+
+#define COMPONENT MAIN_MODULE
+
+#include "Log/LogSettings.h"
+
+#include "Vision/2009/cmvision/vision.h"
+
+
+//Shared memory related definitions
+SharedInformation* sharedInfo = (SharedInformation*) MAP_FAILED;
+sem_t* semaphore = SEM_FAILED;
+int fdShm = -1;
+pid_t pid;
+
+//static unsigned char image[153600];
+
+void deinitialize()
+{
+    if ( sharedInfo != MAP_FAILED )
+    {
+        munmap( sharedInfo, sizeof(SharedInformation) );
+        sharedInfo = (SharedInformation*) MAP_FAILED;
+    }
+
+    if ( fdShm != -1 )
+    {
+        close(fdShm);
+        fdShm = -1;
+    }
+
+    if ( semaphore != SEM_FAILED )
+    {
+        sem_close(semaphore);
+        semaphore = SEM_FAILED;
+    }
+
+
+}
+
+bool initializeSharedMem(Log& log)
+{
+    fdShm = shm_open( SHAREDMEMORYNAME, O_CREAT | O_RDWR, S_IRUSR | S_IWUSR );
+    if( fdShm == -1 )
+    {
+        LOG_ERROR("CMurfsMain::initialize() - The file descriptor for the shared memory could not be opened.\n");
+        deinitialize();
+        return false;
+    }
+
+    if ( ftruncate( fdShm, sizeof(SharedInformation) ) == -1 )
+    {
+        LOG_ERROR("CMurfsMain::initialize() - The size of the shared memory file descriptor is invalid.\n");
+        deinitialize();
+        return false;
+    }
+    
+    //sharedInfo = (SharedInformation*) mmap(NULL, sizeof(SharedInformation), PROT_READ | PROT_WRITE, MAP_SHARED, fdShm, 0);
+    void* temp =  mmap(NULL, sizeof(SharedInformation), PROT_READ | PROT_WRITE, MAP_SHARED, fdShm, 0);
+    sharedInfo = new(temp) SharedInformation();
+    if ( sharedInfo == MAP_FAILED )
+    {
+        LOG_ERROR("CMurfsMain::initialize() - mmap() failed.\n");
+        deinitialize();
+        return false;
+    }
+//    memset(sharedInfo, 0, sizeof(SharedInformation));
+
+    semaphore = sem_open(SEMAPHORENAME, O_CREAT | O_RDWR, S_IRUSR | S_IWUSR, 0 );
+    if ( semaphore == SEM_FAILED )
+    {
+        LOG_ERROR("CMurfsMain::initialize() - The semaphore could not be created.\n");
+        deinitialize();
+        return false;
+    }
+    sem_init(semaphore,0,1);
+
+    return true;
+}
+
+
+
+int main( int argc, const char* argv[] )
+{
+    bool runAsDaemon = false;
+
+    int fd = open("/tmp/cmurfs", O_CREAT, 0600);
+    if ( fd == -1 || flock(fd, LOCK_EX | LOCK_NB) == -1 )
+    {
+        std::cout << "Another instance of CMurfs is running. Kill that process before starting a new one." << std::endl;
+        exit(EXIT_FAILURE);
+    }
+
+
+
+    for ( int i = 1; i < argc; i++ )
+    {
+        if ( !strcmp(argv[i], "-d") )
+        {
+            runAsDaemon = true;
+        }
+    }
+
+    if (runAsDaemon)
+    {
+        std::cout << "CMurfsMain::main() - Starting as a daemon process..." << std::endl;
+        pid = fork();
+        if ( pid == -1 )
+        {
+            exit(EXIT_FAILURE);
+        }
+        if ( pid != 0 )
+        {
+            exit(EXIT_SUCCESS);
+        }
+    }
+	else
+	{
+		// this lets us read from stdin before linebreaks, used for remote control
+		const int fd = fileno(stdin);
+		const int fcflags = fcntl(fd,F_GETFL);
+		fcntl(fd,F_SETFL,fcflags | O_NONBLOCK);
+		termios tcflags;
+		tcgetattr(fd,&tcflags);
+		tcflags.c_lflag &= ~ICANON; // set raw mode (unset canonical modes)
+		tcsetattr(fd,TCSANOW,&tcflags);
+	}
+
+    
+  // How many frames should we run?
+  int maxFrames = 1000;
+  int inputFrames = 0;
+  if ((argc > 1) && (sscanf(argv[1], "%d", &inputFrames) == 1)) {
+    if (inputFrames > 0) {
+      maxFrames = inputFrames;
+    }
+  }
+  else {
+    printf("Usage: %s [number of frames]\n", argv[0]);
+    exit(0);
+  }
+
+  printf("------------------------\n");
+  printf("- CMurfs Profiler Mode -\n");
+  printf("------------------------\n");
+  printf("Running for %d frames.\n", maxFrames);
+
+    RobotState state;
+    //Command command;
+    Agent agent;
+
+
+    NaoV4L camera;
+    Log & log = Factory::getDefaultFactory().getLog();
+
+    initializeSharedMem(log);
+    camera.initialize();
+    sharedInfo->state.setRawImageSize(camera.getImageSize());
+    HMatrix id;
+    id.identity();
+    sharedInfo->state.setTransformationFromCamera(id);
+
+    bool camselect = false;
+    
+    for (int count = 0; count < maxFrames; count++)
+    {
+        if ( semaphore != SEM_FAILED )
+        {
+            sem_trywait(semaphore);
+            //read sensors
+            
+            memcpy(&state,&(sharedInfo->state),sizeof(RobotState));
+            state.setTransformationFromCamera( (HMatrix&)sharedInfo->state.getTransformationFromCamera() );
+            sharedInfo->lastPosition = sharedInfo->currPosition; //set the last read odometry value
+            sem_post(semaphore);
+            
+            //grab a new frame
+
+//            unsigned long t1 = log.getTimestamp();
+            state.setRawImage( (const char*) camera.getImage() );
+//            unsigned long t2 =  log.getTimestamp();
+            //std::cout << "getImage took " << t2 - t1 << " milliseconds" << std::endl;
+            
+            // Set the timestamp
+            state.setTimestamp(log.getTimestamp());
+
+            
+            const Command& command = agent.run( state );
+            //Command command; 
+//            unsigned long t3 = log.getTimestamp();
+//            std::cout << "CMurfs loop took " << t3 - t2 << " milliseconds" << std::endl
+//                      << "Overall loop took " << t3 - t1 << " milliseconds" << std::endl
+//                      << "********************************************" << std::endl;
+            
+           // ((MotionCommand&)command.getMotionCommand()).walk(1,0,0);
+            
+            // Should we switch cameras?
+           
+            
+            bool shouldUseBottomCamera = command.shouldUseBottomCamera();
+            if (camselect != shouldUseBottomCamera) {
+              camselect = shouldUseBottomCamera;
+              camera.setCamera(camselect);
+            }
+            
+            
+
+            unsigned long currTime = log.getTimestamp();
+            sem_trywait(semaphore);
+            //write actuation
+            sharedInfo->state.setCameraInUse(camselect);
+            memcpy(&(sharedInfo->command), &command, sizeof(Command));
+            sharedInfo->lastUpdateTime = currTime;
+            sem_post(semaphore);
+        }
+        usleep(1000);
+
+        printf("Frame %d\n", count);
+    }
+    return 0;
+}
+
+
+
+
