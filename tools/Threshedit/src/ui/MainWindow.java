@@ -1,6 +1,8 @@
 package ui;
 
 import config.*;
+import image.*;
+import image.format.*;
 
 import java.awt.*;
 import javax.swing.*;
@@ -35,7 +37,7 @@ public class MainWindow extends JFrame {
     colorComboBox.setEditable(false);
     colorComboBox.setFocusable(false);
     colorComboBox.addActionListener(new ActionListener() {
-	    public void actionPerformed(ActionEvent e) {
+      public void actionPerformed(ActionEvent e) {
         JComboBox comboBox = (JComboBox)e.getSource();
         int value = comboBox.getSelectedIndex();
         threshedit.setCurrentClass(value);
@@ -111,6 +113,25 @@ public class MainWindow extends JFrame {
     threshBars[5].setUnitIncrement(1 << (8 - visionConfig.getInt("vision/thresholdVBits", 0)));
     
     updateThreshBars();
+    
+    final JLabel pointColorLabel = new JLabel("Y:  U:  V:  ");
+    threshPanel.add(pointColorLabel);
+    imageScreen.addMouseMotionListener(new MouseMotionAdapter() {
+      public void mouseMoved(MouseEvent e) {
+        Point p = imageScreen.componentToImage(e.getPoint());
+        if (p.getX() >= 0)
+        {
+          YUVImage image = threshedit.getOriginalImage();
+          if (image==null) return;
+          YUV color = image.getYUV((int)p.getX(), (int)p.getY());
+          pointColorLabel.setText("Y:" + color.getY() + "  U:" + color.getU() + "  V:" + color.getV());
+        }
+        else
+        {
+          pointColorLabel.setText("Y:  U:  V:  ");
+        }
+      }
+    });
 
     // Add all the ui components
     getContentPane().setLayout(new BorderLayout());

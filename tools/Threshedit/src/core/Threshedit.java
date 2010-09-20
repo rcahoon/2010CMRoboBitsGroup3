@@ -91,12 +91,10 @@ public class Threshedit implements Runnable, MessageFromRobotListener {
           System.out.println("Connected to robot at " + robotHost + ".");
         }
       }
-      if (robotConnector.isConnected()) {
-        try {
-          Thread.sleep(RECONNECT_SLEEP_TIME);
-        }
-        catch (Exception e) {
-        }
+      try {
+        Thread.sleep(RECONNECT_SLEEP_TIME);
+      }
+      catch (Exception e) {
       }
     }
   }
@@ -156,9 +154,16 @@ public class Threshedit implements Runnable, MessageFromRobotListener {
     classes[currentClass].ul = ul;
     classes[currentClass].uu = uu;
     classes[currentClass].vl = vl;
-    classes[currentClass].vu = yu;
+    classes[currentClass].vu = vu;
+    
+   	System.out.println(yl + " " + yu + " " + ul + " " + uu + " " + vl + " " + vu);
     
     segmentImage();
+  }
+  
+  public YUVImage getOriginalImage()
+  {
+    return originalImage;
   }
   
   public void segmentImage() {
@@ -191,7 +196,7 @@ public class Threshedit implements Runnable, MessageFromRobotListener {
       fw.write("\n");
       for(ColorClass cc : classes)
         cc.save(fw);
-      JOptionPane.showMessageDialog(null, "Color class data saved", "Save successful", JOptionPane.INFORMATION_MESSAGE);
+      JOptionPane.showMessageDialog(imageCanvas, "Color class data saved", "Save successful", JOptionPane.INFORMATION_MESSAGE);
     } catch (java.io.IOException e) {
       e.printStackTrace();
     }

@@ -38,6 +38,15 @@ public class ImageCanvas extends JPanel {
     repaint();
   }
   
+  public Point componentToImage(Point p)
+  {
+    float r = Math.min(getWidth() / (float)width, getHeight() / (float)height);
+    int x = (int)(p.getX() / r);
+    int y = (int)(p.getY() / r);
+    if ((x > width) || (y > height)) return new Point(-1,-1);
+    return new Point(x, y);
+  }
+  
   protected void paintComponent(Graphics g)
   {
     Graphics2D graphics = (Graphics2D)g;
