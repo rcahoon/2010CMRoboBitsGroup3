@@ -1,4 +1,5 @@
 vision/numClasses = 5
+vision/thresholdFile = vision/threshold
 
 # Unknown
 vision/classes/0/type = 0
@@ -58,7 +59,7 @@ vision/classes/4/yl = 48
 vision/classes/4/yu = 256
 vision/classes/4/ul = 80
 vision/classes/4/uu = 136
-vision/classes/4/vl = 160
+vision/classes/4/vl = 166
 vision/classes/4/vu = 256
 vision/classes/4/red = 255
 vision/classes/4/green = 0

@@ -61,8 +61,20 @@ void Vision::initMap(ConfigFile & configFile)
 																	classes[i].color.getBlue(), classes[i].min_size);
 		colors[i] = classes[i].color;
 	}
+	
+	std::string tFile = configFile.getPath("vision/thresholdFile");
+	FILE* fid = fopen(tFile.c_str(), "rb");
+	if (fread(Color_Map, sizeof(uchar), Y_SIZE*U_SIZE*V_SIZE, fid) < Y_SIZE*U_SIZE*V_SIZE)
+	{
+		LOG_ERROR("Threshold file is wrong size.");
+	}
+	else
+	{
+		LOG_INFO("Threshold file loaded");
+	}
+	fclose(fid);
 
-	for(int y=0; y < Y_SIZE; y++)
+	/*for(int y=0; y < Y_SIZE; y++)
 	for(int u=0; u < U_SIZE; u++)
 	for(int v=0; v < V_SIZE; v++)
 	{
@@ -71,10 +83,10 @@ void Vision::initMap(ConfigFile & configFile)
 			// last class defined will take precedence on overlapping ranges
 			if (classes[c].match(y,u,v))
 			{
-				Color_Map[y][u][v] = c;
+				Color_Map[(y<<(U_BITS+V_BITS)) | (u<<V_BITS) | v] = c;
 			}
 		}
-	}
+	}*/
 }
 
 Vision::~Vision() {
@@ -100,14 +112,7 @@ bool Vision::run(const RobotState & robotState,
 #ifdef LOG_TRACE_ACTIVE
 	unsigned long startTime;
 	unsigned long elapsed;
-	static long lastTime = log.getTimestamp();
-	static float frameTime = 30.0f;
-	
-	startTime = log.getTimestamp();
-	frameTime = 0.1f*(startTime - lastTime) + 0.9f*frameTime;
-	lastTime = startTime;
 #endif
-	LOG_TRACE("Framerate: %f", 1000/(frameTime+0.1f));
 
 	LOG_TRACE("Vision run started.");
 	
@@ -176,7 +181,7 @@ bool Vision::run(const RobotState & robotState,
 
 inline int Vision::classify(pixel *p)
 {
-	return Color_Map[p->y>>(8-Y_BITS)][p->u>>(8-U_BITS)][p->v>>(8-V_BITS)];
+	return Color_Map[( p->y>>(8-Y_BITS)<<(U_BITS+V_BITS) ) | ( p->u>>(8-U_BITS)<<V_BITS ) | ( p->v>>(8-V_BITS) )];
 }
 
 void Vision::computeRLE()
@@ -192,8 +197,7 @@ void Vision::computeRLE()
 		
 		row_starts[j] = k;
 		
-		int i;
-		for(i=0; i < imageWidth; i+=RUNSTEP)
+		for(int i=0; i < imageWidth; i+=RUNSTEP)
 		{
 			t = classify(&data[i/2]);
 			
@@ -305,11 +309,14 @@ void Vision::findObjects(const HMatrix* transform, VisionFeatures & outputVision
 			float cen_y = rle[k].wcen_y/rle[k].area;
 			Vector2D position = cameraToWorld(transform, Vector2D(cen_x, rle[k].y2));
 			
-			LOG_INFO("#%d %s: (%d,%d)-(%d,%d) @i(%f,%f) @w(%f,%f) a%d",
-				k, object_name(classes[rle[k].ob_class].vobj),
-				rle[k].x1, rle[k].y1, rle[k].x2, rle[k].y2,
-				cen_x, cen_y, position[0], position[1], rle[k].area);
-			LOG_SHAPE(Log::OriginalImageScreen, Rectangle(Vector2D(rle[k].x1, rle[k].y1), Vector2D(rle[k].x2, rle[k].y2), 0x00FFFF, 1));
+			if (classes[rle[k].ob_class].vobj != VisionObject::Line)
+			{
+				LOG_INFO("#%d %s: (%d,%d)-(%d,%d) @i(%f,%f) @w(%f,%f) a%d",
+					k, object_name(classes[rle[k].ob_class].vobj),
+					rle[k].x1, rle[k].y1, rle[k].x2, rle[k].y2,
+					cen_x, cen_y, position[0], position[1], rle[k].area);
+				LOG_SHAPE(Log::OriginalImageScreen, Rectangle(Vector2D(rle[k].x1, rle[k].y1), Vector2D(rle[k].x2, rle[k].y2), 0x00FFFF, 1));
+			}
 			
 			obj = new VisionObject(log, classes[rle[k].ob_class].vobj);
 			obj->setPosition(position);
@@ -322,7 +329,7 @@ void Vision::findObjects(const HMatrix* transform, VisionFeatures & outputVision
 }
 
 const SegmentedImage & Vision::getSegmentedImage() {
-	memset(labeled_image, 0, imageWidth*imageHeight);
+	memset(labeled_image, 0, imageWidth*imageHeight+1);
 	for(int k=0; k < row_starts[processHeight]; k++)
 	{
 		int nextStart = rle[k].start+rle[k].y1*imageWidth;

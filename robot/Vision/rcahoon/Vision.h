@@ -2,11 +2,11 @@
 #define RCAHOON_VISION_H_
 
 #define Y_BITS  4
-#define Y_SIZE  16
+#define Y_SIZE  (1<<Y_BITS)
 #define U_BITS  6
-#define U_SIZE  64
+#define U_SIZE  (1<<U_BITS)
 #define V_BITS  6
-#define V_SIZE  64
+#define V_SIZE  (1<<V_BITS)
 
 #define RUNSTEP  4
 #define MIN_RUN_LENGTH  4
@@ -56,7 +56,7 @@ private:
 	int num_classes;
 	ColorClass* classes;
 	RGB* colors;
-	int Color_Map[Y_SIZE][U_SIZE][V_SIZE];
+	uchar Color_Map[Y_SIZE*U_SIZE*V_SIZE];
 
 	char* labeled_image;
 	SegmentedImage seg_img;

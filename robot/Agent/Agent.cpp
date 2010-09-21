@@ -13,7 +13,7 @@
 #include "shared/Field/Field.h"
 
 #define COMPONENT AGENT
-//#define CLASS_LOG_LEVEL LOG_LEVEL_INFO
+#define CLASS_LOG_LEVEL LOG_LEVEL_INFO
 #include "Log/LogSettings.h"
 
 Agent::Agent()
