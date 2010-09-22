@@ -160,6 +160,11 @@ void CommRemote::runThread() {
 
     int result = select(maxSocket, &sockets, NULL, NULL, &timeout);
     if (result < 0) {
+      if (errno == EINTR) {
+//        printf("EINTR caught in select()\n.");
+        usleep((int)(socketTimeout * 1000000));
+        continue;
+      }
       LOG_ERROR("Error reading from sockets using select().")
       threadRunning = false;
       break;
@@ -178,7 +183,7 @@ void CommRemote::runThread() {
         LOG_INFO("Client ended the connection.");
       }
       // Error reading from the socket
-      else if ((numRead == -1) && (errno != EAGAIN)) {
+      else if ((numRead == -1) && (errno != EAGAIN) && (errno != EINTR)) {
         closeConnection = true;
         LOG_INFO("Error reading from client socket.");
       }
@@ -233,7 +238,12 @@ void CommRemote::runThread() {
                                    (struct sockaddr *)&from,
                                    (socklen_t *)&fromLength);
       if (newClientSocket == -1) {
-        LOG_ERROR("Error accepting client.")
+        if (errno == EINTR) {
+          LOG_INFO("Caught EINTR while accepting client connection.");
+        }
+        else {
+          LOG_ERROR("Error accepting client.")
+        }
       }
       // New client connected
       else {
@@ -389,7 +399,7 @@ bool CommRemote::sendDataToClient(unsigned char const *data, int size) {
 
   while (size > 0) {
     numWritten = send(clientSocket, data, size, MSG_DONTWAIT);
-    if ((numWritten < 0) && (errno != EAGAIN)) {
+    if ((numWritten < 0) && (errno != EAGAIN) && (errno != EINTR)) {
 //      LOG_ERROR("Error = %d", errno);
 //      LOG_ERROR("%d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d",
 //                EACCES, EAGAIN,   EWOULDBLOCK, EBADF,      ECONNRESET, EDESTADDRREQ,
