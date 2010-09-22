@@ -2,19 +2,11 @@
 #define RCAHOON_VISION_H_
 
 #define Y_BITS  4
-#define Y_SIZE  16
-// >>(8-Y_BITS)<<(U_BITS+V_BITS) = 8 - 4 + 6 + 6 = 16
-#define Y_SHIFT 16
-#define Y_MASK  0xf0
 #define U_BITS  6
-#define U_SIZE  64
-// >>(8-U_BITS)<<V_BITS = 8-6+6 = 8
-#define U_SHIFT 8
-#define U_MASK  0xfc
 #define V_BITS  6
-#define V_SIZE  64
-// >>(8-V_BITS)
-#define V_SHIFT 2
+#define Y_SIZE  (1<<Y_BITS)
+#define U_SIZE  (1<<U_BITS)
+#define V_SIZE  (1<<V_BITS)
 
 #define RUNSTEP  4
 #define MIN_RUN_LENGTH  4

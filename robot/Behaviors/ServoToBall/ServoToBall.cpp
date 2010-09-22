@@ -22,7 +22,7 @@ ServoToBall::~ServoToBall() {
 
 #define IMAGE_PAN_SCALE   -0.002f
 #define IMAGE_TILT_SCALE  0.002f
-#define TURN_PAN_SCALE   -1.0f
+#define TURN_PAN_SCALE   1.0f
 
 bool ServoToBall::run(BEHAVIOR_PARAMS) {
 
@@ -55,8 +55,16 @@ bool ServoToBall::run(BEHAVIOR_PARAMS) {
     if (fabs(robotState.getHeadPan()) > 5)
     {
       command.getMotionCommand().walk(0,0, TURN_PAN_SCALE*robotState.getHeadPan());
-      command.getLEDCommand().setLeftEye(0x0000ff);
-      command.getLEDCommand().setRightEye(0x0000ff);
+      if (robotState.getHeadPan() > 0)
+      {
+	    command.getLEDCommand().setLeftEye(0x0000ff);
+	    command.getLEDCommand().setRightEye(0x000000);
+	  }
+	  else
+	  {
+	    command.getLEDCommand().setLeftEye(0x000000);
+        command.getLEDCommand().setRightEye(0x0000ff);
+      }
     }
     else
     {

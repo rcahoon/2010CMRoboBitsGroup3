@@ -43,7 +43,7 @@ public class ImageCanvas extends JPanel {
     float r = Math.min(getWidth() / (float)width, getHeight() / (float)height);
     int x = (int)(p.getX() / r);
     int y = (int)(p.getY() / r);
-    if ((x > width) || (y > height)) return new Point(-1,-1);
+    if ((x > width-1) || (y > height-1)) return new Point(-1,-1);
     return new Point(x, y);
   }
   

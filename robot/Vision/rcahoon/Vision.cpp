@@ -62,10 +62,16 @@ void Vision::initMap(ConfigFile & configFile)
 		colors[i] = classes[i].color;
 	}
 	
-	uchar tempMap[Y_SIZE*U_SIZE*V_SIZE];
+	if (configFile.getInt("vision/thresholdYBits")!=Y_BITS ||
+	    configFile.getInt("vision/thresholdUBits")!=U_BITS ||
+	    configFile.getInt("vision/thresholdVBits")!=V_BITS )
+	{
+		LOG_ERROR("Threshold bitsize mismatch");
+	}
+	
 	std::string tFile = configFile.getPath("vision/thresholdFile");
 	FILE* fid = fopen(tFile.c_str(), "rb");
-	if (fread(tempMap, sizeof(uchar), Y_SIZE*U_SIZE*V_SIZE, fid) < Y_SIZE*U_SIZE*V_SIZE)
+	if (fread(Color_Map, sizeof(uchar), Y_SIZE*U_SIZE*V_SIZE, fid) < Y_SIZE*U_SIZE*V_SIZE)
 	{
 		LOG_ERROR("Threshold file is wrong size.");
 	}
@@ -74,22 +80,6 @@ void Vision::initMap(ConfigFile & configFile)
 		LOG_INFO("Threshold file loaded");
 	}
 	fclose(fid);
-
-	for(int y=0; y < Y_SIZE; y++)
-	for(int u=0; u < U_SIZE; u++)
-	for(int v=0; v < V_SIZE; v++)
-	{
-		for(int c=0; c < num_classes; c++)
-		{
-			// last class defined will take precedence on overlapping ranges
-			/*if (classes[c].match(y,u,v))
-			{
-				//Color_Map[(y<<(U_BITS+V_BITS)) | (u<<V_BITS) | v] = (uchar)c;
-				Color_Map[y][u][v] = (uchar)c;
-			}*/
-			Color_Map[y][u][v] = tempMap[(y<<(U_BITS+V_BITS)) | (u<<V_BITS) | v];
-		}
-	}
 }
 
 Vision::~Vision() {
@@ -184,7 +174,6 @@ bool Vision::run(const RobotState & robotState,
 
 inline int Vision::classify(pixel *p)
 {
-	//return Color_Map[( (p->y & Y_MASK) << Y_SHIFT ) | ( (p->u & U_MASK) << U_SHIFT ) | ( p->v >> V_SHIFT )];
 	return Color_Map[p->y>>(8-Y_BITS)][p->u>>(8-U_BITS)][p->v>>(8-V_BITS)];
 }
 
@@ -195,7 +184,6 @@ void Vision::computeRLE()
 	int k = 0;
 	for(int j=0; j < processHeight; j++, data += rowStep)
 	{
-		int t = 0;
 		int last = 0;
 		int start = 0;
 		
@@ -203,7 +191,7 @@ void Vision::computeRLE()
 		
 		for(int i=0; i < imageWidth; i+=RUNSTEP)
 		{
-			t = classify(&data[i/2]);
+			int t = classify(&data[i/2]);
 			
 			if (t==last) continue;
 			
@@ -219,7 +207,7 @@ void Vision::computeRLE()
 				//printf("%d: (%d,%d) - (%d,%d)\n", last, start, j, end, j);
 			}
 			
-			start = end;
+			start = end+2;
 			last = t;
 		}
 		
@@ -276,19 +264,30 @@ void Vision::segmentImage()
 #define V_SCALE 0.6f
 // note: HORZ_F*H_SCALE = VERT_F*V_SCALE = 0.42
 
+static Vector3D rotMul(const HMatrix* mat, const Vector3D& vec)
+{
+	Vector3D res(0.0f,0.0f,0.0f);
+	for(int i=0; i < 3; i++)
+		for(int j=0; j < 3; j++)
+			res[i] += mat->get(i,j)*vec[j];
+	return res;
+}
+
 Vector2D Vision::cameraToWorld(const HMatrix* cameraBodyTransform, const Vector2D& imageCoords)
 {
-	Vector3D T (cameraBodyTransform->get(0,3), cameraBodyTransform->get(1,3), cameraBodyTransform->get(2,3));
 	Vector3D cameraCoords = Vector3D(1.0f, -(imageCoords[0]/imageWidth-0.5f)*HORZ_F*H_SCALE,
 	                                       -(imageCoords[1]/imageHeight-0.5f)*VERT_F*V_SCALE);
-	//LOG_INFO("Camera: %f,%f\n", cameraCoords[1], cameraCoords[2]/*+0.035f*/);
-	Vector3D ray = cameraBodyTransform->mulNew(cameraCoords); ray -= T;
+	//LOG_INFO("Camera: %f,%f\n", cameraCoords[1], cameraCoords[2]/*+0.035f*/);cameraBodyTransform->get(0,3)
+	Vector3D ray = rotMul(cameraBodyTransform, cameraCoords);
 	//ray.normalize(); printf("Object Heading: (%f %f %f)\n", ray[0], ray[1], ray[2]);
 	
-	float x = T[0] - T[2]*ray[0]/ray[2];
-	float y = T[1] - T[2]*ray[1]/ray[2];
+	Vector3D T( cameraBodyTransform->get(0,3),
+	            cameraBodyTransform->get(1,3),
+	            cameraBodyTransform->get(2,3) );
+	
+	T -= T[2]/ray[2]*ray;
 
-	return Vector2D(x, y);
+	return Vector2D(T[0], T[1]);
 }
 
 static const char * object_name(VisionObject::Type typ) {
@@ -307,8 +306,6 @@ void Vision::findObjects(const HMatrix* transform, VisionFeatures & outputVision
 	{
 		if (rle[k].rank >= 0)
 		{
-			VisionObject *obj;
-		
 			float cen_x = rle[k].wcen_x/rle[k].area;
 			float cen_y = rle[k].wcen_y/rle[k].area;
 			Vector2D position = cameraToWorld(transform, Vector2D(cen_x, rle[k].y2));
@@ -322,7 +319,7 @@ void Vision::findObjects(const HMatrix* transform, VisionFeatures & outputVision
 				LOG_SHAPE(Log::OriginalImageScreen, Rectangle(Vector2D(rle[k].x1, rle[k].y1), Vector2D(rle[k].x2, rle[k].y2), 0x00FFFF, 1));
 			}
 			
-			obj = new VisionObject(log, classes[rle[k].ob_class].vobj);
+			VisionObject *obj = new VisionObject(log, classes[rle[k].ob_class].vobj);
 			obj->setPosition(position);
 			obj->setConfidence(rle[k].area);
 			obj->setBoundingBox(rle[k].x1, rle[k].y1, rle[k].x2, rle[k].y2);
