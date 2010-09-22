@@ -3,47 +3,7 @@
 #include "shared/ConfigFile/ConfigFile.h"
 #include "Vision/rcahoon/Vision.h"
 
-/*#define Y_BITS  4
-#define U_BITS  6
-#define V_BITS  6
-#define Y_SIZE  (1<<Y_BITS)
-#define U_SIZE  (1<<U_BITS)
-#define V_SIZE  (1<<V_BITS)*/
-
-/*struct ColorClass {
-	// label color
-	RGB color;
-	
-	// color range for classification
-	int yl;
-	int yu;
-	int ul;
-	int uu;
-	int vl;
-	int vu;
-	
-	// minimum region size for this class
-	int min_size;
-	
-	// VisionObject Type
-	VisionObject::Type vobj;
-	
-	ColorClass() {}
-	
-	ColorClass(int _yl, int _yu, int _ul, int _uu, int _vl, int _vu, int _r, int _g, int _b, int _min_size, VisionObject::Type _vobj)
-		: color(_r, _g, _b),
-		  yl(_yl>>(8-Y_BITS)), yu(_yu>>(8-Y_BITS)),
-		  ul(_ul>>(8-U_BITS)), uu(_uu>>(8-U_BITS)),
-		  vl(_vl>>(8-V_BITS)), vu(_vu>>(8-V_BITS)),
-		  min_size(_min_size),
-		  vobj(_vobj)
-	{}
-	
-	bool match(int y, int u, int v)
-	{
-		return (y >= yl && y < yu) && (u >= ul && u < uu) && (v >= vl && v < vu);
-	}
-};*/
+using namespace RCahoon;
 
 int main()
 {
@@ -89,4 +49,5 @@ int main()
 
 	FILE* fid = fopen("threshold", "wb+");
 	fwrite(Color_Map, sizeof(unsigned char), Y_SIZE*U_SIZE*V_SIZE, fid);
+	fclose(fid);
 }

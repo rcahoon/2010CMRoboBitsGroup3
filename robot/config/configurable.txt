@@ -1,6 +1,6 @@
 # Configurable settings
 # ---------------------
-configurable/behaviors      = Test
+configurable/behaviors      = ServoToBall
 configurable/gameController = AlwaysPlaying
 configurable/localization   = Null
 configurable/vision         = RCahoon

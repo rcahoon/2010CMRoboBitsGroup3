@@ -1,5 +1,7 @@
 #include "BehaviorsConfigurable.h"
 #include "Behaviors/Null/NullBehaviors.h"
+#include "Behaviors/MoveToBall/MoveToBall.h"
+#include "Behaviors/ServoToBall/ServoToBall.h"
 #include "Behaviors/Test/BehaviorsTest.h"
 #include "shared/ConfigFile/ConfigFile.h"
 
@@ -19,9 +21,15 @@ BehaviorsConfigurable::BehaviorsConfigurable(ConfigFile & configFile,
     behaviors = new NullBehaviors();
   }
   // Should we use TestBehaviors?
-   if (name.compare("Test") == 0) {
-     behaviors = new RoboCup2010::BehaviorsTest(configFile,_log,field);
-   }
+  if (name.compare("Test") == 0) {
+    behaviors = new RoboCup2010::BehaviorsTest(configFile,_log,field);
+  }
+  else if (name.compare("ServoToBall") == 0) {
+    behaviors = new RoboCup2010::ServoToBall(configFile,_log);
+  }
+  else if (name.compare("MoveToBall") == 0) {
+    behaviors = new RoboCup2010::MoveToBall(configFile,_log);
+  }
   else {
     LOG_WARN("Configurable Behaviors was not defined.");
   }

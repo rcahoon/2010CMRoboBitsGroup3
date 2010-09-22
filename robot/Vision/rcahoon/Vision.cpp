@@ -62,9 +62,10 @@ void Vision::initMap(ConfigFile & configFile)
 		colors[i] = classes[i].color;
 	}
 	
+	uchar tempMap[Y_SIZE*U_SIZE*V_SIZE];
 	std::string tFile = configFile.getPath("vision/thresholdFile");
 	FILE* fid = fopen(tFile.c_str(), "rb");
-	if (fread(Color_Map, sizeof(uchar), Y_SIZE*U_SIZE*V_SIZE, fid) < Y_SIZE*U_SIZE*V_SIZE)
+	if (fread(tempMap, sizeof(uchar), Y_SIZE*U_SIZE*V_SIZE, fid) < Y_SIZE*U_SIZE*V_SIZE)
 	{
 		LOG_ERROR("Threshold file is wrong size.");
 	}
@@ -74,19 +75,21 @@ void Vision::initMap(ConfigFile & configFile)
 	}
 	fclose(fid);
 
-	/*for(int y=0; y < Y_SIZE; y++)
+	for(int y=0; y < Y_SIZE; y++)
 	for(int u=0; u < U_SIZE; u++)
 	for(int v=0; v < V_SIZE; v++)
 	{
 		for(int c=0; c < num_classes; c++)
 		{
 			// last class defined will take precedence on overlapping ranges
-			if (classes[c].match(y,u,v))
+			/*if (classes[c].match(y,u,v))
 			{
-				Color_Map[(y<<(U_BITS+V_BITS)) | (u<<V_BITS) | v] = c;
-			}
+				//Color_Map[(y<<(U_BITS+V_BITS)) | (u<<V_BITS) | v] = (uchar)c;
+				Color_Map[y][u][v] = (uchar)c;
+			}*/
+			Color_Map[y][u][v] = tempMap[(y<<(U_BITS+V_BITS)) | (u<<V_BITS) | v];
 		}
-	}*/
+	}
 }
 
 Vision::~Vision() {
@@ -181,7 +184,8 @@ bool Vision::run(const RobotState & robotState,
 
 inline int Vision::classify(pixel *p)
 {
-	return Color_Map[( p->y>>(8-Y_BITS)<<(U_BITS+V_BITS) ) | ( p->u>>(8-U_BITS)<<V_BITS ) | ( p->v>>(8-V_BITS) )];
+	//return Color_Map[( (p->y & Y_MASK) << Y_SHIFT ) | ( (p->u & U_MASK) << U_SHIFT ) | ( p->v >> V_SHIFT )];
+	return Color_Map[p->y>>(8-Y_BITS)][p->u>>(8-U_BITS)][p->v>>(8-V_BITS)];
 }
 
 void Vision::computeRLE()

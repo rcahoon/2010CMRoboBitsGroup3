@@ -16,6 +16,7 @@
 #include "Agent/Command/Command.h"
 #include "Agent/Feedback/Feedback.h"
 
+#include "Behaviors/Behaviors.h"
 #include "Behaviors/shared/FSM.h"
 #include "shared/UsefulMacros.h"
 #include "shared/Vector/Vector2D.h"
@@ -24,13 +25,11 @@
 class ConfigFile;
 class Log;
 
-class BehaviorBase {
+class BehaviorBase : public Behaviors {
 public:
   BehaviorBase();
 
   virtual ~BehaviorBase();
-
-  virtual bool run(BEHAVIOR_PARAMS) = 0;
 
   virtual void reset() {}
 
