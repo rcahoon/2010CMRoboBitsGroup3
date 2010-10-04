@@ -859,7 +859,7 @@ void NaoQiInterface::act()
         {
             HeadAngles& angles = motionCommand.getHeadAngles();
             float panDelta = fabs(headAngles[0] - angles.getPan());
-            float tiltDelta = fabs(headAngles[0] - angles.getTilt());
+            float tiltDelta = fabs(headAngles[1] - angles.getTilt());
 
             if ((panDelta >= MIN_PAN_DELTA) || (tiltDelta >= MIN_TILT_DELTA)) {
               // Kill the previous task (if any)

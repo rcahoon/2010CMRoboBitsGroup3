@@ -2,6 +2,7 @@
 #include <sys/socket.h>
 #include <strings.h>
 #include <math.h>
+#include <errno.h>
 
 #include <iostream>
 #include <sstream>
@@ -15,7 +16,7 @@
 #include "shared/ConfigFile/ConfigFile.h"
 
 #define COMPONENT COMM
-//#define CLASS_LOG_LEVEL LOG_LEVEL_DEBUG
+//#define CLASS_LOG_LEVEL LOG_LEVEL_INFO
 #include "Log/LogSettings.h"
 
 CommPlayer::CommPlayer(ConfigFile & configFile, Log & _log)
@@ -145,6 +146,11 @@ void CommPlayer::runThread() {
 
     int result = select(maxSocket, &sockets, NULL, NULL, &timeout);
     if (result < 0) {
+      if (errno == EINTR) {
+//        printf("EINTR caught in select()\n.");
+        usleep((int)(socketTimeout * 1000000));
+        continue;
+      }
       LOG_ERROR("Error reading from sockets using select().")
       threadRunning = false;
       break;
@@ -175,7 +181,7 @@ void CommPlayer::runThread() {
           delete gameControllerMessage;
         }
       }
-      else {
+      else if (numBytes > 0) {
         LOG_WARN("Size of packet from game controller does not match RoboCupGameControlData.");
       }
     }
@@ -190,24 +196,34 @@ void CommPlayer::runThread() {
                               0,
                               (struct sockaddr *)&from,
                               (socklen_t *)&fromLength);
-      LOG_INFO("Received a player message.");
+      if (numBytes > 0) {
+        LOG_DEBUG("Received a player message of %d bytes.", numBytes);
 
-      PlayerMessage *playerMessage = new PlayerMessage();
+        PlayerMessage *playerMessage = new PlayerMessage();
 
-      try {
-        // De-serialize the player message
-        std::string playerMessageStr((char const *)messageData, numBytes);
-        std::istringstream iss(playerMessageStr, std::stringstream::in | std::stringstream::binary);
-        boost::archive::binary_iarchive input(iss);
-        input & (*playerMessage);
+        try {
+          // De-serialize the player message
+          std::string playerMessageStr((char const *)messageData, numBytes);
+          std::istringstream iss(playerMessageStr, std::stringstream::in | std::stringstream::binary);
+          boost::archive::binary_iarchive input(iss);
+          input & (*playerMessage);
 
-        pthread_mutex_lock(&dataMutex);
-        newPlayerMessagesReceived.push_back(playerMessage);
-        pthread_mutex_unlock(&dataMutex);
-      }
-      catch (std::exception const& error) {
-        LOG_WARN("I couldn't de-serialize the incoming packet.");
-        delete playerMessage;
+          // Ignore message from other teams
+          // Ignore messages that we sent
+          if ((playerMessage->getSenderTeamNumber() == teamNumber)
+           && (playerMessage->getSenderPlayerNumber() != playerNumber)) {
+            pthread_mutex_lock(&dataMutex);
+            newPlayerMessagesReceived.push_back(playerMessage);
+            pthread_mutex_unlock(&dataMutex);
+          }
+          else {
+            delete playerMessage;
+          }
+        }
+        catch (std::exception const& error) {
+          LOG_WARN("I couldn't de-serialize the incoming packet.");
+          delete playerMessage;
+        }
       }
 
     }
@@ -226,10 +242,13 @@ void CommPlayer::runThread() {
       int numBytes = str.length();
 
       // Send the serialized bytes
+      // This can fail if EINTR occurs
       sendto(playerSocket,
              data, numBytes,
              0,
              (struct sockaddr *)&playerBroadcastAddress, sizeof(playerBroadcastAddress));
+
+      LOG_DEBUG("Sent a player message of %d bytes.", numBytes);
 
       // Delete the player message
       delete playerMessage;
