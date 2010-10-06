@@ -52,6 +52,8 @@ public class Threshedit implements Runnable, MessageFromRobotListener {
     for(int i=0; i < classes.length; i++)
     	classes[i] = new ColorClass(vclassConfig, i);
     
+    t_map = new int[256][256][256];
+    
     imagePaused = false;
     
     robotConnector = new RobotConnector(visionConfig);
@@ -211,6 +213,8 @@ public class Threshedit implements Runnable, MessageFromRobotListener {
   }
   
   private final int  IMAGE_WIDTH, IMAGE_HEIGHT;
+  
+  private int[][][] t_map;
   
   private ColorClass[] classes;
   

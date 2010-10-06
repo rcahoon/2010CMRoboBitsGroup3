@@ -16,6 +16,7 @@ public:
     Search,
     Center,
     Approach,
+    Victory
   };
 
   MoveToBall(ConfigFile & configFile, Log & log);

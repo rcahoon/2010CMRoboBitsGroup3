@@ -8,6 +8,11 @@
 #define U_SIZE  (1<<U_BITS)
 #define V_SIZE  (1<<V_BITS)
 
+#define TH_SIZE 16
+#define R_SCALE 0.0625f
+#define R_OFF   100
+#define R_SIZE  200
+
 #define RUNSTEP  4
 #define MIN_RUN_LENGTH  4
 
@@ -15,6 +20,7 @@
 #include "Vision/rcahoon/vis_types.h"
 #include "Vision/SegmentedImage/SegmentedImage.h"
 #include "shared/Vector/Vector2D.h"
+#include <vector>
 
 class RobotState;
 class ConfigFile;
@@ -44,7 +50,8 @@ private:
 	void segmentImage();
 	void findObjects(const HMatrix* transformationFromCamera, VisionFeatures & outputVisionFeatures);
 	Vector2D cameraToWorld(const HMatrix* cameraBodyTransform, const Vector2D& imageCoords);
-	inline int classify(pixel *p);
+	inline int classify(pixel p);
+	void setupTrigTables();
 
 	int imageWidth;
 	int rowStep;
@@ -61,7 +68,7 @@ private:
 	char* labeled_image;
 	SegmentedImage seg_img;
 
-	pixel_run *rle;
+	pixel_run* rle;
 	int *row_starts;
 
 	Log & log;

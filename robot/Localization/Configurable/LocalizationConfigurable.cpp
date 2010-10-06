@@ -1,5 +1,6 @@
 #include "LocalizationConfigurable.h"
 #include "Localization/Null/NullLocalization.h"
+#include "Localization/rcahoon/Localization.h"
 #include "shared/ConfigFile/ConfigFile.h"
 
 #define COMPONENT LOCALIZATION
@@ -14,6 +15,9 @@ LocalizationConfigurable::LocalizationConfigurable(ConfigFile & configFile, Log 
   // Should we use NullLocalization?
   if (name.compare("Null") == 0) {
     localization = new NullLocalization();
+  }
+  else if (name.compare("RCahoon") == 0) {
+    localization = new RCahoon::Localization(configFile, _log, _field);
   }
   else {
     LOG_WARN("Configurable Localization was not defined.");

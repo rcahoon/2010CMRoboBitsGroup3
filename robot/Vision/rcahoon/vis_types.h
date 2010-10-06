@@ -18,22 +18,29 @@ typedef yuyv pixel;
 struct pixel_run {
 	short start, end;    // x range of run
 	short x1,x2,y1,y2;   // bounding box of region (x1,y1) - (x2,y2)
-	short ob_class;      // which object class this region represents
+	VisionObject::Type type; // which object class this region represents
 	short rank;          // union-tree rank, negative for child nodes
 	pixel_run* region;   // parent of this run in the region
 	
-	float wcen_x,wcen_y; // weighted centroid position (i.e. centroid position * area)
+	//float a, b, c;
+	//float wcen_x,wcen_y; // weighted centroid position (i.e. centroid position * area)
 	int area;            // occupied area in pixels
 	
-	void set(short _ob_class, short _start, short _end, short _row)
+	void set(VisionObject::Type _type, short _start, short _end, short _row)
 	{
-		ob_class = _ob_class;
+		type = _type;
 		x1 = start = _start;
 		x2 = end = _end;
 		area = x2 - x1;
-		wcen_x = area*(x1 + x2)/2.0f;
+		//wcen_x = area*(x1 + x2)/2.0f;
 		y1 = y2 = _row;
-		wcen_y = area*_row;
+		//wcen_y = area*_row;
+		/*if (_type==VisionObject::Line)
+		{
+			a = (area+1)*(2*_start*_start+_start*(2*_end-1)+_end*(2*end+1))/6;
+			b = (_start+_end)*(area+1)*_row/2;
+			c = area*_row*_row;
+		}*/
 		rank = 0;
 		region = this;
 	}
@@ -55,8 +62,14 @@ struct pixel_run {
 		x2 = std::max(x2, r.x2);
 		y1 = std::min(y1, r.y1);
 		y2 = std::max(y2, r.y2);
-		wcen_x += r.wcen_x;
-		wcen_y += r.wcen_y;
+		//wcen_x += r.wcen_x;
+		//wcen_y += r.wcen_y;
+		/*if (type==VisionObject::Line)
+		{
+			a += r.a;
+			b += r.b;
+			c += r.c;
+		}*/
 		area += r.area;
 		
 		r.region = region;
@@ -64,6 +77,11 @@ struct pixel_run {
 		
 		return *this;
 	}
+	
+	/*float getOrient()
+	{
+		return atan(b/(a-c))/2.0f;
+	}*/
 
 	pixel_run* canon()
 	{
@@ -72,7 +90,7 @@ struct pixel_run {
 	}
 };
 
-struct ColorClass {
+/*struct ColorClass {
 	// label color
 	RGB color;
 	
@@ -105,6 +123,20 @@ struct ColorClass {
 	{
 		return (y >= yl && y < yu) && (u >= ul && u < uu) && (v >= vl && v < vu);
 	}
+};*/
+
+struct ColorClass {
+	// label color
+	RGB color;
+	
+	// minimum region size for this class
+	int min_size;
+	
+	ColorClass() {}
+	
+	ColorClass(int _r, int _g, int _b, int _min_size)
+		: color(_r, _g, _b), min_size(_min_size)
+	{}
 };
 
 } // end namespace

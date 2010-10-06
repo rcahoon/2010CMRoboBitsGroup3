@@ -37,7 +37,7 @@ SRCS=$(patsubst $(ROBOT_DIR)/%, %, $(SOURCES) )
 HEADERS?=$(shell find ./src -type f -name *.h )
 HEADERS+=$(shell find ../ -type f -name *.h )
 
-CFLAGS=-Wall -g -O3
+CFLAGS=-Wall -g # -O3
 #CFLAGS= --sysroot $(CTC_DIR)/staging/geode-linux/ -Wall -g -fPIC -march=geode -O3
 
 LFLAGS=

@@ -5,8 +5,10 @@
 //#include "Vision/rcahoon/shared/cameraconstants.h"
 #include "Agent/RobotState.h"
 #include "Vision/VisionFeatures.h"
+#include "Vision/VisionObject/LineVisionObject.h"
 #include "Vision/SegmentedImage/RGB.h"
 #include "shared/Shape/Rectangle.h"
+#include "shared/Shape/Line.h"
 #include "shared/ConfigFile/ConfigFile.h"
 
 #define COMPONENT VISION
@@ -38,27 +40,34 @@ Vision::Vision(ConfigFile & configFile, Log & _log)
 	seg_img.setRGB(colors, num_classes);
 }
 
+static const char * object_name(VisionObject::Type typ) {
+	switch(typ)
+	{
+		case VisionObject::Ball: return "BALL";
+		case VisionObject::YellowGoalPost: return "Y_GOAL";
+		case VisionObject::BlueGoalPost: return "B_GOAL";
+		case VisionObject::YellowGoalBar: return "Y_GOAL";
+		case VisionObject::BlueGoalBar: return "B_GOAL";
+		case VisionObject::Robot: return "ROBOT";
+		case VisionObject::Line: return "LINE";
+		default: return "Unknown";
+	}
+}
+
 void Vision::initMap(ConfigFile & configFile)
 {
 	for(int i=0; i < num_classes; i++)
 	{
 		std::string path = "vision/classes/"; path += (char)(i+'0');
 		classes[i] = ColorClass(
-			configFile.getInt(path + "/yl"),
-			configFile.getInt(path + "/yu"),
-			configFile.getInt(path + "/ul"),
-			configFile.getInt(path + "/uu"),
-			configFile.getInt(path + "/vl"),
-			configFile.getInt(path + "/vu"),
 			configFile.getInt(path + "/red"),
 			configFile.getInt(path + "/green"),
 			configFile.getInt(path + "/blue"),
-			configFile.getInt(path + "/minSize"),
-			(VisionObject::Type)configFile.getInt(path + "/type")
+			configFile.getInt(path + "/minSize")
 		);
-		printf("%s  Type: %d   (%d,%d,%d)-(%d,%d,%d)  (%d,%d,%d)  %d\n", path.c_str(), classes[i].vobj, classes[i].yl, classes[i].ul, classes[i].vl, classes[i].yu,
-																	classes[i].uu, classes[i].vu, classes[i].color.getRed(), classes[i].color.getGreen(),
-																	classes[i].color.getBlue(), classes[i].min_size);
+		printf("%s  Type: %s  (%d,%d,%d)  %d\n", path.c_str(), object_name((VisionObject::Type)i),
+												classes[i].color.getRed(), classes[i].color.getGreen(), classes[i].color.getBlue(),
+												classes[i].min_size);
 		colors[i] = classes[i].color;
 	}
 	
@@ -90,16 +99,6 @@ Vision::~Vision() {
 	delete[] row_starts;
 }
 
-static void clearFeaturesList(VisionFeatures & outputVisionFeatures)
-{
-	std::vector<VisionObject const *> features = outputVisionFeatures.getAllVisionObjects();
-	
-	for(std::vector<VisionObject const *>::iterator it = features.begin(); it != features.end(); it++)
-		delete *it;
-	
-	outputVisionFeatures.clear();
-}
-
 bool Vision::run(const RobotState & robotState,
                  VisionFeatures & outputVisionFeatures) {
 #ifdef LOG_TRACE_ACTIVE
@@ -108,8 +107,6 @@ bool Vision::run(const RobotState & robotState,
 #endif
 
 	LOG_TRACE("Vision run started.");
-	
-	clearFeaturesList(outputVisionFeatures);
 
 	// Retrieve the frame from camera
 	frame = (pixel *)robotState.getRawImage();
@@ -172,9 +169,9 @@ bool Vision::run(const RobotState & robotState,
 	return false;
 }
 
-inline int Vision::classify(pixel *p)
+inline int Vision::classify(pixel p)
 {
-	return Color_Map[p->y>>(8-Y_BITS)][p->u>>(8-U_BITS)][p->v>>(8-V_BITS)];
+	return Color_Map[p.y>>(8-Y_BITS)][p.u>>(8-U_BITS)][p.v>>(8-V_BITS)];
 }
 
 void Vision::computeRLE()
@@ -191,19 +188,19 @@ void Vision::computeRLE()
 		
 		for(int i=0; i < imageWidth; i+=RUNSTEP)
 		{
-			int t = classify(&data[i/2]);
+			int t = classify(data[i/2]);
 			
 			if (t==last) continue;
 			
 #if RUNSTEP > 2
-			int end = (classify(&data[i/2-RUNSTEP/4])==last) ? i-RUNSTEP/2 : i-RUNSTEP;
+			int end = (classify(data[i/2-RUNSTEP/4])==last) ? i-RUNSTEP/2 : i-RUNSTEP;
 #else
 			int end = i-RUNSTEP;
 #endif
 			
 			if (last && (end-start > MIN_RUN_LENGTH))
 			{
-				rle[k++].set(last, start, end, j);
+				rle[k++].set( (VisionObject::Type)last, start, end, j);
 				//printf("%d: (%d,%d) - (%d,%d)\n", last, start, j, end, j);
 			}
 			
@@ -213,7 +210,7 @@ void Vision::computeRLE()
 		
 		if (last && (imageWidth-start > MIN_RUN_LENGTH))
 		{
-			rle[k++].set(last, start, imageWidth, j);
+			rle[k++].set( (VisionObject::Type)last, start, imageWidth, j);
 			//printf("%d: (%d,%d) - (%d,%d)\n", last, start, j, imageWidth, j);
 		}
 	}
@@ -230,6 +227,12 @@ void Vision::segmentImage()
 		int endj = row_starts[r+1];
 		while((i < endi) && (j < endj))
 		{
+			if (rle[i].type == VisionObject::Line)
+			{
+				i++;
+				continue;
+			}
+		
 			if (rle[i].end < rle[j].start)
 			{
 				i++;
@@ -240,7 +243,7 @@ void Vision::segmentImage()
 			}
 			else
 			{
-				if (rle[i].ob_class == rle[j].ob_class)
+				if (rle[i].type == rle[j].type)
 					rle[i].doUnion(rle[j]);
 				
 				if (rle[i].end > rle[j].end)
@@ -252,7 +255,7 @@ void Vision::segmentImage()
 	}
 	for(int k = 0; k < row_starts[processHeight]; k++)
 	{
-		if (rle[k].area < classes[rle[k].ob_class].min_size)
+		if (rle[k].area < classes[rle[k].type].min_size)
 			rle[k].rank = -1;
 	}
 }
@@ -290,53 +293,52 @@ Vector2D Vision::cameraToWorld(const HMatrix* cameraBodyTransform, const Vector2
 	return Vector2D(T[0], T[1]);
 }
 
-static const char * object_name(VisionObject::Type typ) {
-	switch(typ)
-	{
-		case VisionObject::Ball: return "Ball";
-		case VisionObject::YellowGoalPost: return "B_GOAL";
-		case VisionObject::BlueGoalPost: return "Y_GOAL";
-		default: return "Unknown";
-	}
-}
-
 void Vision::findObjects(const HMatrix* transform, VisionFeatures & outputVisionFeatures)
 {
+	std::vector<VisionObject const *> objs = outputVisionFeatures.getAllVisionObjects();
+	std::vector<VisionObject const *>::iterator iter = objs.begin();
+    for(; iter != objs.end(); iter++)
+	{
+		delete *iter;
+	}
+	outputVisionFeatures.clear();
 	for(int k = 0; k < row_starts[processHeight]; k++)
 	{
 		if (rle[k].rank >= 0)
 		{
-			float cen_x = rle[k].wcen_x/rle[k].area;
-			float cen_y = rle[k].wcen_y/rle[k].area;
-			Vector2D position = cameraToWorld(transform, Vector2D(cen_x, rle[k].y2));
+			Vector2D position = cameraToWorld(transform, Vector2D((rle[k].x1 + rle[k].x2)/2, rle[k].y2));
 			
-			if (classes[rle[k].ob_class].vobj != VisionObject::Line)
-			{
-				LOG_INFO("#%d %s: (%d,%d)-(%d,%d) @i(%f,%f) @w(%f,%f) a%d",
-					k, object_name(classes[rle[k].ob_class].vobj),
-					rle[k].x1, rle[k].y1, rle[k].x2, rle[k].y2,
-					cen_x, cen_y, position[0], position[1], rle[k].area);
-				LOG_SHAPE(Log::OriginalImageScreen, Rectangle(Vector2D(rle[k].x1, rle[k].y1), Vector2D(rle[k].x2, rle[k].y2), 0x00FFFF, 1));
-			}
-			
-			VisionObject *obj = new VisionObject(log, classes[rle[k].ob_class].vobj);
+			VisionObject* obj = new VisionObject(log, rle[k].type);
+			obj->setBoundingBox(rle[k].x1, rle[k].y1, rle[k].x2, rle[k].y2);
 			obj->setPosition(position);
 			obj->setConfidence(rle[k].area);
-			obj->setBoundingBox(rle[k].x1, rle[k].y1, rle[k].x2, rle[k].y2);
 			
 			outputVisionFeatures.addVisionObject(*obj);
+			
+			if (rle[k].type != VisionObject::Line)
+			{
+				LOG_INFO("#%d %s: (%d,%d)-(%d,%d) @w(%f,%f) a%d",
+					k, object_name(rle[k].type),
+					rle[k].x1, rle[k].y1, rle[k].x2, rle[k].y2,
+					position.x, position.y, rle[k].area);
+			
+				LOG_SHAPE(Log::OriginalImageScreen,
+					Rectangle(Vector2D(rle[k].x1, rle[k].y1),
+						      Vector2D(rle[k].x2, rle[k].y2),
+						      0x00FFFF, 1) );
+			}
 		}
 	}
 }
 
 const SegmentedImage & Vision::getSegmentedImage() {
-	memset(labeled_image, 0, imageWidth*imageHeight+1);
+	memset(labeled_image, 0, sizeof(uchar)*(imageWidth*imageHeight+1));
 	for(int k=0; k < row_starts[processHeight]; k++)
 	{
 		int nextStart = rle[k].start+rle[k].y1*imageWidth;
 		int nextEnd = rle[k].end+rle[k].y1*imageWidth;
-		int nextColor = rle[k].ob_class;
-		memset(labeled_image+nextStart, nextColor, nextEnd-nextStart);
+		int nextColor = rle[k].type;
+		memset(labeled_image+nextStart, nextColor, sizeof(uchar)*(nextEnd-nextStart));
 	}
 	
 	return seg_img;

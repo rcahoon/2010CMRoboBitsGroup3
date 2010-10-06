@@ -3,14 +3,35 @@
 #include "shared/ConfigFile/ConfigFile.h"
 #include "Vision/rcahoon/Vision.h"
 
-using namespace RCahoon;
+struct ColorClass {
+	// color range for classification
+	int yl;
+	int yu;
+	int ul;
+	int uu;
+	int vl;
+	int vu;
+	
+	ColorClass() {}
+	
+	ColorClass(int _yl, int _yu, int _ul, int _uu, int _vl, int _vu)
+		: yl(_yl>>(8-Y_BITS)), yu(_yu>>(8-Y_BITS)),
+		  ul(_ul>>(8-U_BITS)), uu(_uu>>(8-U_BITS)),
+		  vl(_vl>>(8-V_BITS)), vu(_vu>>(8-V_BITS))
+	{}
+	
+	bool match(int y, int u, int v)
+	{
+		return (y >= yl && y < yu) && (u >= ul && u < uu) && (v >= vl && v < vu);
+	}
+};
 
 int main()
 {
-	ConfigFile configFile("../../robot/config/", "vision/vclasses.txt");
+	ConfigFile configFile("./", "vclasses.txt");
 	unsigned char Color_Map[Y_SIZE*U_SIZE*V_SIZE];
 	int num_classes = configFile.getInt("vision/numClasses");
-	ColorClass classes[5];
+	ColorClass classes[8];
 
 	for(int i=0; i < num_classes; i++)
 	{
@@ -21,16 +42,10 @@ int main()
 			configFile.getInt(path + "/ul"),
 			configFile.getInt(path + "/uu"),
 			configFile.getInt(path + "/vl"),
-			configFile.getInt(path + "/vu"),
-			configFile.getInt(path + "/red"),
-			configFile.getInt(path + "/green"),
-			configFile.getInt(path + "/blue"),
-			configFile.getInt(path + "/minSize"),
-			(VisionObject::Type)configFile.getInt(path + "/type")
+			configFile.getInt(path + "/vu")
 		);
-		printf("%s  Type: %d   (%d,%d,%d)-(%d,%d,%d)  (%d,%d,%d)  %d\n", path.c_str(), classes[i].vobj, classes[i].yl, classes[i].ul, classes[i].vl, classes[i].yu,
-																	classes[i].uu, classes[i].vu, classes[i].color.getRed(), classes[i].color.getGreen(),
-																	classes[i].color.getBlue(), classes[i].min_size);
+		printf("%s  (%d,%d,%d)-(%d,%d,%d)\n", path.c_str(), classes[i].yl, classes[i].ul, classes[i].vl, classes[i].yu,
+																	classes[i].uu, classes[i].vu);
 	}
 
 	for(int y=0; y < Y_SIZE; y++)
