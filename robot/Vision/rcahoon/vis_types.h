@@ -26,6 +26,12 @@ struct pixel_run {
 	//float wcen_x,wcen_y; // weighted centroid position (i.e. centroid position * area)
 	int area;            // occupied area in pixels
 	
+	float span()
+	{
+		//return end - start;
+		return area /(float) (y2-y1 +1) + 1;
+	}
+	
 	void set(VisionObject::Type _type, short _start, short _end, short _row)
 	{
 		type = _type;

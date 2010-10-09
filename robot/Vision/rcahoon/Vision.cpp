@@ -227,12 +227,6 @@ void Vision::segmentImage()
 		int endj = row_starts[r+1];
 		while((i < endi) && (j < endj))
 		{
-			if (rle[i].type == VisionObject::Line)
-			{
-				i++;
-				continue;
-			}
-		
 			if (rle[i].end < rle[j].start)
 			{
 				i++;
@@ -244,7 +238,16 @@ void Vision::segmentImage()
 			else
 			{
 				if (rle[i].type == rle[j].type)
-					rle[i].doUnion(rle[j]);
+				{
+					float span = rle[i].span() /(float) rle[j].span();
+					
+					if (span < 1.0f) span = 1.0f / span;
+					
+					//if (span > LINE_BREAK_THRESH)
+						printf("%f\n", span);
+					if (rle[i].type != VisionObject::Line || span < LINE_BREAK_THRESH)
+						rle[i].doUnion(rle[j]);
+				}
 				
 				if (rle[i].end > rle[j].end)
 					j++;
@@ -290,7 +293,7 @@ Vector2D Vision::cameraToWorld(const HMatrix* cameraBodyTransform, const Vector2
 	
 	T -= T[2]/ray[2]*ray;
 
-	return Vector2D(T[0], T[1]);
+	return Vector2D(T[0]*100, T[1]*100); // convert to centimeters
 }
 
 void Vision::findObjects(const HMatrix* transform, VisionFeatures & outputVisionFeatures)
@@ -315,7 +318,7 @@ void Vision::findObjects(const HMatrix* transform, VisionFeatures & outputVision
 			
 			outputVisionFeatures.addVisionObject(*obj);
 			
-			if (rle[k].type != VisionObject::Line)
+			//if (rle[k].type != VisionObject::Line)
 			{
 				LOG_INFO("#%d %s: (%d,%d)-(%d,%d) @w(%f,%f) a%d",
 					k, object_name(rle[k].type),

@@ -47,4 +47,4 @@ vision/classes/6/minSize = 200
 vision/classes/7/red = 255
 vision/classes/7/green = 255
 vision/classes/7/blue = 255
-vision/classes/7/minSize = 0
+vision/classes/7/minSize = 50

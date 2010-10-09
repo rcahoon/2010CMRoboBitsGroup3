@@ -8,10 +8,7 @@
 #define U_SIZE  (1<<U_BITS)
 #define V_SIZE  (1<<V_BITS)
 
-#define TH_SIZE 16
-#define R_SCALE 0.0625f
-#define R_OFF   100
-#define R_SIZE  200
+#define LINE_BREAK_THRESH  1.5f
 
 #define RUNSTEP  4
 #define MIN_RUN_LENGTH  4

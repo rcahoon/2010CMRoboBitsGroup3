@@ -1,9 +1,9 @@
 #ifndef _RCAHOON_LOCALIZATION_H_
 #define _RCAHOON_LOCALIZATION_H_
 
-#define NUM_PARTICLES  500
-#define PARTICLE_POSITION_VAR  15
-#define PARTICLE_ANGLE_VAR  0.2f
+#define NUM_PARTICLES  1000
+#define PARTICLE_POSITION_VAR  4
+#define PARTICLE_ANGLE_VAR  0.1f
 
 #include "Localization/Localization.h"
 #include "shared/Vector/Vector2D.h"
@@ -68,6 +68,9 @@ private:
 
 	float& GOAL_MAP(Vector2D position, bool flp);
 	float& LINE_MAP(Vector2D position);
+	
+	Particle initParticle();
+	Vector2D& fieldBound(Vector2D& position);
 };
 
 }
