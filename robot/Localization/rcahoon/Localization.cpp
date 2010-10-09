@@ -153,13 +153,13 @@ bool Localization::run(const RobotState     & robotState,
 	{
 		particles[i].belief /= belNorm;
 		
-		printf("%f %f %f\n", particles[i].position.x, particles[i].position.y, particles[i].belief);
-		//LOG_SHAPE(Log::Field, Circle(particles[i].position, max(1.0f, 30*particles[i].belief), 0x00FFFF, 3));
+		//printf("%f %f %f\n", particles[i].position.x, particles[i].position.y, particles[i].belief);
+		LOG_SHAPE(Log::Field, Circle(particles[i].position, max(1.0f, 30*particles[i].belief), 0x00FFFF, 3));
 	}
 	
 	pose = particles[bestPose];
 	
-	/*LOG_SHAPE(Log::Field, Circle(particles[bestPose].position, 8, 0x00FFFF, 4));
+	LOG_SHAPE(Log::Field, Circle(particles[bestPose].position, 8, 0x00FFFF, 4));
 	printf("Size: %d\n", vis_objs.size());
 	for(unsigned j=0; j < vis_objs.size(); j++)
 	{
@@ -185,7 +185,7 @@ bool Localization::run(const RobotState     & robotState,
 			default:
 			break;
 		}
-	}*/
+	}
 	
 	int k=0;
 	for(int i=0; i < NUM_PARTICLES && k < NUM_PARTICLES; i++)

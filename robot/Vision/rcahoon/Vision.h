@@ -8,7 +8,16 @@
 #define U_SIZE  (1<<U_BITS)
 #define V_SIZE  (1<<V_BITS)
 
-#define LINE_BREAK_THRESH  1.5f
+#define TH_SIZE 16
+#define R_SCALE 0.0625f
+#define R_OFF   100
+#define R_SIZE  200
+#define HOUGH_THRESH  90
+
+#define LINE_PROXIMITY_THRESH  27
+
+#define LINE_BREAK_THRESH  1.25f
+#define DSLOPE_THRESH  1.0f
 
 #define RUNSTEP  4
 #define MIN_RUN_LENGTH  4
@@ -48,7 +57,7 @@ private:
 	void findObjects(const HMatrix* transformationFromCamera, VisionFeatures & outputVisionFeatures);
 	Vector2D cameraToWorld(const HMatrix* cameraBodyTransform, const Vector2D& imageCoords);
 	inline int classify(pixel p);
-	void setupTrigTables();
+	//void houghVote(int x, int y);
 
 	int imageWidth;
 	int rowStep;
@@ -61,6 +70,8 @@ private:
 	ColorClass* classes;
 	RGB* colors;
 	uchar Color_Map[Y_SIZE][U_SIZE][V_SIZE];
+	
+	//int hough[TH_SIZE][R_SIZE];
 
 	char* labeled_image;
 	SegmentedImage seg_img;

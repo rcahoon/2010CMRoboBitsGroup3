@@ -190,6 +190,12 @@ void Vision::computeRLE()
 		{
 			int t = classify(data[i/2]);
 			
+			/*if (t==VisionObject::Line && (classify(data[i/2-rowStep])!=VisionObject::Line ||
+			                              classify(data[i/2+rowStep])!=VisionObject::Line))
+			{
+				houghVote(i, j);
+			}*/
+			
 			if (t==last) continue;
 			
 #if RUNSTEP > 2
@@ -217,8 +223,21 @@ void Vision::computeRLE()
 	row_starts[processHeight] = k;
 }
 
+/*void Vision::houghVote(int x, int y)
+{
+	printf("%d %d\n", x, y);
+	for(int th=0; th < TH_SIZE; th++)
+	{
+		float R = x*cos(th*M_PI/(TH_SIZE+1)) + y*sin(th*M_PI/(TH_SIZE+1));
+		
+		hough[th][(int)(R*R_SCALE+R_OFF)]++;
+	}
+}*/
+
 void Vision::segmentImage()
 {
+	//memset(hough, 0, sizeof(int)*TH_SIZE*R_SIZE);
+
 	for(int r = 1; r < processHeight; r++)
 	{
 		int i = row_starts[r-1];
@@ -227,6 +246,15 @@ void Vision::segmentImage()
 		int endj = row_starts[r+1];
 		while((i < endi) && (j < endj))
 		{
+			/*if (rle[i].type == VisionObject::Line)
+			{
+				//houghVote(rle[i].x1, rle[i].y1);
+				//houghVote(rle[i].x2, rle[i].y1);
+				
+				//rle[i].rank = -1;
+				i++;
+				continue;
+			}*/
 			if (rle[i].end < rle[j].start)
 			{
 				i++;
@@ -239,13 +267,14 @@ void Vision::segmentImage()
 			{
 				if (rle[i].type == rle[j].type)
 				{
-					float span = rle[i].span() /(float) rle[j].span();
+					/*float span = log2(rle[i].span()) /(float) log2(rle[j].span());
 					
 					if (span < 1.0f) span = 1.0f / span;
 					
 					//if (span > LINE_BREAK_THRESH)
+					if (rle[i].type == VisionObject::Line)
 						printf("%f\n", span);
-					if (rle[i].type != VisionObject::Line || span < LINE_BREAK_THRESH)
+					if (rle[i].type != VisionObject::Line || span < LINE_BREAK_THRESH)*/
 						rle[i].doUnion(rle[j]);
 				}
 				
@@ -312,9 +341,18 @@ void Vision::findObjects(const HMatrix* transform, VisionFeatures & outputVision
 			Vector2D position = cameraToWorld(transform, Vector2D((rle[k].x1 + rle[k].x2)/2, rle[k].y2));
 			
 			VisionObject* obj = new VisionObject(log, rle[k].type);
-			obj->setBoundingBox(rle[k].x1, rle[k].y1, rle[k].x2, rle[k].y2);
-			obj->setPosition(position);
-			obj->setConfidence(rle[k].area);
+			if (rle[k].type == VisionObject::Line)
+			{
+				if (position.x < LINE_PROXIMITY_THRESH) continue;
+				
+				
+			}
+			else
+			{
+				obj->setBoundingBox(rle[k].x1, rle[k].y1, rle[k].x2, rle[k].y2);
+				obj->setPosition(position);
+				obj->setConfidence(rle[k].area);
+			}
 			
 			outputVisionFeatures.addVisionObject(*obj);
 			
@@ -324,14 +362,57 @@ void Vision::findObjects(const HMatrix* transform, VisionFeatures & outputVision
 					k, object_name(rle[k].type),
 					rle[k].x1, rle[k].y1, rle[k].x2, rle[k].y2,
 					position.x, position.y, rle[k].area);
+				//if (rle[k].type == VisionObject::Line) LOG_INFO("Slope: %f", rle[k].slope);
 			
-				LOG_SHAPE(Log::OriginalImageScreen,
+				LOG_SHAPE(Log::SegmentedImageScreen,
 					Rectangle(Vector2D(rle[k].x1, rle[k].y1),
 						      Vector2D(rle[k].x2, rle[k].y2),
-						      0x00FFFF, 1) );
+						      0x000000, 1) );
 			}
 		}
 	}
+	/*for(int th=0; th < TH_SIZE; th++)
+	for(int R=0; R < R_SIZE; R++)
+	{
+		if (hough[th][R] > HOUGH_THRESH)
+		{
+			float TH = th*M_PI/(TH_SIZE+1);
+			Vector2D p0, p1;
+			if (TH < 0.001)
+			{
+				p0.x = 0;
+				p0.y = R;
+				p1.x = 320;
+				p1.y = R;
+			}
+			else if (fabs(TH - M_PI/2) < 0.001)
+			{
+				p0.x = R;
+				p0.y = 0;
+				p1.x = R;
+				p1.y = 240;
+			}
+			else if (TH < M_PI/2)
+			{
+				p0.x = R/cos(th*M_PI/(TH_SIZE+1));
+				p0.y = 0;
+				p1.x = (R - 240*sin(th*M_PI/(TH_SIZE+1)))/cos(th*M_PI/(TH_SIZE+1));
+				p1.y = 240;
+			}
+			else
+			{
+				p0.x = R/cos(th*M_PI/(TH_SIZE+1));
+				p0.y = 0;
+				p1.x = 0;
+				p1.y = R/sin(th*M_PI/(TH_SIZE+1));
+			}
+			
+			LOG_SHAPE(Log::OriginalImageScreen,
+				Line(p0, p1, 0x00FFFF, 2));
+			
+			printf("@%d  <%f  %d  (%f,%f)-(%f,%f)\n", R, TH, hough[th][R], p0.x, p0.y, p1.x, p1.y);
+		}
+	}*/
 }
 
 const SegmentedImage & Vision::getSegmentedImage() {

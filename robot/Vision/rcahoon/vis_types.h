@@ -25,12 +25,14 @@ struct pixel_run {
 	//float a, b, c;
 	//float wcen_x,wcen_y; // weighted centroid position (i.e. centroid position * area)
 	int area;            // occupied area in pixels
+	//float slope;
 	
-	float span()
+	/*float span()
 	{
 		//return end - start;
 		return area /(float) (y2-y1 +1) + 1;
-	}
+		//return area /(float) ((x2-x1+1)*(y2-y1+1));
+	}*/
 	
 	void set(VisionObject::Type _type, short _start, short _end, short _row)
 	{
@@ -47,6 +49,7 @@ struct pixel_run {
 			b = (_start+_end)*(area+1)*_row/2;
 			c = area*_row*_row;
 		}*/
+		//slope = 0.0f;
 		rank = 0;
 		region = this;
 	}
@@ -60,6 +63,18 @@ struct pixel_run {
 			return canon()->doUnion(*r.canon());
 		if (r.rank > rank)
 			return r.doUnion(*this);
+		
+		if (type==VisionObject::Line)
+		{
+			/*float dslope1 = x1-r.x1 - slope;
+			float dslope2 = x2-r.x2 - slope;
+			printf("dslope: %f  %f\n", dslope1, dslope2);
+			if ( fabs(dslope)*(y2-y1)/(y2-y1+4) > DSLOPE_THRESH ) return *this;
+			
+			slope += (dslope1+dslope2)/2/(y2-y1+1);*/
+			
+			if (y2 - y1 > 20) return *this;
+		}
 		
 		if (r.rank == rank)
 			rank++;
