@@ -12,6 +12,9 @@ import network.message.*;
 //import network.message.fromrobot.*;
 import ui.*;
 
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+
 public class Threshedit implements Runnable, MessageFromRobotListener {
 
   public static void main(String[] args) throws Exception {
@@ -46,13 +49,17 @@ public class Threshedit implements Runnable, MessageFromRobotListener {
   	ConfigFile visionConfig = new ConfigFile(VISION_CONFIG_PATH, VISION_CONFIG_FILE);
     IMAGE_WIDTH = visionConfig.getInt("vision/imageWidth", 320);
     IMAGE_HEIGHT = visionConfig.getInt("vision/imageHeight", 240);
+    Y_BITS = visionConfig.getInt("vision/thresholdYBits", 4);
+    U_BITS = visionConfig.getInt("vision/thresholdUBits", 6);
+    V_BITS = visionConfig.getInt("vision/thresholdVBits", 6);
 
     ConfigFile vclassConfig = new ConfigFile(VISION_CONFIG_PATH, VCLASSES_CONFIG_FILE);
     this.classes = new ColorClass[vclassConfig.getInt("vision/numClasses", 0)];
     for(int i=0; i < classes.length; i++)
     	classes[i] = new ColorClass(vclassConfig, i);
     
-    t_map = new int[256][256][256];
+    t_map = new byte[1<<Y_BITS][1<<U_BITS][1<<V_BITS];
+    reloadThreshold();
     
     imagePaused = false;
     
@@ -68,6 +75,22 @@ public class Threshedit implements Runnable, MessageFromRobotListener {
     imageCanvas = mainWindow.getImageScreen();
     
     connectTo(robotHost, port);
+  }
+  
+  public void reloadThreshold()
+  {
+	try {
+		byte[] temp = new byte[(1<<Y_BITS)*(1<<U_BITS)*(1<<V_BITS)];
+		FileInputStream fStream = new FileInputStream(VISION_CONFIG_PATH + "vision/threshold");
+		fStream.read(temp);
+		fStream.close();
+		for(int i=0; i < (1<<Y_BITS); i++)
+		for(int j=0; j < (1<<U_BITS); j++)
+		for(int k=0; k < (1<<V_BITS); k++)
+			t_map[i][j][k] = temp[(i*(1<<U_BITS)+j)*(1<<V_BITS)+k];
+	} catch (java.io.IOException e) {
+		System.err.println(e);
+	}
   }
   
   public void connectTo(String robotHost, int robotPort) {
@@ -149,7 +172,55 @@ public class Threshedit implements Runnable, MessageFromRobotListener {
     this.currentClass = currentClass;
   }
   
-  public void updateCurrentClass(int yl, int yu, int ul, int uu, int vl, int vu)
+  private void fillBlock(YUV c1, YUV c2, int label)
+  {
+    int y1 = c1.getY();
+    int y2 = c2.getY();
+    int u1 = c1.getU();
+    int u2 = c2.getU();
+    int v1 = c1.getV();
+    int v2 = c2.getV();
+    
+    for(int y=Math.min(y1,y2); y <= Math.max(y1,y2); y++)
+    for(int u=Math.min(u1,u1); u <= Math.max(u1,u2); u++)
+    for(int v=Math.min(v1,v2); v <= Math.max(v1,v2); v++)
+    {
+  		t_map[y>>(8-Y_BITS)][u>>(8-U_BITS)][v>>(8-V_BITS)] = (byte)label;
+  	}
+  }
+  
+  public void applyLabel(YUV color, int classIdx)
+  {
+    Lab colorL = new Lab(color);
+    System.out.println(color.getY() + " " + color.getU() + " " + color.getV());
+    System.out.println(colorL.getL() + " " + colorL.getA() + " " + colorL.getB());
+    YUV yuvL = colorL.toYUV();
+    System.out.println(yuvL.getY() + " " + yuvL.getU() + " " + yuvL.getV());
+    
+    YUV last = null;
+    System.out.println(t_map[color.getY()>>(8-Y_BITS)][color.getU()>>(8-U_BITS)][color.getV()>>(8-V_BITS)]);
+    for(double L = colorL.getL() - 5; L <= colorL.getL() + 5; L+=2)
+    for(double A = colorL.getA() - 5; A <= colorL.getA() + 5; A+=2)
+    for(double B = colorL.getB() - 5; B <= colorL.getB() + 5; B+=2)
+    {
+    	YUV yuv = new Lab(L, A, B).toYUV();
+    	
+    	//System.out.println(L + " " + A + " " + B);
+    	//System.out.println(yuv.getY() + " " + yuv.getU() + " " + yuv.getV());
+    	
+    	if (last!=null)
+    	{
+    		System.out.println("("+last.getY()+","+last.getU()+","+last.getV()+")-("+yuv.getY()+","+yuv.getU()+","+yuv.getV()+")");
+    		fillBlock(last, yuv, classIdx);
+    	}
+    	
+    	last = yuv;
+    }
+    System.out.println(t_map[color.getY()>>(8-Y_BITS)][color.getU()>>(8-U_BITS)][color.getV()>>(8-V_BITS)]);
+    System.out.println("updated");
+  }
+  
+  /*public void updateCurrentClass(int yl, int yu, int ul, int uu, int vl, int vu)
   {
     classes[currentClass].yl = yl;
     classes[currentClass].yu = yu;
@@ -161,7 +232,7 @@ public class Threshedit implements Runnable, MessageFromRobotListener {
    	System.out.println(yl + " " + yu + " " + ul + " " + uu + " " + vl + " " + vu);
     
     segmentImage();
-  }
+  }*/
   
   public YUVImage getOriginalImage()
   {
@@ -178,9 +249,11 @@ public class Threshedit implements Runnable, MessageFromRobotListener {
     for(int i=0; i < IMAGE_HEIGHT; i++)
     for(int j=0; j < IMAGE_WIDTH; j++)
     {
-      for(int k=0; k < classes.length; k++)
+      /*for(int k=0; k < classes.length; k++)
         if (classes[k].match(originalImage.getYUV(j,i)))
-          indices[j+i*IMAGE_WIDTH] = (byte)k;
+          indices[j+i*IMAGE_WIDTH] = (byte)k;*/
+      YUV yuv = originalImage.getYUV(j,i);
+      indices[j+i*IMAGE_WIDTH] = t_map[yuv.getY()>>(8-Y_BITS)][yuv.getU()>>(8-U_BITS)][yuv.getV()>>(8-V_BITS)];
     }
     
     try {
@@ -192,7 +265,7 @@ public class Threshedit implements Runnable, MessageFromRobotListener {
   }
   
   public void saveThreshold() {
-    try {
+    /*try {
       FileWriter fw = new FileWriter(VISION_CONFIG_PATH + VCLASSES_CONFIG_FILE);
       fw.write("vision/numClasses = " + classes.length + "\n");
       fw.write("\n");
@@ -201,7 +274,20 @@ public class Threshedit implements Runnable, MessageFromRobotListener {
       JOptionPane.showMessageDialog(imageCanvas, "Color class data saved", "Save successful", JOptionPane.INFORMATION_MESSAGE);
     } catch (java.io.IOException e) {
       e.printStackTrace();
-    }
+    }*/
+	byte[] temp = new byte[(1<<Y_BITS)*(1<<U_BITS)*(1<<V_BITS)];
+	for(int i=0; i < (1<<Y_BITS); i++)
+	for(int j=0; j < (1<<U_BITS); j++)
+	for(int k=0; k < (1<<V_BITS); k++)
+		temp[(i*(1<<U_BITS)+j)*(1<<V_BITS)+k] = t_map[i][j][k];
+	
+    try {
+		FileOutputStream fStream = new FileOutputStream(VISION_CONFIG_PATH + "vision/threshold");
+		fStream.write(temp);
+		fStream.close();
+	} catch (java.io.IOException e) {
+		System.err.println(e);
+	}
   }
   
   public boolean isImagePaused() {
@@ -213,8 +299,9 @@ public class Threshedit implements Runnable, MessageFromRobotListener {
   }
   
   private final int  IMAGE_WIDTH, IMAGE_HEIGHT;
+  private final int  Y_BITS, U_BITS, V_BITS;
   
-  private int[][][] t_map;
+  private byte[][][] t_map;
   
   private ColorClass[] classes;
   

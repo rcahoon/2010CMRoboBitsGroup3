@@ -64,8 +64,8 @@ public class ImageCanvas extends JPanel {
   
   private void drawImage(Graphics2D graphics, BufferedImage image, int alpha) {
     // Full alpha for the original image
-    graphics.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, (float)alpha / 100));
-    float r = Math.min(getWidth() / (float)width, getHeight() / (float)height);
+    graphics.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alpha /(float) 100));
+    float r = Math.min(getWidth() /(float) width, getHeight() /(float) height);
     graphics.drawImage(image, 0, 0, (int)(r*width), (int)(r*height), null);
   }
   
