@@ -12,7 +12,7 @@ import core.*;
 
 public class MainWindow extends JFrame {
 
-  public class SliderListener implements AdjustmentListener
+  /*public class SliderListener implements AdjustmentListener
   {
     public void adjustmentValueChanged(AdjustmentEvent e) {
       threshedit.updateCurrentClass(threshBars[0].getValue(), threshBars[1].getValue(),
@@ -21,13 +21,13 @@ public class MainWindow extends JFrame {
       for(int i=0; i < 6; i++)
         threshLabels[i].setText(""+threshBars[i].getValue());
     }
-  }
+  }*/
 
   public MainWindow(final Threshedit threshedit, ConfigFile visionConfig) {
     super("CMRoboBits Group3 Threshold Editor");
 
     setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-    setSize(new Dimension(800, 480));
+    setSize(new Dimension(/*800*/ 600, /*480*/ 520));
     
     this.threshedit = threshedit;
     imageScreen = new ImageCanvas(visionConfig.getInt("vision/imageWidth", 320), visionConfig.getInt("vision/imageHeight", 240));
@@ -42,7 +42,7 @@ public class MainWindow extends JFrame {
         int value = comboBox.getSelectedIndex();
         threshedit.setCurrentClass(value);
         
-        updateThreshBars();
+        //updateThreshBars();
       }
     });
     
@@ -51,9 +51,10 @@ public class MainWindow extends JFrame {
     resetButton.setMnemonic(KeyEvent.VK_R);
     resetButton.addActionListener(new ActionListener() {
       public void actionPerformed(ActionEvent e) {
-        threshedit.getClasses()[threshedit.getCurrentClass()].reload();
+        //threshedit.getClasses()[threshedit.getCurrentClass()].reload();
+        threshedit.reloadThreshold();
         threshedit.segmentImage();
-        updateThreshBars();
+        //updateThreshBars();
       }
     });
     
@@ -90,7 +91,7 @@ public class MainWindow extends JFrame {
     topPanel.add(saveButton);
     topPanel.add(pauseButton);
     
-    JPanel threshPanel = new JPanel();
+    /*JPanel threshPanel = new JPanel();
     threshPanel.setPreferredSize(new Dimension(300, 300));
     threshPanel.setLayout(new BoxLayout(threshPanel, BoxLayout.Y_AXIS));
     threshBars = new JScrollBar[6];
@@ -131,6 +132,20 @@ public class MainWindow extends JFrame {
           pointColorLabel.setText("Y:  U:  V:  ");
         }
       }
+    });*/
+    
+    imageScreen.addMouseListener(new MouseAdapter() {
+      public void mouseClicked(MouseEvent e) {
+        Point p = imageScreen.componentToImage(e.getPoint());
+        if (p.getX() >= 0)
+        {
+          YUVImage image = threshedit.getOriginalImage();
+          if (image==null) return;
+          YUV color = image.getYUV((int)p.getX(), (int)p.getY());
+          threshedit.applyLabel(color, threshedit.getCurrentClass());
+          threshedit.segmentImage();
+        }
+      }
     });
 
     // Add all the ui components
@@ -138,12 +153,12 @@ public class MainWindow extends JFrame {
     getContentPane().add(topPanel, BorderLayout.NORTH);
     getContentPane().add(imageScreen, BorderLayout.CENTER);
     getContentPane().add(alphaScrollBar, BorderLayout.SOUTH);
-    getContentPane().add(threshPanel, BorderLayout.EAST);
+    //getContentPane().add(threshPanel, BorderLayout.EAST);
     
     this.setVisible(true);
   }
   
-  protected void updateThreshBars()
+  /*protected void updateThreshBars()
   {
     ColorClass cc = new ColorClass(threshedit.getClasses()[threshedit.getCurrentClass()]);
   
@@ -153,7 +168,7 @@ public class MainWindow extends JFrame {
     threshBars[3].setValue(cc.uu);
     threshBars[4].setValue(cc.vl);
     threshBars[5].setValue(cc.vu);
-  }
+  }*/
   
   public int getSegmentedAlpha() {
     return imageScreen.getSegmentedAlpha();
@@ -186,8 +201,8 @@ public class MainWindow extends JFrame {
   
   private Threshedit threshedit;
   
-  private JLabel[] threshLabels;
-  private JScrollBar[] threshBars;
+  /*private JLabel[] threshLabels;
+  private JScrollBar[] threshBars;*/
   
   private ImageCanvas imageScreen;
   
