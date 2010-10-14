@@ -86,13 +86,15 @@ std::string ConfigFile::getPath(const std::string & name, const std::string & de
   }
 }
 
-int ConfigFile::getInt(const std::string & name, int defaultValue) {
+int ConfigFile::getInt(const std::string & name, int defaultValue, bool override) {
   useDefault = false;
 
   // Check if the map to int has the key we need
-  std::map<std::string, int>::const_iterator it = mapInt.find(name);
-  if (it != mapInt.end()) {
-    return it->second;
+  if (!override) {
+    std::map<std::string, int>::const_iterator it = mapInt.find(name);
+    if (it != mapInt.end()) {
+      return it->second;
+    }
   }
 
   // Check if the key exists in the map to string
@@ -119,13 +121,29 @@ int ConfigFile::getInt(const std::string & name, int defaultValue) {
   return defaultValue;
 }
 
-float ConfigFile::getFloat(const std::string & name, float defaultValue) {
+const int & ConfigFile::getIntReference(const std::string & name,
+                                        int defaultValue) {
+  // Try to read the value
+  getInt(name, defaultValue);
+
+  // Was the default value used?
+  if (useDefault) {
+    // Set the value in the map
+    mapInt[name] = defaultValue;
+  }
+
+  return mapInt[name];
+}
+
+float ConfigFile::getFloat(const std::string & name, float defaultValue, bool override) {
   useDefault = false;
 
   // Check if the map to float has the key we need
-  std::map<std::string, float>::const_iterator it = mapFloat.find(name);
-  if (it != mapFloat.end()) {
-    return it->second;
+  if (!override) {
+    std::map<std::string, float>::const_iterator it = mapFloat.find(name);
+    if (it != mapFloat.end()) {
+      return it->second;
+    }
   }
 
   // Check if the key exists in the map to string
@@ -209,12 +227,22 @@ bool ConfigFile::getBool(const std::string & name,
 
 void ConfigFile::setString(const std::string & name,
                            const std::string & value) {
+  bool hadInt(false), hadFloat(false);
+
+  // Retrieve the previous int and float values (if any)
+  hadInt   = (mapInt.find(name) != mapInt.end());
+  hadFloat = (mapFloat.find(name) != mapFloat.end());
+
   // Set the value in the map of strings
   mapString[name] = value;
 
-  // Delete the index in all the other maps
-  mapInt.erase(name);
-  mapFloat.erase(name);
+  // Replace the mapped values if they existed before
+  if (hadInt) {
+    getInt(name, mapInt[name], true);
+  }
+  if (hadFloat) {
+    getFloat(name, mapFloat[name], true);
+  }
 }
 
 void ConfigFile::readFile(const std::string & name) {

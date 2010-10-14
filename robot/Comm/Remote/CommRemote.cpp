@@ -20,7 +20,7 @@
 #include "shared/ConfigFile/ConfigFile.h"
 
 #define COMPONENT COMM
-//#define CLASS_LOG_LEVEL LOG_LEVEL_TRACE
+//#define CLASS_LOG_LEVEL LOG_LEVEL_INFO
 #include "Log/LogSettings.h"
 
 CommRemote::CommRemote(ConfigFile & configFile, Log & _log)
@@ -175,7 +175,10 @@ void CommRemote::runThread() {
       bool closeConnection = false;
 
       // Read as much as we can
-      int numRead = recv(clientSocket, clientBuffer, offset, 0);
+      int numRead = recv(clientSocket, clientBuffer + offset, maxPacketSize - offset, 0);
+      if (numRead > 0) {
+        LOG_INFO("Read %d bytes.", numRead);
+      }
 
       // Client ended the connection
       if (numRead == 0) {
@@ -185,10 +188,11 @@ void CommRemote::runThread() {
       // Error reading from the socket
       else if ((numRead == -1) && (errno != EAGAIN) && (errno != EINTR)) {
         closeConnection = true;
-        LOG_INFO("Error reading from client socket.");
+        LOG_INFO("Error reading from client socket: %d.", errno);
       }
 
       if (closeConnection) {
+        LOG_INFO("Disconnecting client");
         disconnectClient(sockets, maxSocket);
       }
 
@@ -200,26 +204,30 @@ void CommRemote::runThread() {
           uint32_t *sizePointer = (uint32_t *)(clientBuffer + robotMessageHeaderSize - 4);
           size = ntohl(*sizePointer);
 
+          LOG_INFO("Read a size of %d", size);
+
           // Update the buffer's offset and numRead counter
           offset += robotMessageHeaderSize;
           numRead -= robotMessageHeaderSize;
         }
         // Has the whole packet been read?
-        if ((size > 0) && (offset + numRead >= size + robotMessageHeaderSize)) {
+        if ((size >= 0) && (offset + numRead >= size + robotMessageHeaderSize)) {
           // Update the buffer's offset and numRead counter
           numRead -= (size + robotMessageHeaderSize - offset);
           offset = size + robotMessageHeaderSize; // same as: offset += (size + robotMessageHeaderSize - offset)
 
-          LOG_INFO("Received a packet of size %d.", size);
+          LOG_INFO("Received a packet of type %d, size %d.", clientBuffer[0], size);
 
           // Convert it into a packet
           // Assumption: the type fits in 1 byte
-          RemoteMessageToRobot *message = new RemoteMessageToRobot(clientBuffer[0],
-                                                                   size,
-                                                                   clientBuffer + robotMessageHeaderSize);
-          pthread_mutex_lock(&dataMutex);
-          messagesToRobot.push_back(message);
-          pthread_mutex_unlock(&dataMutex);
+          RemoteMessageToRobot const *message = RemoteMessageToRobot::create(clientBuffer[0],
+                                                                             size,
+                                                                             clientBuffer + robotMessageHeaderSize);
+          if (message != NULL) {
+            pthread_mutex_lock(&dataMutex);
+            messagesToRobot.push_back(message);
+            pthread_mutex_unlock(&dataMutex);
+          }
 
           // Move the buffer's data as necessary
           if (numRead > 0) {

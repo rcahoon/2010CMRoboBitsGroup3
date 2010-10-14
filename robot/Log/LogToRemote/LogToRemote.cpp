@@ -13,9 +13,9 @@
 
 LogToRemote::LogToRemote(ConfigFile & configFile)
   : Log(configFile),
-    LOG_ROBOTSTATE_PERIOD(configFile.getInt("log/logRemote/logRobotStatePeriod", 0)),
-    LOG_ORIGINAL_IMAGE_PERIOD(configFile.getInt("log/logRemote/logOriginalImagePeriod", 0)),
-    LOG_SEGMENTED_IMAGE_PERIOD(configFile.getInt("log/logRemote/logSegmentedImagePeriod", 0)),
+    LOG_ROBOTSTATE_PERIOD(configFile.getIntReference("log/logRemote/logRobotStatePeriod", 0)),
+    LOG_ORIGINAL_IMAGE_PERIOD(configFile.getIntReference("log/logRemote/logOriginalImagePeriod", 0)),
+    LOG_SEGMENTED_IMAGE_PERIOD(configFile.getIntReference("log/logRemote/logSegmentedImagePeriod", 0)),
     logRobotStateCounter(0),
     logOriginalImageCounter(0) {
 }
@@ -89,10 +89,10 @@ void LogToRemote::logRobotState(const RobotState & robotState) {
   if (LOG_ROBOTSTATE_PERIOD > 0) {
     // We want to log the RobotState every couple of frames
     logRobotStateCounter++;
-    logRobotStateCounter %= LOG_ROBOTSTATE_PERIOD;
-
     // Is it time to log the robot state?
-    if (logRobotStateCounter == 0) {
+    if (logRobotStateCounter >= LOG_ROBOTSTATE_PERIOD) {
+      logRobotStateCounter = 0;
+
       RemoteMessageFromRobot *message = new RobotStateMessage(robotState);
 
       remoteMessagesFromRobot.push_back(message);
@@ -102,10 +102,10 @@ void LogToRemote::logRobotState(const RobotState & robotState) {
   if (LOG_ORIGINAL_IMAGE_PERIOD > 0) {
     // We want to log the original image every couple of frames
     logOriginalImageCounter++;
-    logOriginalImageCounter %= LOG_ORIGINAL_IMAGE_PERIOD;
-
     // Is it time to log the image?
-    if (logOriginalImageCounter == 0) {
+    if (logOriginalImageCounter >= LOG_ORIGINAL_IMAGE_PERIOD) {
+      logOriginalImageCounter = 0;
+
       RemoteMessageFromRobot *message = new RemoteMessageFromRobot(RemoteMessageFromRobot::originalImage,
                                                                    robotState.getRawImageSize(),
                                                                    robotState.getRawImage());
@@ -124,10 +124,10 @@ void LogToRemote::logSegmentedImage(const SegmentedImage & segmentedImage) {
   if (LOG_SEGMENTED_IMAGE_PERIOD > 0) {
     // We want to extract the segmented image every couple of frames
     logSegmentedImageCounter++;
-    logSegmentedImageCounter %= LOG_SEGMENTED_IMAGE_PERIOD;
-
     // Is it time to log the image?
-    if (logSegmentedImageCounter == 0) {
+    if (logSegmentedImageCounter >= LOG_SEGMENTED_IMAGE_PERIOD) {
+      logSegmentedImageCounter = 0;
+
       RemoteMessageFromRobot *message = new SegmentedImageMessage(segmentedImage);
       remoteMessagesFromRobot.push_back(message);
     }

@@ -39,9 +39,9 @@ public:
   virtual void logGameState(const GameState & gameState);
 
 private:
-  const int LOG_ROBOTSTATE_PERIOD;
-  const int LOG_ORIGINAL_IMAGE_PERIOD;
-  const int LOG_SEGMENTED_IMAGE_PERIOD;
+  const int & LOG_ROBOTSTATE_PERIOD;
+  const int & LOG_ORIGINAL_IMAGE_PERIOD;
+  const int & LOG_SEGMENTED_IMAGE_PERIOD;
 
   int logRobotStateCounter, logOriginalImageCounter, logSegmentedImageCounter;
 

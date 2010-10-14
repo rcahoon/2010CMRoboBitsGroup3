@@ -147,6 +147,23 @@ void NaoQiInterface::initFastAccess( AL::ALPtr<AL::ALBroker> pBroker )
     fastAccess.ConnectToVariables( pBroker,sensorNames,false );
 
     std::cout << "NaoQiInterface::initFastAccess() - Fast memory access is initialized" << std::endl;
+
+    // Initialize the ALValue used in setting stiffness
+    body.arraySetSize(jointNames.size());
+    bodyStiffness.arraySetSize(jointNames.size());
+    for (unsigned int i = 0; i < jointNames.size(); i++) {
+      body[i] = jointNames[i];
+    }
+
+    // Assumption: the first 2 elements are the head
+    float stiffness = configFile.getFloat("motion/stiffness/head", 0.8f);
+    bodyStiffness[0] = stiffness;
+    bodyStiffness[1] = stiffness;
+
+    stiffness = configFile.getFloat("motion/stiffness/body", 0.8f);
+    for (unsigned int i = 2; i < jointNames.size(); i++) {
+      bodyStiffness[i] = stiffness;
+    }
 }
 
 bool NaoQiInterface::initialize( AL::ALPtr<AL::ALBroker> pBroker )
@@ -357,8 +374,13 @@ void NaoQiInterface::stand()
         //do standing action
         if ( !staticActionPlayer.isActive() )
         {
-            motionProxy->post.setStiffnesses("Body",configFile.getFloat("motion/stiffness/body",0.8f));
-            motionProxy->post.setStiffnesses("Head",configFile.getFloat("motion/stiffness/head",0.8f));
+//            motionProxy->post.setStiffnesses("Body",configFile.getFloat("motion/stiffness/body",0.8f));
+            motionProxy->post.setStiffnesses(body, bodyStiffness);
+//            motionProxy->post.setStiffnesses("LArm",configFile.getFloat("motion/stiffness/body",0.8f));
+//            motionProxy->post.setStiffnesses("RArm",configFile.getFloat("motion/stiffness/body",0.8f));
+//            motionProxy->post.setStiffnesses("LLeg",configFile.getFloat("motion/stiffness/body",0.8f));
+//            motionProxy->post.setStiffnesses("RLeg",configFile.getFloat("motion/stiffness/body",0.8f));
+//            motionProxy->post.setStiffnesses("Head",configFile.getFloat("motion/stiffness/head",0.8f));
             staticActionPlayer.standUp();
             stiffnessSet = true;
             sitting = false;
@@ -438,8 +460,13 @@ void NaoQiInterface::updateRobotState()
         sharedInfo->state.setOdometryRotation(angle);
 
         //std::cout << "restoring stiffness" << std::endl;
-        motionProxy->post.setStiffnesses("Body",configFile.getFloat("motion/stiffness/body",0.8f));
-        motionProxy->post.setStiffnesses("Head",configFile.getFloat("motion/stiffness/head",0.8f));
+//        motionProxy->post.setStiffnesses("Body",configFile.getFloat("motion/stiffness/body",0.8f));
+        motionProxy->post.setStiffnesses(body, bodyStiffness);
+//        motionProxy->post.setStiffnesses("LArm",configFile.getFloat("motion/stiffness/body",0.8f));
+//        motionProxy->post.setStiffnesses("RArm",configFile.getFloat("motion/stiffness/body",0.8f));
+//        motionProxy->post.setStiffnesses("LLeg",configFile.getFloat("motion/stiffness/body",0.8f));
+//        motionProxy->post.setStiffnesses("RLeg",configFile.getFloat("motion/stiffness/body",0.8f));
+//        motionProxy->post.setStiffnesses("Head",configFile.getFloat("motion/stiffness/head",0.8f));
     }
     else
 //    if ( bodyCommandType == bcWalk || bodyCommandType == bcWalkTo )
@@ -882,6 +909,29 @@ void NaoQiInterface::act()
 
               headAnglesTaskID = motionProxy->post.setAngles("Head", headAngles, headSpeed);
             }
+        }
+        else if (headCommand == hcHeadStiffness) {
+          HeadStiffness& headStiffness = motionCommand.getHeadStiffness();
+          float stiffness = headStiffness.getStiffness();
+          stiffness = bound(stiffness, 0.0f, 1.0f);
+
+          // Assumption: the first 2 joints are the head
+          // We set it here so the head stiffness is set correctly after a keyframe
+          bodyStiffness[0] = stiffness;
+          bodyStiffness[1] = stiffness;
+
+          motionProxy->post.setStiffnesses("Head", stiffness);
+        }
+        else if (headCommand == hcRestoreHeadStiffness) {
+          float stiffness = configFile.getFloat("motion/stiffness/head",0.8f);
+          stiffness = bound(stiffness, 0.0f, 1.0f);
+
+          // Assumption: the first 2 joints are the head
+          // We set it here so the head stiffness is set correctly after a keyframe
+          bodyStiffness[0] = stiffness;
+          bodyStiffness[1] = stiffness;
+
+          motionProxy->post.setStiffnesses("Head", stiffness);
         }
         
         
