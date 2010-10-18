@@ -908,6 +908,14 @@ void NaoQiInterface::act()
               }
 
               headAnglesTaskID = motionProxy->post.setAngles("Head", headAngles, headSpeed);
+
+              // We store the current head angle if a keyframe is being played,
+              // instead of the destination angles.
+              // In future, check if the static action involves the head
+              if (staticActionPlayer.isActive()) {
+                headAngles[0] = sensorValues[HeadYaw];
+                headAngles[1] = sensorValues[HeadPitch];
+              }
             }
         }
         else if (headCommand == hcHeadStiffness) {
