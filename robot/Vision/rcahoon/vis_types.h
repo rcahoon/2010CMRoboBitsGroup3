@@ -22,17 +22,7 @@ struct pixel_run {
 	short rank;          // union-tree rank, negative for child nodes
 	pixel_run* region;   // parent of this run in the region
 	
-	//float a, b, c;
-	//float wcen_x,wcen_y; // weighted centroid position (i.e. centroid position * area)
 	int area;            // occupied area in pixels
-	//float slope;
-	
-	/*float span()
-	{
-		//return end - start;
-		return area /(float) (y2-y1 +1) + 1;
-		//return area /(float) ((x2-x1+1)*(y2-y1+1));
-	}*/
 	
 	void set(VisionObject::Type _type, short _start, short _end, short _row)
 	{
@@ -40,16 +30,7 @@ struct pixel_run {
 		x1 = start = _start;
 		x2 = end = _end;
 		area = x2 - x1;
-		//wcen_x = area*(x1 + x2)/2.0f;
 		y1 = y2 = _row;
-		//wcen_y = area*_row;
-		/*if (_type==VisionObject::Line)
-		{
-			a = (area+1)*(2*_start*_start+_start*(2*_end-1)+_end*(2*end+1))/6;
-			b = (_start+_end)*(area+1)*_row/2;
-			c = area*_row*_row;
-		}*/
-		//slope = 0.0f;
 		rank = 0;
 		region = this;
 	}
@@ -66,14 +47,8 @@ struct pixel_run {
 		
 		if (type==VisionObject::Line)
 		{
-			/*float dslope1 = x1-r.x1 - slope;
-			float dslope2 = x2-r.x2 - slope;
-			printf("dslope: %f  %f\n", dslope1, dslope2);
-			if ( fabs(dslope)*(y2-y1)/(y2-y1+4) > DSLOPE_THRESH ) return *this;
-			
-			slope += (dslope1+dslope2)/2/(y2-y1+1);*/
-			
-			if (y2 - y1 > 20) return *this;
+			if (y2 - y1 > LINE_BLOCK_SIZE) return *this;
+			if (r.y2 - r.y1 > LINE_BLOCK_SIZE) return *this;
 		}
 		
 		if (r.rank == rank)
@@ -83,14 +58,7 @@ struct pixel_run {
 		x2 = std::max(x2, r.x2);
 		y1 = std::min(y1, r.y1);
 		y2 = std::max(y2, r.y2);
-		//wcen_x += r.wcen_x;
-		//wcen_y += r.wcen_y;
-		/*if (type==VisionObject::Line)
-		{
-			a += r.a;
-			b += r.b;
-			c += r.c;
-		}*/
+
 		area += r.area;
 		
 		r.region = region;
@@ -98,11 +66,6 @@ struct pixel_run {
 		
 		return *this;
 	}
-	
-	/*float getOrient()
-	{
-		return atan(b/(a-c))/2.0f;
-	}*/
 
 	pixel_run* canon()
 	{

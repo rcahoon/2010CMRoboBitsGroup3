@@ -12,6 +12,7 @@ identity/nameDescription = a robot without a description
 ~INCLUDE comm.txt
 ~INCLUDE gameController.txt
 ~INCLUDE vision/vision.txt
+~INCLUDE localization/localization.txt
 ~INCLUDE worldModel.txt
 
 ~INCLUDE log.txt
