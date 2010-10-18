@@ -17,7 +17,7 @@ static inline float pdf(float x, float var)
 	return var/(var+x*x);
 }
 
-//TODO: do sensor fusion correctl
+//TODO: do sensor fusion correctly
 void Particle::update(Localization& loc, std::vector<VisionObject const *> vis_objs, Noisy<float> t_x, Noisy<float> t_y, Noisy<float> rot)
 {
 	pos_x += t_x;

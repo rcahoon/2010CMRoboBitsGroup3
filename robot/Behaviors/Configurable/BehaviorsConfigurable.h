@@ -4,6 +4,7 @@
 #include "Behaviors/Behaviors.h"
 #include "shared/UsefulMacros.h"
 
+class BehaviorBase;
 class ConfigFile;
 class Log;
 class Field;
@@ -29,6 +30,7 @@ private:
   Log & log;
 
   Behaviors *behaviors;
+  BehaviorBase *remoteControl;
 };
 
 #endif /* BEHAVIORSCONFIGURABLE_H_ */

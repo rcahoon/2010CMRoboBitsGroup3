@@ -6,6 +6,8 @@ configurable/localization   = RCahoon
 configurable/vision         = RCahoon
 configurable/worldModel     = Null
 
+configurable/behaviors/useRemoteControl = 1
+
 configurable/comm/useCommPlayer = 1
 configurable/comm/useCommRemote = 1
 

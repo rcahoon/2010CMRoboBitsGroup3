@@ -18,8 +18,9 @@ public class RobotConnector implements Runnable, NetworkConnector {
     buffer = new byte[bufferSize];
     
     listeners = new Vector<MessageFromRobotListener>();
+    
+    messagesToSend = new Vector<RemoteMessageToRobot>();
   }
-  
   
   @Override
   public boolean isConnected() {
@@ -67,7 +68,10 @@ public class RobotConnector implements Runnable, NetworkConnector {
     
     try {
       
+      List<RemoteMessageToRobot> messagesToSend = new Vector<RemoteMessageToRobot>();
+      
       InputStream in = socket.getInputStream();
+      OutputStream out = new BufferedOutputStream(socket.getOutputStream());
       
       int offset = 0;
       
@@ -75,63 +79,88 @@ public class RobotConnector implements Runnable, NetworkConnector {
       int size = 0;
       
       boolean done = false;
+      boolean skipReading = false;
+      
       while (!done && running) {
         int numRead = 0;
         
         try {
+          skipReading = false;
           numRead = in.read(buffer, offset, buffer.length - offset);
         }
         catch (SocketTimeoutException e) {
-          continue;
+          skipReading = true;
         }
         
-        if (numRead <= 0) {
-          done = true;
-          break;
-        }
-        
-        offset += numRead;
-        
-        boolean tryAgain = false;
-        
-        do {
-          tryAgain = false;
-          
-          // Do we have a size for the packet?
-          if ((size == 0) && (offset >= RemoteMessageFromRobot.MESSAGE_HEADER_SIZE)) {
-            // The first byte is the type
-            type = (int)buffer[0];
-            // The next 4 bytes are the size
-            size = RemoteMessage.readInt(buffer, 1);
-            
-            //System.out.printf("Expecting a packet of type %d with size %d.\n", type, size);
+        if (!skipReading) {
+          if (numRead <= 0) {
+            done = true;
+            break;
           }
           
-          // Has the whole packet been read?
-          if ((size > 0) && (offset >= RemoteMessageFromRobot.MESSAGE_HEADER_SIZE + size)) {
-            // Copy the data out
-            byte [] data = new byte[size];
-            System.arraycopy(buffer, RemoteMessageFromRobot.MESSAGE_HEADER_SIZE, data, 0, size);
+          offset += numRead;
+          
+          boolean tryAgain = false;
+          
+          do {
+            tryAgain = false;
             
-            RemoteMessageFromRobot message = network.message.fromrobot.Factory.create(type, data);
-            handleMessage(message);
-            
-            // Move the rest of buffer's data towards the front
-            offset -= RemoteMessageFromRobot.MESSAGE_HEADER_SIZE + size;
-            if (offset >= 0) {
-              System.arraycopy(buffer, RemoteMessageFromRobot.MESSAGE_HEADER_SIZE + size, buffer, 0, offset);
+            // Do we have a size for the packet?
+            if ((size == 0) && (offset >= RemoteMessageFromRobot.MESSAGE_HEADER_SIZE)) {
+              // The first byte is the type
+              type = (int)buffer[0];
+              // The next 4 bytes are the size
+              size = RemoteMessage.readInt(buffer, 1);
+              
+              //System.out.printf("Expecting a packet of type %d with size %d.\n", type, size);
             }
-
-            size = 0;
-            tryAgain = true;
+            
+            // Has the whole packet been read?
+            if ((size > 0) && (offset >= RemoteMessageFromRobot.MESSAGE_HEADER_SIZE + size)) {
+              // Copy the data out
+              byte [] data = new byte[size];
+              System.arraycopy(buffer, RemoteMessageFromRobot.MESSAGE_HEADER_SIZE, data, 0, size);
+              
+              RemoteMessageFromRobot message = network.message.fromrobot.Factory.create(type, data);
+              handleMessage(message);
+              
+              // Move the rest of buffer's data towards the front
+              offset -= RemoteMessageFromRobot.MESSAGE_HEADER_SIZE + size;
+              if (offset >= 0) {
+                System.arraycopy(buffer, RemoteMessageFromRobot.MESSAGE_HEADER_SIZE + size, buffer, 0, offset);
+              }
+  
+              size = 0;
+              tryAgain = true;
+            }
+          } while (tryAgain);
+        }
+        
+        // Do we have messages to send?
+        synchronized(this) {
+          if (this.messagesToSend.size() > 0) {
+            messagesToSend.addAll(this.messagesToSend);
+            this.messagesToSend.clear();
           }
-        } while (tryAgain);
+        }
+        for (RemoteMessageToRobot message : messagesToSend) {
+          byte [] bytes = message.convertToBytes();
+          if (bytes != null) {
+            out.write(message.convertToBytes());
+            //System.out.println("Sending a message.");
+          }
+        }
+        if (messagesToSend.size() > 0) {
+          out.flush();
+          messagesToSend.clear();
+        }
         
       }
       
       socket.close();
     }
     catch (Exception e) {
+      System.err.println("Error caught! " + e.toString());
     }
     
     running = false;
@@ -150,6 +179,10 @@ public class RobotConnector implements Runnable, NetworkConnector {
       listener.receiveRemoteMessageFromRobot(message);
     }
   }
+  
+  public synchronized void addMessageToSend(RemoteMessageToRobot message) {
+    messagesToSend.add(message);
+  }
  
   private int    socketTimeout;
   private int    bufferSize;
@@ -161,5 +194,7 @@ public class RobotConnector implements Runnable, NetworkConnector {
   
   private byte [] buffer;
   
-  private Vector<MessageFromRobotListener> listeners;
+  private List<MessageFromRobotListener> listeners;
+  
+  private List<RemoteMessageToRobot> messagesToSend;
 }

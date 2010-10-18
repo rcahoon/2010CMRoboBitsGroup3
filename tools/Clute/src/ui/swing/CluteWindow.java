@@ -69,9 +69,6 @@ public class CluteWindow extends JFrame {
     setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
     setFocusable(true);
     
-    // Add window listener
-    addWindowListener(new CluteWindowListener(this, localSettings));
-    
     // Add a key listener
     cluteWindowKeys = new CluteWindowKeys(this);
     setFocusable(true);
@@ -89,6 +86,9 @@ public class CluteWindow extends JFrame {
     clute = new Clute(configFile, imageScreen);
     clute.setImagePaused(imagePaused);
     clute.setAutoSegment(autoSegment);
+    
+    // Add window listener
+    addWindowListener(new CluteWindowListener(this, localSettings));
     
     // Add a combo box for all the colors
     JComboBox colorComboBox = new JComboBox(clute.getColors().getAllNames());

@@ -1,7 +1,6 @@
 #include "BehaviorsConfigurable.h"
+#include "Behaviors/RemoteControl/RemoteControl.h"
 #include "Behaviors/Null/NullBehaviors.h"
-#include "Behaviors/MoveToBall/MoveToBall.h"
-#include "Behaviors/ServoToBall/ServoToBall.h"
 #include "Behaviors/Test/BehaviorsTest.h"
 #include "shared/ConfigFile/ConfigFile.h"
 
@@ -13,7 +12,8 @@ BehaviorsConfigurable::BehaviorsConfigurable(ConfigFile & configFile,
                                              Log & _log,
                                              Field & field)
   : log(_log),
-    behaviors(NULL) {
+    behaviors(NULL),
+    remoteControl(NULL) {
   std::string name = configFile.getString("configurable/behaviors");
 
   // Should we use NullBehaviors?
@@ -21,17 +21,16 @@ BehaviorsConfigurable::BehaviorsConfigurable(ConfigFile & configFile,
     behaviors = new NullBehaviors();
   }
   // Should we use TestBehaviors?
-  if (name.compare("Test") == 0) {
+  else if (name.compare("Test") == 0) {
     behaviors = new RoboCup2010::BehaviorsTest(configFile,_log,field);
-  }
-  else if (name.compare("ServoToBall") == 0) {
-    behaviors = new RoboCup2010::ServoToBall(configFile,_log);
-  }
-  else if (name.compare("MoveToBall") == 0) {
-    behaviors = new RoboCup2010::MoveToBall(configFile,_log);
   }
   else {
     LOG_WARN("Configurable Behaviors was not defined.");
+  }
+
+  // Should we allow remote control?
+  if (configFile.getBool("configurable/behaviors/useRemoteControl", false)) {
+    remoteControl = new RemoteControl(configFile, _log);
   }
 }
 
@@ -39,6 +38,10 @@ BehaviorsConfigurable::~BehaviorsConfigurable() {
   if (behaviors != NULL) {
     delete behaviors;
     behaviors = NULL;
+  }
+  if (remoteControl != NULL) {
+    delete remoteControl;
+    remoteControl = NULL;
   }
 }
 
@@ -50,17 +53,20 @@ bool BehaviorsConfigurable::run(const RobotState     & robotState,
                                       Messages       & messages,
                                       Command        & command,
                                       Feedback       & feedback) {
+  bool result = false;
   if (behaviors != NULL) {
-    return behaviors->run(robotState,
-                          gameState,
-                          visionFeatures,
-                          worldFeatures,
-                          pose,
-                          messages,
-                          command,
-                          feedback);
+    result = behaviors->run(robotState,
+                            gameState,
+                            visionFeatures,
+                            worldFeatures,
+                            pose,
+                            messages,
+                            command,
+                            feedback);
   }
-  else {
-    return false;
+  if (remoteControl != NULL) {
+    remoteControl->run(BEHAVIOR_CALL);
   }
+
+  return result;
 }
