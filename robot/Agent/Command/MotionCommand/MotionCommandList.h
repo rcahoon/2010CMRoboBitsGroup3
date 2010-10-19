@@ -8,6 +8,8 @@
 
 #include "HeadCommand/HeadAngles.h"
 #include "HeadCommand/NoHeadCommand.h"
+#include "HeadCommand/HeadStiffness.h"
+#include "HeadCommand/RestoreHeadStiffness.h"
 
 #include "BodyCommand/StandNeutral.h"
 #include "BodyCommand/StopWalk.h"
@@ -29,7 +31,9 @@ enum BodyCommand {
 };
 
 enum HeadCommand {
-    hcNoHeadCommand = 0, // - No params
-    hcHeadAngles,        // - Directly set the head angles (pan, tilt) (in radians)
+    hcNoHeadCommand = 0,   // - No params
+    hcHeadAngles,          // - Directly set the head angles (pan, tilt) (in radians)
+    hcHeadStiffness,       // - Set the head stiffness
+    hcRestoreHeadStiffness // - Restore the head stiffness to the default value
   };
 #endif /* MOTIONCOMMANDLIST_H_ */

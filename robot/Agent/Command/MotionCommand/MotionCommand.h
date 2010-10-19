@@ -75,9 +75,13 @@ public:
   // Functions to set head commands
   void noHeadCommand();
   void headAngles(float pan, float tilt, float speed = 0.8f);
+  void setHeadStiffness(float stiffness);
+  void restoreHeadStiffness();
 
   NoHeadCommand& getNoHeadCommand();
   HeadAngles& getHeadAngles();
+  HeadStiffness& getHeadStiffness();
+  RestoreHeadStiffness& getRestoreHeadStiffness();
 
   // Functions for falling/getting up
 
@@ -91,8 +95,10 @@ private:
   WalkTo        _walkTo;
   StaticAction  _staticAction;
 
-  NoHeadCommand _noHeadCommand;
-  HeadAngles    _headAngles;
+  NoHeadCommand        _noHeadCommand;
+  HeadAngles           _headAngles;
+  HeadStiffness        _headStiffness;
+  RestoreHeadStiffness _restoreHeadStiffness;
 
 //  HeadCommand const *headCommand;
 //  BodyCommand const *bodyCommand;

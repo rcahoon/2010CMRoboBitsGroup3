@@ -43,3 +43,20 @@ void RemoteMessage::writeFloat(char *data, float value) {
   uint32_t floatBits = htonl(*floatBitsPointer);
   memcpy(data, &floatBits, 4);
 }
+
+int RemoteMessage::readInt(char const *data) {
+  uint32_t valueNetwork(0);
+  memcpy(&valueNetwork, data, 4);
+
+  return ntohl(valueNetwork);
+}
+
+float RemoteMessage::readFloat(char const *data) {
+  uint32_t valueNetwork(0);
+  memcpy(&valueNetwork, data, 4);
+  valueNetwork = ntohl(valueNetwork);
+  float *floatBitsPointer = reinterpret_cast<float *>(&valueNetwork);
+
+  return *floatBitsPointer;
+}
+

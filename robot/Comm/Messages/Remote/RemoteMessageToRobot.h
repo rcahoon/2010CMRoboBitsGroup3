@@ -1,7 +1,7 @@
 #ifndef REMOTEMESSAGETOROBOT_H_
 #define REMOTEMESSAGETOROBOT_H_
 
-#include "RemoteMessage.h"
+#include "Comm/Messages/Remote/RemoteMessage.h"
 #include "shared/UsefulMacros.h"
 
 class RemoteMessageToRobot : public RemoteMessage {
@@ -9,7 +9,12 @@ public:
 
   enum MessageType {
     unknown = 0,
-    protoBufToRobot,
+    startRemoteControl,
+    stopRemoteControl,
+    setCamera,
+    setConfigValue,
+    setHeadStiffness,
+    restoreHeadStiffness,
     maxTypes
   };
 
@@ -20,6 +25,8 @@ public:
   virtual ~RemoteMessageToRobot();
 
   MessageType getType() const;
+
+  static RemoteMessageToRobot const * create(int typeInt, unsigned int size, void const * data);
 
 private:
   PREVENT_COPY_AND_ASSIGNMENT(RemoteMessageToRobot);

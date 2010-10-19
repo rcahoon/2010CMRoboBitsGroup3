@@ -59,12 +59,29 @@ protected:
   static void writeInt(char *data, int value);
 
   /**
-   * Write a float into a data buffer. 4 bytes will be ised.
+   * Write a float into a data buffer. 4 bytes will be used.
    *
    * @param data pointer to the data buffer
    * @param value the value of the float
    */
   static void writeFloat(char *data, float value);
+
+  /**
+   * Read an integer from a data buffer, in network format. 4 bytes will be
+   * read.
+   *
+   * @param data pointer to the data buffer
+   * @return the value of the integer (in host format)
+   */
+  static int readInt(char const *data);
+
+  /**
+   * Read a float from a data buffer. 4 bytes will be read.
+   *
+   * @param data pointer to the data buffer
+   * @return the value of the float
+   */
+  static float readFloat(char const *data);
 
   unsigned int  size;
   char         *data;

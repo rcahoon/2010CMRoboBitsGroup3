@@ -120,6 +120,8 @@ private:
     bool initialized, initializedSonar;
 
     float maxTrapezoidValue, maxThetaValue;
+
+    AL::ALValue body, bodyStiffness;
 };
 
 #endif /*_NAOQIINTERFACE_H*/

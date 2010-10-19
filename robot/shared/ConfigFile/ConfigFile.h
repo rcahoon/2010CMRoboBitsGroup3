@@ -97,11 +97,25 @@ public:
    *
    * @param name name of the value to in the file(s)
    * @param defaultValue default value to be returned if name does not exist
+   * @param override whether or not to override the value in the map even if it exists
    *
    * @return value as an integer
    */
   int getInt(const std::string & name,
-             int defaultValue = 0);
+             int defaultValue = 0,
+             bool override = false);
+
+  /**
+   * Returns the reference associated with the name. If the name does not exist
+   * in the files, then the default value is set in the map.
+   *
+   * @param name name of the value to in the file(s)
+   * @param defaultValue default value to be returned if name does not exist
+   *
+   * @return reference to integer value
+   */
+  const int & getIntReference(const std::string & name,
+                              int defaultValue = 0);
 
   /**
    * Returns the value associated with the name. If the name does not exist in
@@ -109,11 +123,13 @@ public:
    *
    * @param name name of the value in the file(s)
    * @param defaultValue default value to be returned if name does not exist
+   * @param override whether or not to override the value in the map even if it exists
    *
    * @return value as a float
    */
   float getFloat(const std::string & name,
-                 float defaultValue = 0);
+                 float defaultValue = 0,
+                 bool override = false);
 
   /**
    * Returns the value associated with the name. If the name does not exist in
@@ -196,7 +212,7 @@ public:
   void setString(const std::string & name,
                  const std::string & value);
 
-  /**
+  /**l
    * Trim whitespace from a string, and any comments (starting with #)
    *
    * @param str string to trim

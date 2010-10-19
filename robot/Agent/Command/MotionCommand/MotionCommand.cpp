@@ -100,6 +100,19 @@ HeadAngles& MotionCommand::getHeadAngles()
     return _headAngles;
 }
 
+void MotionCommand::setHeadStiffness(float stiffness) {
+  _headStiffness.setStiffness(stiffness);
+  headCommand = hcHeadStiffness;
+}
 
+HeadStiffness& MotionCommand::getHeadStiffness() {
+  return _headStiffness;
+}
 
+void MotionCommand::restoreHeadStiffness() {
+  headCommand = hcRestoreHeadStiffness;
+}
 
+RestoreHeadStiffness& MotionCommand::getRestoreHeadStiffness() {
+  return _restoreHeadStiffness;
+}

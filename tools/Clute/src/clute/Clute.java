@@ -7,7 +7,7 @@ import image.*;
 import image.format.*;
 import network.*;
 import network.message.*;
-//import network.message.fromrobot.*;
+import network.message.torobot.*;
 import ui.swing.clute.*;
 
 public class Clute implements Runnable, MessageFromRobotListener {
@@ -68,6 +68,16 @@ public class Clute implements Runnable, MessageFromRobotListener {
       if (!robotConnector.isConnected()) {
         if (robotConnector.connect(robotHost, robotPort)) {
           System.out.println("Connected to robot at " + robotHost + ".");
+          
+          // Send a start remote control message
+          robotConnector.addMessageToSend(new StartRemoteControlMessage());
+
+          // Send messages to switch off logging of RobotState,
+          // logging of original image to 1, and logging of segmented image to 0
+          setLogFrequencies();
+          
+          // Remove head stiffness
+          robotConnector.addMessageToSend(new SetHeadStiffnessMessage(0));
         }
       }
       if (robotConnector.isConnected()) {
@@ -78,6 +88,7 @@ public class Clute implements Runnable, MessageFromRobotListener {
         }
       }
     }
+    
   }
 
   public void startThread() {
@@ -187,6 +198,18 @@ public class Clute implements Runnable, MessageFromRobotListener {
     if (autoSegment) {
       segmentImage();
     }
+  }
+  
+  public void setCamera(boolean useBottomCamera) {
+    // Send a set camera message
+    RemoteMessageToRobot message = new SetCameraMessage(true, useBottomCamera);
+    robotConnector.addMessageToSend(message);
+  }
+  
+  private void setLogFrequencies() {
+    robotConnector.addMessageToSend(new SetConfigValueMessage("log/logRemote/logRobotStatePeriod", "0"));
+    robotConnector.addMessageToSend(new SetConfigValueMessage("log/logRemote/logOriginalImagePeriod", "1"));
+    robotConnector.addMessageToSend(new SetConfigValueMessage("log/logRemote/logSegmentedImagePeriod", "0"));
   }
   
   private final long RECONNECT_SLEEP_TIME;
