@@ -2,7 +2,7 @@
 # ---------------------
 configurable/behaviors      = ServoToBall
 configurable/gameController = AlwaysPlaying
-configurable/localization   = RCahoon
+configurable/localization   = Null
 configurable/vision         = RCahoon
 configurable/worldModel     = Null
 
