@@ -44,10 +44,10 @@ static const char * object_name(VisionObject::Type typ) {
 	switch(typ)
 	{
 		case VisionObject::Ball: return "BALL";
-		case VisionObject::YellowGoalPost: return "Y_GOAL";
-		case VisionObject::BlueGoalPost: return "B_GOAL";
-		case VisionObject::YellowGoalBar: return "Y_GOAL";
-		case VisionObject::BlueGoalBar: return "B_GOAL";
+		case VisionObject::YellowGoalPost: return "Y_GOAL Post";
+		case VisionObject::BlueGoalPost: return "B_GOAL Post";
+		case VisionObject::YellowGoalBar: return "Y_GOAL Full";
+		case VisionObject::BlueGoalBar: return "B_GOAL Full";
 		case VisionObject::Robot: return "ROBOT";
 		case VisionObject::Line: return "LINE";
 		default: return "Unknown";
@@ -171,7 +171,7 @@ bool Vision::run(const RobotState & robotState,
 
 inline int Vision::classify(pixel p)
 {
-	return Color_Map[p.y>>(8-Y_BITS)][p.u>>(8-U_BITS)][p.v>>(8-V_BITS)];
+	return Color_Map[p.yuv.y>>(8-Y_BITS)][p.yuv.u>>(8-U_BITS)][p.yuv.v>>(8-V_BITS)];
 }
 
 void Vision::computeRLE()
@@ -182,13 +182,22 @@ void Vision::computeRLE()
 	for(int j=0; j < processHeight; j++, data += rowStep)
 	{
 		int last = 0;
+		pixel lastP;
 		int start = 0;
+		
+		lastP.num = -data[0].num;
 		
 		row_starts[j] = k;
 		
 		for(int i=0; i < imageWidth; i+=RUNSTEP)
 		{
-			int t = classify(data[i/2]);
+			pixel p = data[i/2];
+			
+			if (abs((int)(p.num - lastP.num)) < 0x03000000) continue;
+			
+			lastP = p;
+			
+			int t = classify(p);
 			
 			if (t==last) continue;
 			
@@ -295,7 +304,7 @@ VisionObject* Vision::addVisionObject(VisionObject::Type type, float area,
 {
 	Vector2D position = cameraToWorld(transform, Vector2D((x1 + x2)/2, y2));
 	
-	if (type == VisionObject::Line && position.x < LINE_PROXIMITY_THRESH) return false;;
+	if (type == VisionObject::Line && position.x < LINE_PROXIMITY_THRESH) return false;
 	
 	VisionObject* obj = new VisionObject(log, type);
 	obj->setBoundingBox(x1, y1, x2, y2);
@@ -308,9 +317,9 @@ VisionObject* Vision::addVisionObject(VisionObject::Type type, float area,
 		object_name(type), x1, y1, x2, y2,
 		position.x, position.y, area);
 	
-	LOG_SHAPE(Log::SegmentedImageScreen,
+	/*LOG_SHAPE(Log::SegmentedImageScreen,
 		Rectangle(Vector2D(x1, y1), Vector2D(x2, y2),
-				  0x000000, 1) );
+				  0x000000, 1) );*/
 	
 	return obj;
 }

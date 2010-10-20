@@ -9,11 +9,12 @@ typedef unsigned char uchar;
 
 namespace RCahoon {
 
-struct yuyv {
-	uchar y,u,y2,v;
+union pixel {
+	struct {
+		uchar y,u,y2,v;
+	} yuv;
+	unsigned int num;
 };
-
-typedef yuyv pixel;
 
 struct pixel_run {
 	short start, end;    // x range of run
