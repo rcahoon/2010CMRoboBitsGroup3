@@ -10,6 +10,7 @@
 #include "shared/Shape/Rectangle.h"
 #include "shared/Shape/Line.h"
 #include "shared/ConfigFile/ConfigFile.h"
+#include "shared/random.h"
 
 #define COMPONENT VISION
 #define CLASS_LOG_LEVEL LOG_LEVEL_TRACE
@@ -236,6 +237,12 @@ void Vision::segmentImage()
 		int endj = row_starts[r+1];
 		while((i < endi) && (j < endj))
 		{
+			if (rle[i].type == VisionObject::Line)
+			{
+				i++;
+				continue;
+			}
+			
 			if (rle[i].end < rle[j].start)
 			{
 				i++;
@@ -317,9 +324,9 @@ VisionObject* Vision::addVisionObject(VisionObject::Type type, float area,
 		object_name(type), x1, y1, x2, y2,
 		position.x, position.y, area);
 	
-	/*LOG_SHAPE(Log::SegmentedImageScreen,
+	LOG_SHAPE(Log::SegmentedImageScreen,
 		Rectangle(Vector2D(x1, y1), Vector2D(x2, y2),
-				  0x000000, 1) );*/
+				  0x000000, 1) );
 	
 	return obj;
 }
@@ -335,37 +342,50 @@ void Vision::findObjects(const HMatrix* transform, VisionFeatures & outputVision
 	outputVisionFeatures.clear();
 	for(int k = 0; k < row_starts[processHeight]; k++)
 	{
+		if (rle[k].type == VisionObject::Line)
+		{
+			/*int i;
+			float area = rle[k].area /(float) LINE_BLOCK_SIZE;
+			for(i=rle[k].x1; i < rle[k].x2 - LINE_BLOCK_SIZE*3/2; i+=LINE_BLOCK_SIZE)
+				addVisionObject(rle[k].type, area,
+					i, rle[k].y1, i+LINE_BLOCK_SIZE, rle[k].y2,
+					transform, outputVisionFeatures);
+			addVisionObject(rle[k].type, area,
+				i, rle[k].y1, rle[k].x2, rle[k].y2,
+				transform, outputVisionFeatures);*/
+			
+			int span = rle[k].area;
+			int left = rle[k].start;
+			int row = rle[k].y1;
+			int samp_count = round(randomDbl()*span*LINE_SAMP_WIDTH)+round(randomDbl()/2+LINE_SAMP_HEIGHT/2);
+			for(int i=0; i < samp_count; i++)
+			{
+				int pos = (int)(randomDbl()*span+left);
+				
+				addVisionObject(VisionObject::Line, span,
+					pos, row, pos, row,
+					transform, outputVisionFeatures);
+			}
+			
+			continue;
+		}
+		
 		if (rle[k].rank >= 0)
 		{
-			if (rle[k].type == VisionObject::Line)
+			if ((rle[k].type == VisionObject::BlueGoalPost) || (rle[k].type == VisionObject::YellowGoalPost))
 			{
-				int i;
-				float area = rle[k].area /(float) LINE_BLOCK_SIZE;
-				for(i=rle[k].x1; i < rle[k].x2 - LINE_BLOCK_SIZE*3/2; i+=LINE_BLOCK_SIZE)
-					addVisionObject(rle[k].type, area,
-						i, rle[k].y1, i+LINE_BLOCK_SIZE, rle[k].y2,
-						transform, outputVisionFeatures);
-				addVisionObject(rle[k].type, area,
-					i, rle[k].y1, rle[k].x2, rle[k].y2,
-					transform, outputVisionFeatures);
-			}
-			else
-			{
-				if ((rle[k].type == VisionObject::BlueGoalPost) || (rle[k].type == VisionObject::YellowGoalPost))
+				if ((rle[k].y2 - rle[k].y1) < (rle[k].x2 - rle[k].x1))
 				{
-					if ((rle[k].y2 - rle[k].y1) < (rle[k].x2 - rle[k].x1))
-					{
-						if (rle[k].type == VisionObject::BlueGoalPost)
-							rle[k].type = VisionObject::BlueGoalBar;
-						else
-							rle[k].type = VisionObject::YellowGoalBar;
-					}
+					if (rle[k].type == VisionObject::BlueGoalPost)
+						rle[k].type = VisionObject::BlueGoalBar;
+					else
+						rle[k].type = VisionObject::YellowGoalBar;
 				}
-				
-				addVisionObject(rle[k].type, rle[k].area,
-					rle[k].x1, rle[k].y1, rle[k].x2, rle[k].y2,
-					transform, outputVisionFeatures);
 			}
+			
+			addVisionObject(rle[k].type, rle[k].area,
+				rle[k].x1, rle[k].y1, rle[k].x2, rle[k].y2,
+				transform, outputVisionFeatures);
 		}
 	}
 }

@@ -133,21 +133,24 @@ public:
 		             const GameState      & gameState,
 		             const VisionFeatures & visionFeatures,
 		             Pose & pose);
-	virtual void updateWorldFeatures(const WorldFeatures & worldFeatures);
+	
+	virtual void reset(ResetCase resetCase);
 
 private:
 	Log & log;
 	Field & field;
 	int l_half_length;
 	int l_half_width;
-	Particle* particles, *particles_buf;
+	/*Particle* particles, *particles_buf;
 	Vector2D* line_map;
 	Vector2D* blue_goal_map;
 
 	Vector2D& GOAL_MAP(Vector2D position, bool flp);
-	Vector2D& LINE_MAP(Vector2D position);
+	Vector2D& LINE_MAP(Vector2D position);*/
 	
 	Vector2D& fieldBound(Vector2D& position);
+	
+	/**/Particle position;
 	
 friend class Particle;
 };

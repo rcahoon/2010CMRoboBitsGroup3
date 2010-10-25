@@ -11,6 +11,8 @@
 #define LINE_PROXIMITY_THRESH  27
 
 #define LINE_BLOCK_SIZE  30
+#define LINE_SAMP_WIDTH  0.003
+#define LINE_SAMP_HEIGHT 0.06
 
 #define RUNSTEP  4
 #define MIN_RUN_LENGTH  4

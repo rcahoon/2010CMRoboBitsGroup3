@@ -2,6 +2,7 @@
 #include "Behaviors/RemoteControl/RemoteControl.h"
 #include "Behaviors/Null/NullBehaviors.h"
 #include "Behaviors/MoveToBall/MoveToBall.h"
+#include "Behaviors/Scheduler/Scheduler.h"
 #include "Behaviors/ServoToBall/ServoToBall.h"
 #include "Behaviors/Test/BehaviorsTest.h"
 #include "shared/ConfigFile/ConfigFile.h"
@@ -25,6 +26,9 @@ BehaviorsConfigurable::BehaviorsConfigurable(ConfigFile & configFile,
   // Should we use TestBehaviors?
   if (name.compare("Test") == 0) {
     behaviors = new RoboCup2010::BehaviorsTest(configFile,_log,field);
+  }
+  else if (name.compare("Scheduler") == 0) {
+    behaviors = new RoboCup2010::Scheduler(configFile,_log);
   }
   else if (name.compare("ServoToBall") == 0) {
     behaviors = new RoboCup2010::ServoToBall(configFile,_log);

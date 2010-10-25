@@ -1,5 +1,6 @@
 #include "WorldModelConfigurable.h"
 #include "WorldModel/Null/NullWorldModel.h"
+#include "WorldModel/rcahoon/WorldModel.h"
 #include "shared/ConfigFile/ConfigFile.h"
 
 #define COMPONENT WORLD_MODEL
@@ -16,6 +17,9 @@ WorldModelConfigurable::WorldModelConfigurable(ConfigFile & configFile,
   // Should we use NullWorldModel?
   if (name.compare("Null") == 0) {
     worldModel = new NullWorldModel();
+  }
+  if (name.compare("RCahoon") == 0) {
+    worldModel = new RCahoon::WorldModel(configFile, _log, field);
   }
   else {
     LOG_WARN("Configurable World Model was not defined.");
