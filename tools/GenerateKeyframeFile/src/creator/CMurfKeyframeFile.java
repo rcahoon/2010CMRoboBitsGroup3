@@ -55,15 +55,15 @@ public class CMurfKeyframeFile {
 		
 		while ((line = input.readLine()) != null){
 			// Line containing joint name
-		    if (line.startsWith("names[") && line.contains("] = ") && line.endsWith("\";")) {
-                startIndex = line.indexOf("] = ") + 5;
-                endIndex   = line.indexOf("\";", startIndex);
+		    if (line.startsWith("names") && line.contains("push_back") && line.endsWith("\");")) {
+                startIndex = line.indexOf("(") + 2;
+                endIndex   = line.indexOf("\");", startIndex);
                 jointName = line.substring(startIndex, endIndex);
 //                System.out.println("Joint Name = " + jointName);
 			}
 
             // Line containing time
-            if (line.startsWith("times[") && line.contains("] = ") &&line.endsWith(";")) {
+            if (line.startsWith("times") && line.contains("] = ") &&line.endsWith(";")) {
                 startIndex = line.indexOf("] = ") + 4;
                 endIndex   = line.indexOf(";", startIndex);
                 time = line.substring(startIndex, endIndex);
@@ -74,8 +74,8 @@ public class CMurfKeyframeFile {
                 startIndex = line.indexOf("] = AL::ALValue::array(") + 23;
                 endIndex = line.indexOf(");", startIndex);
                 jointAngle = line.substring(startIndex, endIndex);
-                jointAngle = jointAngle.replaceAll("0,", "0.0,");
-                jointAngle = jointAngle.replaceAll("0\\)", "0.0)");
+//                jointAngle = jointAngle.replaceAll("0,", "0.0,");
+//                jointAngle = jointAngle.replaceAll("0\\)", "0.0)");
 //                System.out.println("Joint Angle = " + jointAngle);
             }		    
             
