@@ -17,10 +17,10 @@ static inline float pdf(float x, float var)
 	return var/(var+x*x);
 }
 
-//TODO: do sensor fusion correctl
+//TODO: do sensor fusion correctly
 void Particle::update(Localization& loc, std::vector<VisionObject const *> vis_objs, Noisy<float> t_x, Noisy<float> t_y, Noisy<float> rot)
 {
-	pos_x += t_x;
+/*	pos_x += t_x;
 	pos_y += t_y;
 	angle += rot;
 	
@@ -61,7 +61,7 @@ void Particle::update(Localization& loc, std::vector<VisionObject const *> vis_o
 							subvec *= subvec.dot(vec2);
 							if (subvec.length() > 0.01)
 								vec += subvec.norm(pr);
-						}*/
+						}* /
 						vec = loc.LINE_MAP(position);
 					break;
 					case VisionObject::BlueGoalPost:
@@ -93,7 +93,7 @@ void Particle::update(Localization& loc, std::vector<VisionObject const *> vis_o
 			printf("%.2f %.2f %.2f\t| %.2f %.2f %.2f\t| %.2f %.2f %.2f\n",
 			       pos_x.val(), pos_y.val(), angle.val(), grad.x, grad.y, moment, dpos_x, dpos_y, dang);
 		}
-	}
+	}*/
 }
 
 }

@@ -47,6 +47,11 @@ public:
 		return _var;
 	}
 	
+	void angle_norm()
+	{
+		_val = norm_angle(_val);
+	}
+	
 	inline Noisy operator + (const Noisy& b) const
 	{
 		return Noisy(_val+b._val, _var+b._var);
@@ -116,6 +121,18 @@ struct Particle
 		return globalCoords;
 	}
 	
+	// fusion/averaging operator
+	inline Particle operator | (const Particle& b) const
+	{
+		Particle newVal(pos_x | b.pos_x, pos_y | b.pos_y, angle | b.angle);
+		newVal.angle.angle_norm();
+		return newVal;
+	}
+	Particle& operator |= (const Particle& b)
+	{
+		return (*this = *this | b);
+	}
+	
 	inline operator Pose() const
 	{
 		return Pose(position(), angle.val(), belief());
@@ -133,21 +150,24 @@ public:
 		             const GameState      & gameState,
 		             const VisionFeatures & visionFeatures,
 		             Pose & pose);
-	virtual void updateWorldFeatures(const WorldFeatures & worldFeatures);
+	
+	virtual void reset(ResetCase resetCase);
 
 private:
 	Log & log;
 	Field & field;
 	int l_half_length;
 	int l_half_width;
-	Particle* particles, *particles_buf;
+	/*Particle* particles, *particles_buf;
 	Vector2D* line_map;
 	Vector2D* blue_goal_map;
 
 	Vector2D& GOAL_MAP(Vector2D position, bool flp);
-	Vector2D& LINE_MAP(Vector2D position);
+	Vector2D& LINE_MAP(Vector2D position);*/
 	
 	Vector2D& fieldBound(Vector2D& position);
+	
+	/**/Particle position;
 	
 friend class Particle;
 };

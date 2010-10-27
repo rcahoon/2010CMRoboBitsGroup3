@@ -1,10 +1,10 @@
 # Configurable settings
 # ---------------------
-configurable/behaviors      = ServoToBall
+configurable/behaviors      = Scheduler
 configurable/gameController = AlwaysPlaying
 configurable/localization   = RCahoon
 configurable/vision         = RCahoon
-configurable/worldModel     = Null
+configurable/worldModel     = RCahoon
 
 configurable/behaviors/useRemoteControl = 1
 
