@@ -47,6 +47,11 @@ public:
 		return _var;
 	}
 	
+	void angle_norm()
+	{
+		_val = norm_angle(_val);
+	}
+	
 	inline Noisy operator + (const Noisy& b) const
 	{
 		return Noisy(_val+b._val, _var+b._var);
@@ -114,6 +119,18 @@ struct Particle
 		globalCoords.y += s * x + c * y;
 		
 		return globalCoords;
+	}
+	
+	// fusion/averaging operator
+	inline Particle operator | (const Particle& b) const
+	{
+		Particle newVal(pos_x | b.pos_x, pos_y | b.pos_y, angle | b.angle);
+		newVal.angle.angle_norm();
+		return newVal;
+	}
+	Particle& operator |= (const Particle& b)
+	{
+		return (*this = *this | b);
 	}
 	
 	inline operator Pose() const

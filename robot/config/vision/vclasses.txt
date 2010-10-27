@@ -6,45 +6,53 @@ vision/classes/0/red = 0
 vision/classes/0/green = 255
 vision/classes/0/blue = 0
 vision/classes/0/minSize = 0
+vision/classes/0/meanSize = 5
 
 # Ball
 vision/classes/1/red = 255
 vision/classes/1/green = 0
 vision/classes/1/blue = 0
 vision/classes/1/minSize = 8
+vision/classes/1/meanSize = 5
 
 # BlueGoalPost
 vision/classes/2/red = 0
 vision/classes/2/green = 0
 vision/classes/2/blue = 255
 vision/classes/2/minSize = 400
+vision/classes/3/meanSize = 5
 
 # YellowGoalPost
 vision/classes/3/red = 255
 vision/classes/3/green = 255
 vision/classes/3/blue = 0
 vision/classes/3/minSize = 400
+vision/classes/3/meanSize = 5
 
 # BlueGoalBar
 vision/classes/4/red = 0
 vision/classes/4/green = 0
 vision/classes/4/blue = 255
 vision/classes/4/minSize = 400
+vision/classes/4/meanSize = 5
 
 # YellowGoalBar
 vision/classes/5/red = 255
 vision/classes/5/green = 255
 vision/classes/5/blue = 0
 vision/classes/5/minSize = 400
+vision/classes/5/meanSize = 5
 
 # Robot
 vision/classes/6/red = 255
 vision/classes/6/green = 0
 vision/classes/6/blue = 255
 vision/classes/6/minSize = 200
+vision/classes/3/meanSize = 5
 
 # Line
 vision/classes/7/red = 255
 vision/classes/7/green = 255
 vision/classes/7/blue = 255
 vision/classes/7/minSize = 70
+vision/classes/3/meanSize = 5

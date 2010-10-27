@@ -117,10 +117,13 @@ struct ColorClass {
 	// minimum region size for this class
 	int min_size;
 	
+	// region size used for confidence measures
+	int mean_size;
+	
 	ColorClass() {}
 	
-	ColorClass(int _r, int _g, int _b, int _min_size)
-		: color(_r, _g, _b), min_size(_min_size)
+	ColorClass(int _r, int _g, int _b, int _min_size, int _mean_size)
+		: color(_r, _g, _b), min_size(_min_size), mean_size(_mean_size)
 	{}
 };
 

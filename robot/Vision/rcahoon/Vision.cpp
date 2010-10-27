@@ -2,7 +2,7 @@
 #include <ios>
 
 #include "Vision/rcahoon/Vision.h"
-//#include "Vision/rcahoon/shared/cameraconstants.h"
+#include "Vision/rcahoon/shared/cameraconstants.h"
 #include "Agent/RobotState.h"
 #include "Vision/VisionFeatures.h"
 #include "Vision/VisionObject/LineVisionObject.h"
@@ -55,6 +55,40 @@ static const char * object_name(VisionObject::Type typ) {
 	}
 }
 
+static Vector3D rotMul(const HMatrix* mat, const Vector3D& vec)
+{
+	Vector3D res(0.0f,0.0f,0.0f);
+	for(int i=0; i < 3; i++)
+		for(int j=0; j < 3; j++)
+			res[i] += mat->get(i,j)*vec[j];
+	return res;
+}
+
+// camera pseudo-focal length
+#define HORZ_F  1.05f  // = tan(H_FOV)
+#define VERT_F  0.695f // = tan(V_FOV)
+#define H_SCALE 0.4f
+#define V_SCALE 0.6f
+// note: HORZ_F*H_SCALE = VERT_F*V_SCALE = 0.42
+
+Vector2D cameraToWorld(const HMatrix* cameraBodyTransform, const Vector2D& imageCoords)
+{
+	//TODO: don't depend on hard-coded image size
+	Vector3D cameraCoords = Vector3D(1.0f, -(imageCoords[0]/IMAGEWIDTH-0.5f)*HORZ_F*H_SCALE,
+	                                       -(imageCoords[1]/IMAGEHEIGHT-0.5f)*VERT_F*V_SCALE);
+	//LOG_INFO("Camera: %f,%f\n", cameraCoords[1], cameraCoords[2]/*+0.035f*/);cameraBodyTransform->get(0,3)
+	Vector3D ray = rotMul(cameraBodyTransform, cameraCoords);
+	//ray.normalize(); printf("Object Heading: (%f %f %f)\n", ray[0], ray[1], ray[2]);
+	
+	Vector3D T( cameraBodyTransform->get(0,3),
+	            cameraBodyTransform->get(1,3),
+	            cameraBodyTransform->get(2,3) );
+	
+	T -= T[2]/ray[2]*ray;
+
+	return Vector2D(T[0]*100, T[1]*100); // convert to centimeters
+}
+
 void Vision::initMap(ConfigFile & configFile)
 {
 	for(int i=0; i < num_classes; i++)
@@ -64,7 +98,8 @@ void Vision::initMap(ConfigFile & configFile)
 			configFile.getInt(path + "/red"),
 			configFile.getInt(path + "/green"),
 			configFile.getInt(path + "/blue"),
-			configFile.getInt(path + "/minSize")
+			configFile.getInt(path + "/minSize"),
+			configFile.getInt(path + "/meanSize")
 		);
 		printf("%s  Type: %s  (%d,%d,%d)  %d\n", path.c_str(), object_name((VisionObject::Type)i),
 												classes[i].color.getRed(), classes[i].color.getGreen(), classes[i].color.getBlue(),
@@ -127,22 +162,22 @@ bool Vision::run(const RobotState & robotState,
 #ifdef LOG_TRACE_ACTIVE
 	startTime = log.getTimestamp();
 #endif
-	// Segment the image
-	segmentImage();
-#ifdef LOG_TRACE_ACTIVE
-	elapsed = log.getTimestamp() - startTime;
-#endif
-	LOG_TRACE("Segmenting took %d ms.", elapsed);
-
-#ifdef LOG_TRACE_ACTIVE
-	startTime = log.getTimestamp();
-#endif
 	// Retrieve the transformation matrix from the camera
 	HMatrix const* transformationFromCamera = &(robotState.getTransformationFromCamera());
 #ifdef LOG_TRACE_ACTIVE
 	elapsed = log.getTimestamp() - startTime;
 #endif
 	LOG_TRACE("Retrieving transformation matrix from RobotState took %d ms.", elapsed);
+
+#ifdef LOG_TRACE_ACTIVE
+	startTime = log.getTimestamp();
+#endif
+	// Segment the image
+	segmentImage(transformationFromCamera);
+#ifdef LOG_TRACE_ACTIVE
+	elapsed = log.getTimestamp() - startTime;
+#endif
+	LOG_TRACE("Segmenting took %d ms.", elapsed);
 
 	//LOG_INFO("Head: %f %f", robotState.getHeadPan(), robotState.getHeadTilt());
 
@@ -194,9 +229,9 @@ void Vision::computeRLE()
 		{
 			pixel p = data[i/2];
 			
-			if (abs((int)(p.num - lastP.num)) < 0x03000000) continue;
+			/*if (abs((int)(p.num - lastP.num)) < PIXEL_CHANGE_THRESH) continue;
 			
-			lastP = p;
+			lastP = p;*/
 			
 			int t = classify(p);
 			
@@ -227,9 +262,22 @@ void Vision::computeRLE()
 	row_starts[processHeight] = k;
 }
 
-void Vision::segmentImage()
+void Vision::segmentImage(const HMatrix* transform)
 {
-	for(int r = 1; r < processHeight; r++)
+	HMatrix xf = *transform;
+	xf.reverse();
+	Vector3D ray = rotMul(&xf, Vector3D(1, 0, SCAN_TOP_DECLINATION));
+	printf("%f %f %f\n", ray.x, ray.y, ray.z);
+	int scanTop = (int)( ((ray.z/ray.x/(-VERT_F*V_SCALE))+0.5f)*imageHeight );
+	scanTop = min(max(scanTop, 0), processHeight);
+	LOG_DEBUG("Scan top: %d", scanTop);
+	
+	for(int i=0; i < row_starts[scanTop]; i++)
+	{
+		rle[i].rank = -1;
+	}
+
+	for(int r=scanTop+1; r < processHeight; r++)
 	{
 		int i = row_starts[r-1];
 		int j = row_starts[r];
@@ -265,44 +313,33 @@ void Vision::segmentImage()
 			}
 		}
 	}
+	
+	balls.clear();
+	b_goals.clear();
+	y_goals.clear();
+	lines.clear();
 	for(int k = 0; k < row_starts[processHeight]; k++)
 	{
-		if (rle[k].area < classes[rle[k].type].min_size)
-			rle[k].rank = -1;
+		if (rle[k].rank >= 0)
+		{
+			switch(rle[k].type)
+			{
+			case VisionObject::Ball:
+				balls.push_back(&rle[k]);
+			break;
+			case VisionObject::BlueGoalPost:
+				b_goals.push_back(&rle[k]);
+			break;
+			case VisionObject::YellowGoalPost:
+				y_goals.push_back(&rle[k]);
+			break;
+			case VisionObject::Line:
+				lines.push_back(&rle[k]);
+			break;
+			default: break;
+			}
+		}
 	}
-}
-
-// camera pseudo-focal length
-#define HORZ_F  1.05f  // = tan(H_FOV)
-#define VERT_F  0.695f // = tan(V_FOV)
-#define H_SCALE 0.4f
-#define V_SCALE 0.6f
-// note: HORZ_F*H_SCALE = VERT_F*V_SCALE = 0.42
-
-static Vector3D rotMul(const HMatrix* mat, const Vector3D& vec)
-{
-	Vector3D res(0.0f,0.0f,0.0f);
-	for(int i=0; i < 3; i++)
-		for(int j=0; j < 3; j++)
-			res[i] += mat->get(i,j)*vec[j];
-	return res;
-}
-
-Vector2D Vision::cameraToWorld(const HMatrix* cameraBodyTransform, const Vector2D& imageCoords)
-{
-	Vector3D cameraCoords = Vector3D(1.0f, -(imageCoords[0]/imageWidth-0.5f)*HORZ_F*H_SCALE,
-	                                       -(imageCoords[1]/imageHeight-0.5f)*VERT_F*V_SCALE);
-	//LOG_INFO("Camera: %f,%f\n", cameraCoords[1], cameraCoords[2]/*+0.035f*/);cameraBodyTransform->get(0,3)
-	Vector3D ray = rotMul(cameraBodyTransform, cameraCoords);
-	//ray.normalize(); printf("Object Heading: (%f %f %f)\n", ray[0], ray[1], ray[2]);
-	
-	Vector3D T( cameraBodyTransform->get(0,3),
-	            cameraBodyTransform->get(1,3),
-	            cameraBodyTransform->get(2,3) );
-	
-	T -= T[2]/ray[2]*ray;
-
-	return Vector2D(T[0]*100, T[1]*100); // convert to centimeters
 }
 
 VisionObject* Vision::addVisionObject(VisionObject::Type type, float area,
@@ -316,7 +353,7 @@ VisionObject* Vision::addVisionObject(VisionObject::Type type, float area,
 	VisionObject* obj = new VisionObject(log, type);
 	obj->setBoundingBox(x1, y1, x2, y2);
 	obj->setPosition(position);
-	obj->setConfidence(area);
+	obj->setConfidence(exp(-position.length()*classes[type].mean_size/area));
 	
 	outputVisionFeatures.addVisionObject(*obj);
 	
@@ -335,14 +372,100 @@ void Vision::findObjects(const HMatrix* transform, VisionFeatures & outputVision
 {
 	std::vector<VisionObject const *> objs = outputVisionFeatures.getAllVisionObjects();
 	std::vector<VisionObject const *>::iterator iter = objs.begin();
-    for(; iter != objs.end(); iter++)
+	for(; iter != objs.end(); iter++)
 	{
 		delete *iter;
 	}
 	outputVisionFeatures.clear();
-	for(int k = 0; k < row_starts[processHeight]; k++)
+	
+	
+	for(list<pixel_run*>::iterator iter = balls.begin();
+		iter != balls.end(); )
 	{
-		if (rle[k].type == VisionObject::Line)
+		for(list<pixel_run*>::iterator iter2 = iter;
+			iter2 != balls.end(); )
+		{
+			iter2++;
+		}
+		
+		pixel_run& r = **iter;
+		if (r.area < classes[VisionObject::Ball].min_size)
+		{
+			iter = balls.erase(iter);
+		}
+		else
+		{
+			addVisionObject(r.type, r.area,
+				r.x1, r.y1, r.x2, r.y2,
+				transform, outputVisionFeatures);
+			
+			iter++;
+		}
+	}
+	
+	for(list<pixel_run*>::iterator iter = b_goals.begin();
+		iter != b_goals.end(); )
+	{
+		pixel_run& r = **iter;
+		if (r.area < classes[VisionObject::BlueGoalPost].min_size)
+		{
+			iter = b_goals.erase(iter);
+		}
+		else
+		{
+			Vector2D post1 = cameraToWorld(transform, Vector2D(r.x1, r.y2));
+			Vector2D post2 = cameraToWorld(transform, Vector2D(r.x2, r.y2));
+			printf("Posts: (%f %f)  (%f %f)\n", post1.x, post1.y, post2.x, post2.y);
+			if (sqdistance(post1,post2) > (100*100))
+			//if ((r.y2 - r.y1) < (r.x2 - r.x1))
+			{
+				r.type = VisionObject::BlueGoalBar;
+			}
+			
+			addVisionObject(r.type, r.area,
+				r.x1, r.y1, r.x2, r.y2,
+				transform, outputVisionFeatures);
+			
+			iter++;
+		}
+	}
+	
+	for(list<pixel_run*>::iterator iter = y_goals.begin();
+		iter != y_goals.end(); )
+	{
+		pixel_run& r = **iter;
+		if (r.area < classes[VisionObject::YellowGoalPost].min_size)
+		{
+			iter = y_goals.erase(iter);
+		}
+		else
+		{
+			Vector2D post1 = cameraToWorld(transform, Vector2D(r.x1, r.y2));
+			Vector2D post2 = cameraToWorld(transform, Vector2D(r.x2, r.y2));
+			printf("Posts: (%f %f)  (%f %f)\n", post1.x, post1.y, post2.x, post2.y);
+			if (sqdistance(post1,post2) > (100*100))
+			//if ((r.y2 - r.y1) < (r.x2 - r.x1))
+			{
+				r.type = VisionObject::YellowGoalBar;
+			}
+			
+			addVisionObject(r.type, r.area,
+				r.x1, r.y1, r.x2, r.y2,
+				transform, outputVisionFeatures);
+			
+			iter++;
+		}
+	}
+	
+	for(list<pixel_run*>::iterator iter = lines.begin();
+		iter != lines.end(); )
+	{
+		pixel_run& r = **iter;
+		/*if (r.area < classes[VisionObject::Line].min_size)
+		{
+			iter = lines.erase(iter);
+		}
+		else*/
 		{
 			/*int i;
 			float area = rle[k].area /(float) LINE_BLOCK_SIZE;
@@ -354,9 +477,9 @@ void Vision::findObjects(const HMatrix* transform, VisionFeatures & outputVision
 				i, rle[k].y1, rle[k].x2, rle[k].y2,
 				transform, outputVisionFeatures);*/
 			
-			int span = rle[k].area;
-			int left = rle[k].start;
-			int row = rle[k].y1;
+			int span = r.area;
+			int left = r.start;
+			int row = r.y1;
 			int samp_count = round(randomDbl()*span*LINE_SAMP_WIDTH)+round(randomDbl()/2+LINE_SAMP_HEIGHT/2);
 			for(int i=0; i < samp_count; i++)
 			{
@@ -367,25 +490,7 @@ void Vision::findObjects(const HMatrix* transform, VisionFeatures & outputVision
 					transform, outputVisionFeatures);
 			}
 			
-			continue;
-		}
-		
-		if (rle[k].rank >= 0)
-		{
-			if ((rle[k].type == VisionObject::BlueGoalPost) || (rle[k].type == VisionObject::YellowGoalPost))
-			{
-				if ((rle[k].y2 - rle[k].y1) < (rle[k].x2 - rle[k].x1))
-				{
-					if (rle[k].type == VisionObject::BlueGoalPost)
-						rle[k].type = VisionObject::BlueGoalBar;
-					else
-						rle[k].type = VisionObject::YellowGoalBar;
-				}
-			}
-			
-			addVisionObject(rle[k].type, rle[k].area,
-				rle[k].x1, rle[k].y1, rle[k].x2, rle[k].y2,
-				transform, outputVisionFeatures);
+			iter++;
 		}
 	}
 }
