@@ -461,12 +461,11 @@ void NaoQiInterface::updateRobotState()
 
         //std::cout << "restoring stiffness" << std::endl;
 //        motionProxy->post.setStiffnesses("Body",configFile.getFloat("motion/stiffness/body",0.8f));
-        motionProxy->post.setStiffnesses(body, bodyStiffness);
-//        motionProxy->post.setStiffnesses("LArm",configFile.getFloat("motion/stiffness/body",0.8f));
-//        motionProxy->post.setStiffnesses("RArm",configFile.getFloat("motion/stiffness/body",0.8f));
-//        motionProxy->post.setStiffnesses("LLeg",configFile.getFloat("motion/stiffness/body",0.8f));
-//        motionProxy->post.setStiffnesses("RLeg",configFile.getFloat("motion/stiffness/body",0.8f));
-//        motionProxy->post.setStiffnesses("Head",configFile.getFloat("motion/stiffness/head",0.8f));
+        // Restore the stiffness only if the robot is already stiff
+        std::vector<float> stiffnesses = motionProxy->getStiffnesses("LHipYawPitch");
+        if ((stiffnesses.size() > 0) && (stiffnesses[0] > 0)) {
+          motionProxy->post.setStiffnesses(body, bodyStiffness);
+        }
     }
     else
 //    if ( bodyCommandType == bcWalk || bodyCommandType == bcWalkTo )
@@ -779,7 +778,11 @@ void NaoQiInterface::act()
                 //std::cout << "bcStaticAction" << std::endl;
                 if ( !isWalkToRunning )
                 {
-                    motionProxy->post.setStiffnesses("Body",configFile.getFloat("motion/stiffness/keyframe",1.0f));
+                    // Set the stiffness only if the robot is already stiff
+                    std::vector<float> stiffnesses = motionProxy->getStiffnesses("LHipYawPitch");
+                    if ((stiffnesses.size() > 0) && (stiffnesses[0] > 0)) {
+                      motionProxy->post.setStiffnesses("Body",configFile.getFloat("motion/stiffness/keyframe",1.0f));
+                    }
                     //std::cout << "Setting stiffness to 1" << std::endl;
 
                     //std::cout << "actively playing keyframe: " << staticActionPlayer.isActive() << std::endl;
