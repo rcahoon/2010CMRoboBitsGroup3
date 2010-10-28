@@ -1,0 +1,2 @@
+~INCLUDE behaviors/2010/getUp.txt
+~INCLUDE behaviors/2010/obeyGameManager.txt

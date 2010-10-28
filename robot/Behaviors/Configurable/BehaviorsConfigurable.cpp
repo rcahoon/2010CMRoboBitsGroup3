@@ -2,6 +2,7 @@
 #include "Behaviors/RemoteControl/RemoteControl.h"
 #include "Behaviors/Null/NullBehaviors.h"
 #include "Behaviors/Tests/TestComm.h"
+#include "Behaviors/2010/Player.h"
 #include "Behaviors/Test/BehaviorsTest.h"
 #include "shared/ConfigFile/ConfigFile.h"
 
@@ -25,9 +26,13 @@ BehaviorsConfigurable::BehaviorsConfigurable(ConfigFile & configFile,
   else if (name.compare("tests/testComm") == 0) {
     behaviors = new RoboCupTests::TestComm(configFile, _log);
   }
+  // Should we run the player?
+  else if (name.compare("Player") == 0) {
+    behaviors = new RoboCup2010::Player(configFile, _log, field);
+  }
   // Should we use TestBehaviors?
   else if (name.compare("Test") == 0) {
-    behaviors = new RoboCup2010::BehaviorsTest(configFile,_log,field);
+    behaviors = new RoboCup2010::BehaviorsTest(configFile,_log, field);
   }
   else {
     LOG_WARN("Configurable Behaviors was not defined.");
