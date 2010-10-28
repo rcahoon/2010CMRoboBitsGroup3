@@ -1,6 +1,7 @@
 #include "BehaviorsConfigurable.h"
 #include "Behaviors/RemoteControl/RemoteControl.h"
 #include "Behaviors/Null/NullBehaviors.h"
+#include "Behaviors/Tests/TestComm.h"
 #include "Behaviors/Test/BehaviorsTest.h"
 #include "shared/ConfigFile/ConfigFile.h"
 
@@ -19,6 +20,10 @@ BehaviorsConfigurable::BehaviorsConfigurable(ConfigFile & configFile,
   // Should we use NullBehaviors?
   if (name.compare("Null") == 0) {
     behaviors = new NullBehaviors();
+  }
+  // Should we test communications?
+  else if (name.compare("tests/testComm") == 0) {
+    behaviors = new RoboCupTests::TestComm(configFile, _log);
   }
   // Should we use TestBehaviors?
   else if (name.compare("Test") == 0) {

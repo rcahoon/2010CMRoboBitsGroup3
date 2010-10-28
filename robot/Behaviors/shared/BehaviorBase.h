@@ -8,6 +8,7 @@
 #include "shared/ConfigFile/ConfigFile.h"
 
 #include "Agent/RobotState.h"
+#include "Behaviors/Behaviors.h"
 #include "GameController/GameState.h"
 #include "Vision/VisionFeatures.h"
 #include "WorldModel/WorldFeatures.h"
@@ -24,7 +25,7 @@
 class ConfigFile;
 class Log;
 
-class BehaviorBase {
+class BehaviorBase : public Behaviors {
 public:
   BehaviorBase();
 
