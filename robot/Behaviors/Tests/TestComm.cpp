@@ -30,18 +30,21 @@ bool TestComm::run(BEHAVIOR_PARAMS) {
 
   // Create a message
   PlayerMessage *message = new PlayerMessage(configFile);
+  message->setBallSeen(true);
   // Add the message into queue
   // Note: ownership is transferred, so don't delete the message!
   messages.addPlayerMessageToSend(message);
+
 
   // Check for messages
   const std::vector<PlayerMessage const *> & receivedMessages = messages.getReceivedPlayerMessages();
   std::vector<PlayerMessage const *>::const_iterator iter;
   for (iter = receivedMessages.begin(); iter != receivedMessages.end(); iter++) {
     PlayerMessage const *receivedMessage = *iter;
-    LOG_INFO("Received a message from player %d on team %d.",
+    LOG_INFO("Received a message from player %d on team %d, ballSeen = %d.",
              receivedMessage->getSenderPlayerNumber(),
-             receivedMessage->getSenderTeamNumber());
+             receivedMessage->getSenderTeamNumber(),
+             receivedMessage->isBallSeen());
   }
   LOG_DEBUG("End of received messages.")
 
