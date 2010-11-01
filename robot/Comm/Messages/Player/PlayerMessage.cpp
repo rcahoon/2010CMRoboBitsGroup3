@@ -36,5 +36,5 @@ bool PlayerMessage::isBallSeen() const {
 }
 
 void PlayerMessage::setBallSeen(bool _ballSeen) {
-  ballSeen = ballSeen;
+  ballSeen = _ballSeen;
 }
