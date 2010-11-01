@@ -11,7 +11,7 @@
 #define PIXEL_CHANGE_THRESH  0x03000000  /* yuyv */
 
 #define LINE_PROXIMITY_THRESH  27
-#define SCAN_TOP_DECLINATION  -0.025
+#define SCAN_TOP_DECLINATION  /*-0.025*/ 0
 
 #define LINE_BLOCK_SIZE  30
 #define LINE_SAMP_WIDTH  0.003
@@ -58,7 +58,7 @@ private:
 	void segmentImage(const HMatrix* transform);
 	void findObjects(const HMatrix* transformationFromCamera, VisionFeatures & outputVisionFeatures);
 	inline int classify(pixel p);
-	VisionObject* addVisionObject(VisionObject::Type type, float area, int x1, int y1, int x2, int y2,
+	VisionObject* addVisionObject(VisionObject::Type type, float area, int x1, int y1, int x2, int y2, float center,
 		const HMatrix* transform, VisionFeatures & outputVisionFeatures);
 
 	int imageWidth;

@@ -76,7 +76,7 @@ public:
 	// fusion/averaging operator
 	inline Noisy operator | (const Noisy& b) const
 	{
-		return Noisy((_val*b._var+b._val*_var)/(_var+b._var), _var*b._var/(_var+b._var));
+		return Noisy((_val*b._var+b._val*_var)/(_var+b._var+0.0001), _var*b._var/(_var+b._var+0.0001));
 	}
 	Noisy& operator |= (const Noisy& b)
 	{

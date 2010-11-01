@@ -8,6 +8,7 @@
 #include "shared/ConfigFile/ConfigFile.h"
 
 #include "Agent/RobotState.h"
+#include "Behaviors/Behaviors.h"
 #include "GameController/GameState.h"
 #include "Vision/VisionFeatures.h"
 #include "WorldModel/WorldFeatures.h"

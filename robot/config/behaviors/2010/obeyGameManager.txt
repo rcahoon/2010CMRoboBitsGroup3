@@ -1,0 +1,9 @@
+behaviors/2010/tactics/obeyGameManager/readySpeech           = I will get ready for the game.
+behaviors/2010/tactics/obeyGameManager/setSpeech             = I am all set!
+behaviors/2010/tactics/obeyGameManager/playingSpeech         = It's time to play.
+behaviors/2010/tactics/obeyGameManager/penalizedSpeech       = Please don't penalize me!
+behaviors/2010/tactics/obeyGameManager/backFromPenaltySpeech = The taste of freedom is sweet.
+behaviors/2010/tactics/obeyGameManager/blueTeamSpeech        = I am now on the blue team.
+behaviors/2010/tactics/obeyGameManager/redTeamSpeech         = I am now on the red team.
+behaviors/2010/tactics/obeyGameManager/kickoffSpeech         = We have kickoff.
+behaviors/2010/tactics/obeyGameManager/noKickoffSpeech       = We don't have kickoff.

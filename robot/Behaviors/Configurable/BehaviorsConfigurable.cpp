@@ -4,6 +4,8 @@
 #include "Behaviors/MoveToBall/MoveToBall.h"
 #include "Behaviors/Scheduler/Scheduler.h"
 #include "Behaviors/ServoToBall/ServoToBall.h"
+#include "Behaviors/Tests/TestComm.h"
+#include "Behaviors/2010/Player.h"
 #include "Behaviors/Test/BehaviorsTest.h"
 #include "shared/ConfigFile/ConfigFile.h"
 
@@ -23,9 +25,17 @@ BehaviorsConfigurable::BehaviorsConfigurable(ConfigFile & configFile,
   if (name.compare("Null") == 0) {
     behaviors = new NullBehaviors();
   }
+  // Should we test communications?
+  else if (name.compare("tests/testComm") == 0) {
+    behaviors = new RoboCupTests::TestComm(configFile, _log);
+  }
+  // Should we run the player?
+  else if (name.compare("Player") == 0) {
+    behaviors = new RoboCup2010::Player(configFile, _log, field);
+  }
   // Should we use TestBehaviors?
-  if (name.compare("Test") == 0) {
-    behaviors = new RoboCup2010::BehaviorsTest(configFile,_log,field);
+  else if (name.compare("Test") == 0) {
+    behaviors = new RoboCup2010::BehaviorsTest(configFile,_log, field);
   }
   else if (name.compare("Scheduler") == 0) {
     behaviors = new RoboCup2010::Scheduler(configFile,_log);

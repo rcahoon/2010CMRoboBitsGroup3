@@ -1,0 +1,7 @@
+# Getup
+# -----
+# In seconds
+behaviors/2010/tactics/getUp/fallTime = 0.5
+behaviors/2010/tactics/getUp/liftTime = 1
+behaviors/2010/tactics/getUp/facingUpBodyAngleY = 0
+

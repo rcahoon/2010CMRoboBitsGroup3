@@ -221,7 +221,7 @@ void CommPlayer::runThread() {
           }
         }
         catch (std::exception const& error) {
-          LOG_WARN("I couldn't de-serialize the incoming packet.");
+          LOG_INFO("I couldn't de-serialize the incoming packet.");
           delete playerMessage;
         }
       }

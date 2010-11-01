@@ -167,7 +167,7 @@ void FSM::setState(int new_state, const string reason, unsigned long timestamp){
   timeOfLastTrans = timestamp;
 }
 
-//Returns how long we have been in the current state in seconds
+//Returns how long we have been in the current state in milliseconds
 unsigned long int FSM::timeInState(){
   return (currTime - timeOfLastTrans);
 }

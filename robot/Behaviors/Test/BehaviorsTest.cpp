@@ -32,8 +32,7 @@ bool BehaviorsTest::run(BEHAVIOR_PARAMS){
     static unsigned long startTime = 0;
 
     if (robotState.getLeftFootButton()) {
-    	startTime = robotState.getTimestamp();
-    	command.getMotionCommand().walk(10, 0, 0);
+    	command.getSoundCommand().playWavFile("/home/nao/config/fcnt.wav");
     }
     if (robotState.getTimestamp() - startTime > 5000) {
     	command.getMotionCommand().stopWalk();

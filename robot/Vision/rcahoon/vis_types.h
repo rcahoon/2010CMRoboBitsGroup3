@@ -23,6 +23,9 @@ struct pixel_run {
 	short rank;          // union-tree rank, negative for child nodes
 	pixel_run* region;   // parent of this run in the region
 	
+	float w_cenx;
+	float w_ceny;
+	
 	int area;            // occupied area in pixels
 	
 	void set(VisionObject::Type _type, short _start, short _end, short _row)
@@ -30,8 +33,10 @@ struct pixel_run {
 		type = _type;
 		x1 = start = _start;
 		x2 = end = _end;
-		area = x2 - x1;
+		area = _end - _start;
 		y1 = y2 = _row;
+		w_cenx = area*(_start + _end);
+		w_ceny = area*_row;
 		rank = 0;
 		region = this;
 	}
@@ -60,6 +65,8 @@ struct pixel_run {
 		y1 = std::min(y1, r.y1);
 		y2 = std::max(y2, r.y2);
 
+		w_cenx += r.w_cenx;
+		w_ceny += r.w_ceny;
 		area += r.area;
 		
 		r.region = region;

@@ -81,6 +81,7 @@ public class Threshedit implements Runnable, MessageFromRobotListener {
   {
 	try {
 		byte[] temp = new byte[(1<<Y_BITS)*(1<<U_BITS)*(1<<V_BITS)];
+		System.out.println("Loading from " + VISION_CONFIG_PATH + "vision/threshold");
 		FileInputStream fStream = new FileInputStream(VISION_CONFIG_PATH + "vision/threshold");
 		fStream.read(temp);
 		fStream.close();
@@ -282,6 +283,7 @@ public class Threshedit implements Runnable, MessageFromRobotListener {
 		temp[(i*(1<<U_BITS)+j)*(1<<V_BITS)+k] = t_map[i][j][k];
 	
     try {
+    	System.out.println("Saved to " + VISION_CONFIG_PATH + "vision/threshold");
 		FileOutputStream fStream = new FileOutputStream(VISION_CONFIG_PATH + "vision/threshold");
 		fStream.write(temp);
 		fStream.close();
