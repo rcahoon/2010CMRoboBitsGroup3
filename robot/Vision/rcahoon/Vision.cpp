@@ -276,8 +276,9 @@ void Vision::segmentImage(const HMatrix* transform)
 	LOG_SHAPE(Log::SegmentedImageScreen,
 		Rectangle(Vector2D(-1, scanTop), Vector2D(320, 240),
 				  0x00FFFF, 1) );
-
-	for(int r=scanTop+1; r < processHeight; r++)
+	
+	//for(int r=/*scanTop+*/1; r < processHeight; r++)
+	for(int r=processHeight-1; r > scanTop; r--)
 	{
 		int i = row_starts[r-1];
 		int j = row_starts[r];
@@ -303,7 +304,22 @@ void Vision::segmentImage(const HMatrix* transform)
 			{
 				if (rle[i].type == rle[j].type)
 				{
-					rle[i].doUnion(rle[j]);
+					if ((rle[i].type != VisionObject::BlueGoalPost) && (rle[i].type != VisionObject::YellowGoalPost))
+					{
+						rle[i].doUnion(rle[j]);
+					}
+					else
+					{
+						int x1 = std::min(rle[i].x1, rle[j].x1);
+						int x2 = std::max(rle[i].x2, rle[j].x2);
+						int y1 = std::min(rle[i].y1, rle[j].y1);
+						int y2 = std::max(rle[i].y2, rle[j].y2);
+						float density = (x2-x1)*(y2-y1)/(float)(rle[i].area + rle[j].area);
+						//if (density < GOAL_DENSITY_THRESH)
+						{
+							rle[i].doUnion(rle[j]);
+						}
+					}
 				}
 				
 				if (rle[i].end > rle[j].end)
@@ -319,7 +335,8 @@ void Vision::segmentImage(const HMatrix* transform)
 	y_goals.clear();
 	lines.clear();
 	
-	for(int k=row_starts[scanTop]; k < row_starts[processHeight]; k++)
+	//for(int k=row_starts[scanTop]; k < row_starts[processHeight]; k++)
+	for(int k=row_starts[processHeight]-1; k > row_starts[scanTop]-1; k--)
 	{
 		if (rle[k].rank >= 0)
 		{
@@ -353,8 +370,18 @@ void Vision::segmentImage(const HMatrix* transform)
 					pixel_run r1 = rle[k];
 					pixel_run r2 = **iter;
 					
-					if ( max(r1.x2, r2.x2)-min(r1.x1, r2.x1) < r1.x2 - r1.x1 + r2.x2 - r2.x1 + 20 &&
-					     max(r1.y2, r2.y2)-min(r1.y1, r2.y1) < r1.y2 - r1.y1 + r2.y2 - r2.y1 + 30 )
+					int x1 = std::min(r1.x1, r2.x1);
+					int x2 = std::max(r1.x2, r2.x2);
+					int y1 = std::min(r1.y1, r2.y1);
+					int y2 = std::max(r1.y2, r2.y2);
+					float density = (x2-x1)*(y2-y1)/(float)(r1.area + r2.area);
+					//if (density >= GOAL_DENSITY_THRESH)
+					{
+						continue;
+					}
+					
+					if ( max(r1.x2, r2.x2)-min(r1.x1, r2.x1) < r1.x2 - r1.x1 + r2.x2 - r2.x1 + 80 )//&&
+					     //max(r1.y2, r2.y2)-min(r1.y1, r2.y1) < r1.y2 - r1.y1 + r2.y2 - r2.y1 + 80 )
 					{
 						rle[k].rank = 0; // force union direction
 						(*iter)->doUnion(rle[k]);
@@ -373,8 +400,18 @@ void Vision::segmentImage(const HMatrix* transform)
 					pixel_run r1 = rle[k];
 					pixel_run r2 = **iter;
 					
-					if ( max(r1.x2, r2.x2)-min(r1.x1, r2.x1) < r1.x2 - r1.x1 + r2.x2 - r2.x1 + 20 &&
-					     max(r1.y2, r2.y2)-min(r1.y1, r2.y1) < r1.y2 - r1.y1 + r2.y2 - r2.y1 + 30 )
+					int x1 = std::min(r1.x1, r2.x1);
+					int x2 = std::max(r1.x2, r2.x2);
+					int y1 = std::min(r1.y1, r2.y1);
+					int y2 = std::max(r1.y2, r2.y2);
+					float density = (x2-x1)*(y2-y1)/(float)(r1.area + r2.area);
+					if (density >= GOAL_DENSITY_THRESH)
+					{
+						continue;
+					}
+					
+					if ( max(r1.x2, r2.x2)-min(r1.x1, r2.x1) < r1.x2 - r1.x1 + r2.x2 - r2.x1 + 40 )// &&
+					     //max(r1.y2, r2.y2)-min(r1.y1, r2.y1) < r1.y2 - r1.y1 + r2.y2 - r2.y1 + 50 )
 					{
 						rle[k].rank = 0; // force union direction
 						(*iter)->doUnion(rle[k]);
@@ -412,9 +449,10 @@ VisionObject* Vision::addVisionObject(VisionObject::Type type, float area,
 	
 	if (type != VisionObject::Line)
 	{
-	LOG_INFO("%s: (%d,%d)-(%d,%d) @w(%f,%f) c%f",
+	float density = (x2-x1)*(y2-y1)/(float)area;
+	LOG_INFO("%s: (%d,%d)-(%d,%d) @w(%f,%f) c%f  d%f",
 		object_name(type), x1, y1, x2, y2,
-		position.x, position.y, obj->getConfidence());
+		position.x, position.y, obj->getConfidence(), density);
 	}
 	
 	LOG_SHAPE(Log::SegmentedImageScreen,

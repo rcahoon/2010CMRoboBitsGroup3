@@ -25,18 +25,18 @@ bool Scheduler::run(BEHAVIOR_PARAMS) {
 
 	//setKickEffect(const Vector2D & kickEffect);
 	
-	//if (pose.getConfidence() < POSE_CONFIDENCE_THRESH)
+	if (pose.getConfidence() < POSE_CONFIDENCE_THRESH)
 	{
 		LOG_INFO("Running Global Localization");
 		gLoc.run(BEHAVIOR_CALL);
 	}
-	/*else
+	else
 	{
 		LOG_INFO("Running goal behavior");
 		kick2goal.run(BEHAVIOR_CALL);
 		
 		gLoc.reset();
-	}*/
+	}
 	
 	if (!robotState.isRobotOnGround())
 		feedback.setRobotIsLifted();

@@ -10,6 +10,7 @@
 #include <cmath>
 #include <vector>
 #include "shared/num_util.h"
+#include "matinv.h"
 
 #define COMPONENT VISION
 #define CLASS_LOG_LEVEL LOG_LEVEL_TRACE
@@ -104,15 +105,19 @@ bool Localization::run(const RobotState     & robotState,
 					swap(postL, postR);
 				}
 				Vector2D goal = (postL+postR)/2;
+				/*Vector2D goalline = postL - postR; //140
 				
 				//float angle = M_PI/2 - acos(((140*140)+postR.sqlength()-postL.sqlength())/(140*postR.length()));
 				//printf("%f\n", ((140*140)+postR.sqlength()-postL.sqlength())/(140*postR.length()));
-				float angle = M_PI/2 - asin(sin(postL.angle() - postR.angle())/140.0f*postL.length());
-				printf("%f\n", sin(postL.angle() - postR.angle())/140.0f*postL.length());
+				float angle = -M_PI/2 + asin(sin(postL.angle() - postR.angle())/goalline.length()*postL.length());
+				printf("%f\n", sin(postL.angle() - postR.angle())/goalline.length()*postL.length());
 				
 				Vector2D posEst;
 				posEst.heading(angle);
-				posEst = posEst * goal.length() + field.getBlueGoalPostLeft();
+				posEst = posEst * goal.length() + blueGoal;*/
+				
+				Vector2D posEst(-2*(70)*csc(L - R)*cos(L)*cos(R), -(70)*csc(L - R)*sin(L + R));
+				posEst += blueGoal;
 				
 				float conf = (*iter1)->getConfidence()*(*iter2)->getConfidence();
 				Particle estimate(Noisy<float>(posEst.x, 1.0f/conf), Noisy<float>(posEst.y, 1.0f/conf), Noisy<float>(norm_angle(M_PI + angle - goal.angle()), 1.0f/conf));
@@ -120,7 +125,8 @@ bool Localization::run(const RobotState     & robotState,
 				
 				LOG_SHAPE(Log::Field, Circle(posEst, 4, 0x0080FF, 2));
 				LOG_INFO("BGOAL estimate: %f %f %f $ %f", estimate.pos_x.val(), estimate.pos_y.val(), estimate.angle.val(), estimate.belief());
-				position |= estimate;
+				if (!isnan(estimate.pos_x.val()) && !isnan(estimate.pos_y.val()) && !isnan(estimate.angle.val()))
+					position |= estimate;
 			}
 		}
 	}
@@ -148,7 +154,7 @@ bool Localization::run(const RobotState     & robotState,
 				
 				//float angle = M_PI/2 + acos(((140*140)+postR.sqlength()-postL.sqlength())/(140*postR.length()));
 				//fprintf(stderr, "a %f <- %f\n", angle, ((140*140)+postR.sqlength()-postL.sqlength())/(140*postR.length()));
-				float angle = M_PI/2 + asin(sin(postL.angle() - postR.angle())/140.0f*postL.length());
+				float angle = -M_PI/2 - asin(sin(postL.angle() - postR.angle())/140.0f*postL.length());
 				printf("%f\n", sin(postL.angle() - postR.angle())/140.0f*postL.length());
 				
 				Vector2D posEst;
@@ -160,7 +166,8 @@ bool Localization::run(const RobotState     & robotState,
 				
 				LOG_SHAPE(Log::Field, Circle(posEst, 4, 0x8000FF, 2));
 				LOG_INFO("YGOAL estimate: %f %f %f $ %f", estimate.pos_x.val(), estimate.pos_y.val(), estimate.angle.val(), estimate.belief());
-				position |= estimate;
+				if (!isnan(estimate.pos_x.val()) && !isnan(estimate.pos_y.val()) && !isnan(estimate.angle.val()))
+					position |= estimate;
 			}
 		}
 	}

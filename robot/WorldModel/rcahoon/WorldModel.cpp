@@ -47,6 +47,18 @@ bool WorldModel::run(const RobotState & robotState,
 	{
 		LOG_SHAPE(Log::Field, Circle(pose.convertRelativeToGlobal((*iter)->getPosition()), 2, 0x000000, 1));
 	}
+	std::vector<VisionObject const *> b_gp = visionFeatures.getVisionObjects(VisionObject::BlueGoalPost);
+	for(std::vector<VisionObject const *>::iterator iter = b_gp.begin();
+	    iter != b_gp.end(); iter++)
+	{
+		LOG_SHAPE(Log::Field, Circle(pose.convertRelativeToGlobal((*iter)->getPosition()), 6, 0x0000FF, 3));
+	}
+	std::vector<VisionObject const *> y_gp = visionFeatures.getVisionObjects(VisionObject::YellowGoalPost);
+	for(std::vector<VisionObject const *>::iterator iter = y_gp.begin();
+	    iter != y_gp.end(); iter++)
+	{
+		LOG_SHAPE(Log::Field, Circle(pose.convertRelativeToGlobal((*iter)->getPosition()), 6, 0xFFFF00, 3));
+	}
 
 	std::vector<VisionObject const *> balls = visionFeatures.getVisionObjects(VisionObject::Ball);
 	if (balls.empty())

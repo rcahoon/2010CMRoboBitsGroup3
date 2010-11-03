@@ -40,6 +40,9 @@ BehaviorsConfigurable::BehaviorsConfigurable(ConfigFile & configFile,
   else if (name.compare("Scheduler") == 0) {
     behaviors = new RoboCup2010::Scheduler(configFile,_log);
   }
+  else if (name.compare("GlobalLocalize") == 0) {
+    behaviors = new RoboCup2010::GlobalLocalize(configFile, _log);
+  }
   else if (name.compare("ServoToBall") == 0) {
     behaviors = new RoboCup2010::ServoToBall(configFile,_log);
   }
