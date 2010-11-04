@@ -99,7 +99,7 @@ void Vision::initMap(ConfigFile & configFile)
 			configFile.getInt(path + "/green"),
 			configFile.getInt(path + "/blue"),
 			configFile.getInt(path + "/minSize"),
-			configFile.getInt(path + "/meanSize")
+			configFile.getFloat(path + "/meanSize")
 		);
 		printf("%s  Type: %s  (%d,%d,%d)  %d\n", path.c_str(), object_name((VisionObject::Type)i),
 												classes[i].color.getRed(), classes[i].color.getGreen(), classes[i].color.getBlue(),
@@ -277,8 +277,8 @@ void Vision::segmentImage(const HMatrix* transform)
 		Rectangle(Vector2D(-1, scanTop), Vector2D(320, 240),
 				  0x00FFFF, 1) );
 	
-	//for(int r=/*scanTop+*/1; r < processHeight; r++)
-	for(int r=processHeight-1; r > scanTop; r--)
+	for(int r=/*scanTop+*/1; r < processHeight; r++)
+	//for(int r=processHeight-1; r > /*scanTop*/0; r--)
 	{
 		int i = row_starts[r-1];
 		int j = row_starts[r];
@@ -304,22 +304,7 @@ void Vision::segmentImage(const HMatrix* transform)
 			{
 				if (rle[i].type == rle[j].type)
 				{
-					if ((rle[i].type != VisionObject::BlueGoalPost) && (rle[i].type != VisionObject::YellowGoalPost))
-					{
-						rle[i].doUnion(rle[j]);
-					}
-					else
-					{
-						int x1 = std::min(rle[i].x1, rle[j].x1);
-						int x2 = std::max(rle[i].x2, rle[j].x2);
-						int y1 = std::min(rle[i].y1, rle[j].y1);
-						int y2 = std::max(rle[i].y2, rle[j].y2);
-						float density = (x2-x1)*(y2-y1)/(float)(rle[i].area + rle[j].area);
-						//if (density < GOAL_DENSITY_THRESH)
-						{
-							rle[i].doUnion(rle[j]);
-						}
-					}
+					rle[i].doUnion(rle[j]);
 				}
 				
 				if (rle[i].end > rle[j].end)
@@ -335,11 +320,12 @@ void Vision::segmentImage(const HMatrix* transform)
 	y_goals.clear();
 	lines.clear();
 	
-	//for(int k=row_starts[scanTop]; k < row_starts[processHeight]; k++)
-	for(int k=row_starts[processHeight]-1; k > row_starts[scanTop]-1; k--)
+	for(int k=0/*row_starts[scanTop]*/; k < row_starts[processHeight]; k++)
 	{
 		if (rle[k].rank >= 0)
 		{
+			if (rle[k].area < 40) continue;
+			
 			bool match = false;
 			switch(rle[k].type)
 			{
@@ -370,18 +356,10 @@ void Vision::segmentImage(const HMatrix* transform)
 					pixel_run r1 = rle[k];
 					pixel_run r2 = **iter;
 					
-					int x1 = std::min(r1.x1, r2.x1);
-					int x2 = std::max(r1.x2, r2.x2);
-					int y1 = std::min(r1.y1, r2.y1);
-					int y2 = std::max(r1.y2, r2.y2);
-					float density = (x2-x1)*(y2-y1)/(float)(r1.area + r2.area);
-					//if (density >= GOAL_DENSITY_THRESH)
-					{
-						continue;
-					}
-					
-					if ( max(r1.x2, r2.x2)-min(r1.x1, r2.x1) < r1.x2 - r1.x1 + r2.x2 - r2.x1 + 80 )//&&
-					     //max(r1.y2, r2.y2)-min(r1.y1, r2.y1) < r1.y2 - r1.y1 + r2.y2 - r2.y1 + 80 )
+					if ( max(r1.x2, r2.x2)-min(r1.x1, r2.x1) < r1.x2 - r1.x1 + r2.x2 - r2.x1 + 20 &&
+					     max(r1.y2, r2.y2)-min(r1.y1, r2.y1) < r1.y2 - r1.y1 + r2.y2 - r2.y1 + 40 )
+					/*if ( max(r1.x2, r2.x2)-min(r1.x1, r2.x1) - max(r1.x2-r1.x1, r2.x2-r2.x1) + 
+					     max(r1.y2, r2.y2)-min(r1.y1, r2.y1) - max(r1.y2-r1.y1, r2.y2-r2.y1) < r1.area )*/
 					{
 						rle[k].rank = 0; // force union direction
 						(*iter)->doUnion(rle[k]);
@@ -400,18 +378,8 @@ void Vision::segmentImage(const HMatrix* transform)
 					pixel_run r1 = rle[k];
 					pixel_run r2 = **iter;
 					
-					int x1 = std::min(r1.x1, r2.x1);
-					int x2 = std::max(r1.x2, r2.x2);
-					int y1 = std::min(r1.y1, r2.y1);
-					int y2 = std::max(r1.y2, r2.y2);
-					float density = (x2-x1)*(y2-y1)/(float)(r1.area + r2.area);
-					if (density >= GOAL_DENSITY_THRESH)
-					{
-						continue;
-					}
-					
-					if ( max(r1.x2, r2.x2)-min(r1.x1, r2.x1) < r1.x2 - r1.x1 + r2.x2 - r2.x1 + 40 )// &&
-					     //max(r1.y2, r2.y2)-min(r1.y1, r2.y1) < r1.y2 - r1.y1 + r2.y2 - r2.y1 + 50 )
+					if ( max(r1.x2, r2.x2)-min(r1.x1, r2.x1) < r1.x2 - r1.x1 + r2.x2 - r2.x1 + 20 &&
+					     max(r1.y2, r2.y2)-min(r1.y1, r2.y1) < r1.y2 - r1.y1 + r2.y2 - r2.y1 + 40 )
 					{
 						rle[k].rank = 0; // force union direction
 						(*iter)->doUnion(rle[k]);
@@ -430,6 +398,19 @@ void Vision::segmentImage(const HMatrix* transform)
 			}
 		}
 	}
+	
+	unsigned goalHist[320];
+	mzero(goalHist, 320);
+	for(int k=0/*row_starts[scanTop]*/; k < row_starts[processHeight]; k++)
+	{
+		if (rle[k].type == VisionObject::BlueGoalPost && rle[k].canon()->area > 40)
+		{
+			for(int i=rle[k].x1; i < rle[k].x2; i++)
+				goalHist[i]++;
+		}
+	}
+	for(int i=0; i < 320; i++)
+		printf("%d: %d\n", i, goalHist[i]);
 }
 
 VisionObject* Vision::addVisionObject(VisionObject::Type type, float area,
@@ -443,7 +424,7 @@ VisionObject* Vision::addVisionObject(VisionObject::Type type, float area,
 	VisionObject* obj = new VisionObject(log, type);
 	obj->setBoundingBox(x1, y1, x2, y2);
 	obj->setPosition(position);
-	obj->setConfidence(exp(-position.length()*classes[type].mean_size/area));
+	obj->setConfidence(1.0/(1+exp(-position.length()+area/classes[type].mean_size)));
 	
 	outputVisionFeatures.addVisionObject(*obj);
 	

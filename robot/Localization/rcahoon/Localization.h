@@ -76,11 +76,25 @@ public:
 	// fusion/averaging operator
 	inline Noisy operator | (const Noisy& b) const
 	{
+		if (isnan(b.val())) return *this;
+		if (isnan(this->val())) return b;
 		return Noisy((_val*b._var+b._val*_var)/(_var+b._var+0.0001), _var*b._var/(_var+b._var+0.0001));
 	}
 	Noisy& operator |= (const Noisy& b)
 	{
 		return (*this = *this | b);
+	}
+	
+	// sub-estimate combination
+	inline Noisy operator & (const Noisy& b) const
+	{
+		if (isnan(b.val())) return *this;
+		if (isnan(this->val())) return b;
+		return Noisy((_val*b._var+b._val*_var)/(_var+b._var+0.0001), _var*b._var);
+	}
+	Noisy& operator &= (const Noisy& b)
+	{
+		return (*this = *this & b);
 	}
 };
 
@@ -92,6 +106,8 @@ struct Particle
 	
 	Particle() : pos_x(), pos_y(), angle() {}
 	Particle(Noisy<float> x, Noisy<float> y, Noisy<float> ang) : pos_x(x), pos_y(y), angle(ang) {}
+	Particle(float x, float y, float ang, float var) : pos_x(x, var), pos_y(y, var), angle(ang, var) {}
+	Particle(Vector2D pos, float ang, float var) : pos_x(pos.x, var), pos_y(pos.y, var), angle(ang, var) {}
 	
 	void init(Field& field);
 	void update(Localization& loc, std::vector<VisionObject const *> vis_objs, Noisy<float> t_x, Noisy<float> t_y, Noisy<float> rot);
@@ -131,6 +147,18 @@ struct Particle
 	Particle& operator |= (const Particle& b)
 	{
 		return (*this = *this | b);
+	}
+	
+	// sub-estimate combination
+	inline Particle operator & (const Particle& b) const
+	{
+		Particle newVal(pos_x & b.pos_x, pos_y & b.pos_y, angle & b.angle);
+		newVal.angle.angle_norm();
+		return newVal;
+	}
+	Particle& operator &= (const Particle& b)
+	{
+		return (*this = *this & b);
 	}
 	
 	inline operator Pose() const

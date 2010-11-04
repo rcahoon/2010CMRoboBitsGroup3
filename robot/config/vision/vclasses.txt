@@ -20,7 +20,7 @@ vision/classes/2/red = 0
 vision/classes/2/green = 0
 vision/classes/2/blue = 255
 vision/classes/2/minSize = 400
-vision/classes/3/meanSize = 5
+vision/classes/2/meanSize = 5
 
 # YellowGoalPost
 vision/classes/3/red = 255
@@ -48,11 +48,11 @@ vision/classes/6/red = 255
 vision/classes/6/green = 0
 vision/classes/6/blue = 255
 vision/classes/6/minSize = 200
-vision/classes/3/meanSize = 5
+vision/classes/6/meanSize = 5
 
 # Line
 vision/classes/7/red = 255
 vision/classes/7/green = 255
 vision/classes/7/blue = 255
 vision/classes/7/minSize = 70
-vision/classes/3/meanSize = 5
+vision/classes/7/meanSize = 5
