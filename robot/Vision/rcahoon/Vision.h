@@ -24,6 +24,7 @@
 
 #include "Vision/Vision.h"
 #include "Vision/rcahoon/vis_types.h"
+#include "Vision/rcahoon/shared/cameraconstants.h"
 #include "Vision/SegmentedImage/SegmentedImage.h"
 #include "shared/Vector/Vector2D.h"
 #include <list>
@@ -75,10 +76,10 @@ private:
 	RGB* colors;
 	uchar Color_Map[Y_SIZE][U_SIZE][V_SIZE];
 	
-	list<pixel_run*> balls;
-	list<pixel_run*> b_goals;
-	list<pixel_run*> y_goals;
-	list<pixel_run*> lines;
+	unsigned bGoalPost[IMAGEWIDTH];
+	unsigned yGoalPost[IMAGEWIDTH];
+	unsigned bGoalBar[IMAGEHEIGHT];
+	unsigned yGoalBar[IMAGEHEIGHT];
 
 	char* labeled_image;
 	SegmentedImage seg_img;
