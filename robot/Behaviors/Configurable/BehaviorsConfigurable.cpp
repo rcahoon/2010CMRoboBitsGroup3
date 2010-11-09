@@ -35,7 +35,7 @@ BehaviorsConfigurable::BehaviorsConfigurable(ConfigFile & configFile,
   }
   // Should we use TestBehaviors?
   else if (name.compare("Test") == 0) {
-    behaviors = new RoboCup2010::BehaviorsTest(configFile,_log, field);
+    behaviors = new RoboCup2010::BehaviorsTest(configFile,_log);
   }
   else if (name.compare("Scheduler") == 0) {
     behaviors = new RoboCup2010::Scheduler(configFile,_log);

@@ -2,6 +2,7 @@
 #include <ios>
 
 #include "Vision/rcahoon/Vision.h"
+#include "Vision/rcahoon/shared/cameraconstants.h"
 #include "Agent/RobotState.h"
 #include "Vision/VisionFeatures.h"
 #include "Vision/VisionObject/LineVisionObject.h"
@@ -273,15 +274,10 @@ void Vision::segmentImage(const HMatrix* transform)
 	LOG_INFO("Scan top: %d", scanTop);
 	
 	LOG_SHAPE(Log::SegmentedImageScreen,
-		Rectangle(Vector2D(-1, scanTop), Vector2D(imageWidth, imageHeight),
+		Rectangle(Vector2D(-1, scanTop), Vector2D(320, 240),
 				  0x00FFFF, 1) );
 	
-	mzero(bGoalPost, IMAGEWIDTH);
-	mzero(yGoalPost, IMAGEWIDTH);
-	mzero(bGoalBar, IMAGEHEIGHT);
-	mzero(yGoalBar, IMAGEHEIGHT);
-	
-	for(int r=/*scanTop+*/1; r < processHeight; r++)
+	for(int r=scanTop+1; r < processHeight; r++)
 	//for(int r=processHeight-1; r > /*scanTop*/0; r--)
 	{
 		int i = row_starts[r-1];
@@ -290,48 +286,115 @@ void Vision::segmentImage(const HMatrix* transform)
 		int endj = row_starts[r+1];
 		while((i < endi) && (j < endj))
 		{
-			switch(rle[i].type)
+			if (rle[i].type == VisionObject::Line)
 			{
-			/*case VisionObject::BlueGoalPost:
-				{
-					for(int k=rle[i].x1; k < rle[i].x2; k++)
-						bGoalPost[k]++;
-					bGoalBar[rle[i].y1] += rle[i].area;
-				}
 				i++;
 				continue;
-			case VisionObject::YellowGoalPost:
-				{
-					for(int k=rle[i].x1; k < rle[i].x2; k++)
-						yGoalHist[k]++;
-					yGoalBar[rle[i].y1] += rle[i].area;
-				}
-				i++;
-				continue;*/
-			case VisionObject::Line:
-				i++;
-				continue;
-			default:
-				if (rle[i].end < rle[j].start)
-				{
-					i++;
-				}
-				else if (rle[i].start > rle[j].end)
-				{
-					j++;
-				}
-				else
-				{
-					if (rle[i].type == rle[j].type)
-					{
-						rle[i].doUnion(rle[j]);
-					}
+			}
 			
-					if (rle[i].end > rle[j].end)
-						j++;
-					else
-						i++;
+			if (rle[i].end < rle[j].start)
+			{
+				i++;
+			}
+			else if (rle[i].start > rle[j].end)
+			{
+				j++;
+			}
+			else
+			{
+				if (rle[i].type == rle[j].type)
+				{
+					rle[i].doUnion(rle[j]);
 				}
+				
+				if (rle[i].end > rle[j].end)
+					j++;
+				else
+					i++;
+			}
+		}
+	}
+	
+	balls.clear();
+	b_goals.clear();
+	y_goals.clear();
+	lines.clear();
+	
+	for(int k=row_starts[scanTop]; k < row_starts[processHeight]; k++)
+	{
+		if (rle[k].rank >= 0)
+		{
+			if (rle[k].area < 40) continue;
+			
+			bool match = false;
+			switch(rle[k].type)
+			{
+			case VisionObject::Ball:
+				for(list<pixel_run*>::iterator iter = balls.begin();
+					iter != balls.end(); iter++)
+				{
+					pixel_run r1 = rle[k];
+					pixel_run r2 = **iter;
+					
+					if ( ((r1.x2 + r1.x1) - (r2.x2 + r2.x1)) < (r1.x2 - r1.x1 + r2.x2 - r2.x1) + 10 &&
+					     ((r1.y2 + r1.y1) - (r2.y2 - r2.y1)) < (r1.y2 - r1.y1 + r2.y2 - r2.y1) + 10 )
+					{
+						rle[k].rank = 0; // force union direction
+						(*iter)->doUnion(rle[k]);
+						match = true;
+						//break;
+					}
+				}
+				
+				if (!match)
+					balls.push_back(&rle[k]);
+			break;
+			case VisionObject::BlueGoalPost:
+				for(list<pixel_run*>::iterator iter = b_goals.begin();
+					iter != b_goals.end(); iter++)
+				{
+					pixel_run r1 = rle[k];
+					pixel_run r2 = **iter;
+					
+					if ( max(r1.x2, r2.x2)-min(r1.x1, r2.x1) < r1.x2 - r1.x1 + r2.x2 - r2.x1 + 20 &&
+					     max(r1.y2, r2.y2)-min(r1.y1, r2.y1) < r1.y2 - r1.y1 + r2.y2 - r2.y1 + 40 )
+					/*if ( max(r1.x2, r2.x2)-min(r1.x1, r2.x1) - max(r1.x2-r1.x1, r2.x2-r2.x1) + 
+					     max(r1.y2, r2.y2)-min(r1.y1, r2.y1) - max(r1.y2-r1.y1, r2.y2-r2.y1) < r1.area )*/
+					{
+						rle[k].rank = 0; // force union direction
+						(*iter)->doUnion(rle[k]);
+						match = true;
+						//break;
+					}
+				}
+				
+				if (!match)
+					b_goals.push_back(&rle[k]);
+			break;
+			case VisionObject::YellowGoalPost:
+				for(list<pixel_run*>::iterator iter = y_goals.begin();
+					iter != y_goals.end(); iter++)
+				{
+					pixel_run r1 = rle[k];
+					pixel_run r2 = **iter;
+					
+					if ( max(r1.x2, r2.x2)-min(r1.x1, r2.x1) < r1.x2 - r1.x1 + r2.x2 - r2.x1 + 15 &&
+					     max(r1.y2, r2.y2)-min(r1.y1, r2.y1) < r1.y2 - r1.y1 + r2.y2 - r2.y1 + 30 )
+					{
+						rle[k].rank = 0; // force union direction
+						(*iter)->doUnion(rle[k]);
+						match = true;
+						//break;
+					}
+				}
+				
+				if (!match)
+					y_goals.push_back(&rle[k]);
+			break;
+			case VisionObject::Line:
+				lines.push_back(&rle[k]);
+			break;
+			default: break;
 			}
 		}
 	}
@@ -348,7 +411,8 @@ VisionObject* Vision::addVisionObject(VisionObject::Type type, float area,
 	VisionObject* obj = new VisionObject(log, type);
 	obj->setBoundingBox(x1, y1, x2, y2);
 	obj->setPosition(position);
-	obj->setConfidence(1.0/(1+exp(-position.length()+area/classes[type].mean_size)));
+	//obj->setConfidence(1.0/(1+exp(-position.length()+area/classes[type].mean_size)));
+	obj->setConfidence(100.0f/(100+position.length()));
 	
 	outputVisionFeatures.addVisionObject(*obj);
 	
@@ -377,118 +441,144 @@ void Vision::findObjects(const HMatrix* transform, VisionFeatures & outputVision
 	}
 	outputVisionFeatures.clear();
 	
-	for(int k=0/*row_starts[scanTop]*/; k < row_starts[processHeight]; k++)
+	
+	for(list<pixel_run*>::iterator iter = balls.begin();
+		iter != balls.end(); iter++)
 	{
-		pixel_run& r = rle[k];
-		if (r.rank >= 0)
+		pixel_run& r = **iter;
+		if (r.area < classes[VisionObject::Ball].min_size) continue;
+
+		addVisionObject(VisionObject::Ball, r.area,
+			r.x1, r.y1, r.x2, r.y2, r.w_cenx/r.area,
+			transform, outputVisionFeatures);
+	}
+	
+	for(list<pixel_run*>::iterator iter = b_goals.begin();
+		iter != b_goals.end(); iter++)
+	{
+		pixel_run& r = **iter;
+		if (r.area < classes[VisionObject::BlueGoalPost].min_size) continue;
+
+		/*unsigned goalHist[320];
+		mzero(goalHist, 320);
+		for(int k=row_starts[r.y1]; k < row_starts[r.y2+1]; k++)
 		{
-			switch(r.type)
+			if (rle[k].canon() != &r)
+			if (rle[k].type == VisionObject::BlueGoalPost && rle[k].canon()->area > 40)
 			{
-			case VisionObject::Ball:
-				if (r.area > classes[VisionObject::Ball].min_size)
-				{
-					addVisionObject(VisionObject::Ball, r.area,
-						r.x1, r.y1, r.x2, r.y2, r.w_cenx/r.area,
-						transform, outputVisionFeatures);
-				}
-			break;
-			case VisionObject::BlueGoalPost:
-				
-				int start = -1;
-				int postcount = 0;
-				for(int i=0; i < IMAGEWIDTH; i++)
-				{
-					if (bGoalHist[i] > 40)
-					{
-						if (start < 0)
-							start = i;
-					}
-					else if (start >= 0)
-					{
-						addVisionObject(VisionObject::BlueGoalPost, r.area,
-							r.x1, r.y1, r.x2, r.y2, r.w_cenx/r.area,
-							transform, outputVisionFeatures);
-						postcount++;
-					}
-				}
-				if (start >= 0)
-				{
-					addVisionObject(VisionObject::BlueGoalPost, r.area,
-						r.x1, r.y1, r.x2, r.y2, r.w_cenx/r.area,
-						transform, outputVisionFeatures);
-					postcount++;
-				}
-				
-				
-				for(int i=0; i < IMAGEWIDTH; i++)
-				{
-					if (bGoalHist[i] > 40)
-					{
-						if (start < 0)
-							start = i;
-					}
-					else if (start >= 0)
-					{
-						addVisionObject(r.type, r.area,
-							r.x1, r.y1, r.x2, r.y2, r.w_cenx/r.area,
-							transform, outputVisionFeatures);
-						postcount++;
-					}
-				}
-				{
-					addVisionObject(VisionObject::BlueGoalBar, r.area,
-						r.x1, r.y1, r.x2, r.y2, r.w_cenx/r.area,
-						transform, outputVisionFeatures);
-				}
-			break;
-			case VisionObject::YellowGoalPost:
-				for(int i=0; i < IMAGEWIDTH; i++)
-					
-				if (r.area > classes[VisionObject::YellowGoalPost].min_size)
-				{
-					Vector2D post1 = cameraToWorld(transform, Vector2D(r.x1, r.y2));
-					Vector2D post2 = cameraToWorld(transform, Vector2D(r.x2, r.y2));
-					printf("Posts: (%f %f)  (%f %f)\n", post1.x, post1.y, post2.x, post2.y);
-					if (sqdistance(post1,post2) > (100*100))
-					//if ((r.y2 - r.y1) < (r.x2 - r.x1))
-					{
-						r.type = VisionObject::YellowGoalBar;
-					}
-			
-					addVisionObject(r.type, r.area,
-						r.x1, r.y1, r.x2, r.y2, r.w_cenx/r.area,
-						transform, outputVisionFeatures);
-				}
-			break;
-			case VisionObject::Line:
-				//if (r.area > classes[VisionObject::Line].min_size)
-				{
-					/*int i;
-					float area = rle[k].area /(float) LINE_BLOCK_SIZE;
-					for(i=rle[k].x1; i < rle[k].x2 - LINE_BLOCK_SIZE*3/2; i+=LINE_BLOCK_SIZE)
-						addVisionObject(rle[k].type, area,
-							i, rle[k].y1, i+LINE_BLOCK_SIZE, rle[k].y2,
-							transform, outputVisionFeatures);
-					addVisionObject(rle[k].type, area,
-						i, rle[k].y1, rle[k].x2, rle[k].y2,
-						transform, outputVisionFeatures);*/
-			
-					int span = r.area;
-					int left = r.start;
-					int row = r.y1;
-					int samp_count = round(randomDbl()*span*LINE_SAMP_WIDTH)+round(randomDbl()/2+LINE_SAMP_HEIGHT/2);
-					for(int i=0; i < samp_count; i++)
-					{
-						int pos = (int)(randomDbl()*span+left);
-				
-						addVisionObject(VisionObject::Line, span,
-							pos, row, pos, row, pos,
-							transform, outputVisionFeatures);
-					}
-				}
-			break;
-			default: break;
+				for(int i=rle[k].x1; i < rle[k].x2; i++)
+					goalHist[i]++;
 			}
+		}
+		
+		int start = -1;
+		int postcount = 0;
+		for(int i=0; i < IMAGEWIDTH; i++)
+		{
+			if (bGoalHist[i] > 40)
+			{
+				if (start < 0)
+					start = i;
+			}
+			else if (start >= 0)
+			{
+				addVisionObject(VisionObject::BlueGoalPost, r.area,
+					r.x1, r.y1, r.x2, r.y2, r.w_cenx/r.area,
+					transform, outputVisionFeatures);
+				postcount++;
+			}
+		}
+		if (start >= 0)
+		{
+			addVisionObject(VisionObject::BlueGoalPost, r.area,
+				r.x1, r.y1, r.x2, r.y2, r.w_cenx/r.area,
+				transform, outputVisionFeatures);
+			postcount++;
+		}
+		
+		
+		for(int i=0; i < IMAGEWIDTH; i++)
+		{
+			if (bGoalHist[i] > 40)
+			{
+				if (start < 0)
+					start = i;
+			}
+			else if (start >= 0)
+			{
+				addVisionObject(r.type, r.area,
+					r.x1, r.y1, r.x2, r.y2, r.w_cenx/r.area,
+					transform, outputVisionFeatures);
+				postcount++;
+			}
+		}
+		{
+			addVisionObject(VisionObject::BlueGoalBar, r.area,
+				r.x1, r.y1, r.x2, r.y2, r.w_cenx/r.area,
+				transform, outputVisionFeatures);
+		}*/
+
+		Vector2D post1 = cameraToWorld(transform, Vector2D(r.x1, r.y2));
+		Vector2D post2 = cameraToWorld(transform, Vector2D(r.x2, r.y2));
+		printf("Posts: (%f %f)  (%f %f)\n", post1.x, post1.y, post2.x, post2.y);
+		if (sqdistance(post1,post2) > (100*100))
+		//if ((r.y2 - r.y1) < (r.x2 - r.x1))
+		{
+			r.type = VisionObject::YellowGoalBar;
+		}
+		
+		addVisionObject(r.type, r.area,
+			r.x1, r.y1, r.x2, r.y2, r.w_cenx/r.area,
+			transform, outputVisionFeatures);
+	}
+	
+	for(list<pixel_run*>::iterator iter = y_goals.begin();
+		iter != y_goals.end(); iter++)
+	{
+		pixel_run& r = **iter;
+		if (r.area < classes[VisionObject::YellowGoalPost].min_size) continue;
+
+		Vector2D post1 = cameraToWorld(transform, Vector2D(r.x1, r.y2));
+		Vector2D post2 = cameraToWorld(transform, Vector2D(r.x2, r.y2));
+		printf("Posts: (%f %f)  (%f %f)\n", post1.x, post1.y, post2.x, post2.y);
+		if (sqdistance(post1,post2) > (100*100))
+		//if ((r.y2 - r.y1) < (r.x2 - r.x1))
+		{
+			r.type = VisionObject::YellowGoalBar;
+		}
+		
+		addVisionObject(r.type, r.area,
+			r.x1, r.y1, r.x2, r.y2, r.w_cenx/r.area,
+			transform, outputVisionFeatures);
+	}
+	
+	for(list<pixel_run*>::iterator iter = lines.begin();
+		iter != lines.end(); iter++)
+	{
+		pixel_run& r = **iter;
+		//if (r.area < classes[VisionObject::Line].min_size) continue;
+
+		/*int i;
+		float area = rle[k].area /(float) LINE_BLOCK_SIZE;
+		for(i=rle[k].x1; i < rle[k].x2 - LINE_BLOCK_SIZE*3/2; i+=LINE_BLOCK_SIZE)
+			addVisionObject(rle[k].type, area,
+				i, rle[k].y1, i+LINE_BLOCK_SIZE, rle[k].y2,
+				transform, outputVisionFeatures);
+		addVisionObject(rle[k].type, area,
+			i, rle[k].y1, rle[k].x2, rle[k].y2,
+			transform, outputVisionFeatures);*/
+		
+		int span = r.area;
+		int left = r.start;
+		int row = r.y1;
+		int samp_count = round(randomDbl()*span*LINE_SAMP_WIDTH)+round(randomDbl()/2+LINE_SAMP_HEIGHT/2);
+		for(int i=0; i < samp_count; i++)
+		{
+			int pos = (int)(randomDbl()*span+left);
+			
+			addVisionObject(VisionObject::Line, span,
+				pos, row, pos, row, pos,
+				transform, outputVisionFeatures);
 		}
 	}
 }

@@ -8,6 +8,7 @@
 #include "BehaviorsTest.h"
 #include "Log/Log.h"
 #include "shared/ConfigFile/ConfigFile.h"
+#include "shared/random.h"
 
 
 // Define the logging constants
@@ -17,11 +18,11 @@
 
 namespace RoboCup2010 {
 
-BehaviorsTest::BehaviorsTest(ConfigFile & _configFile, Log & _log, Field & _field)
+BehaviorsTest::BehaviorsTest(ConfigFile & _configFile, Log & _log)
   : Behaviors(),
     configFile(_configFile),
     log(_log),
-    field(_field) {
+    count(500) {
 }
 
 BehaviorsTest::~BehaviorsTest() {
@@ -29,14 +30,17 @@ BehaviorsTest::~BehaviorsTest() {
 
 bool BehaviorsTest::run(BEHAVIOR_PARAMS){
 
-    static unsigned long startTime = 0;
+command.getMotionCommand().walk(4, 0, 0.1);
+/*    if (count==0)
+    {
+    	count = 500;
+    }
+    count--;
+    printf("Count %d\n", count);
 
     if (robotState.getLeftFootButton()) {
     	command.getSoundCommand().playWavFile("/home/nao/config/fcnt.wav");
-    }
-    if (robotState.getTimestamp() - startTime > 5000) {
-    	command.getMotionCommand().stopWalk();
-    }
+    }*/
 
 	return false;
 }

@@ -38,11 +38,11 @@ Vector2D& Localization::fieldBound(Vector2D& position)
 	return position;
 }
 
-void movementModel(Vector2D T, float R, Noisy<float>& t_x, Noisy<float>& t_y, Noisy<float>& rot)
+void movementModel(Vector2D T, float R, Noisy<float>& t_x, Noisy<float>& t_y, NoisyAngle<float>& rot)
 {
-	t_x = Noisy<float>(T.x, T.x*PARTICLE_POSITION_VAR);
-	t_y = Noisy<float>(T.y, T.y*PARTICLE_POSITION_VAR);
-	rot = Noisy<float>(R, R*PARTICLE_ANGLE_VAR);
+	t_x = Noisy<float>(T.x, PARTICLE_POSITION_DECAY/(PARTICLE_POSITION_DECAY+abs(T.x)));
+	t_y = Noisy<float>(T.y, PARTICLE_POSITION_DECAY/(PARTICLE_POSITION_DECAY+abs(T.y)));
+	rot = NoisyAngle<float>(R, PARTICLE_ANGLE_DECAY/(PARTICLE_ANGLE_DECAY+abs(R)));
 }
 
 bool Localization::run(const RobotState     & robotState,
@@ -55,16 +55,20 @@ bool Localization::run(const RobotState     & robotState,
 	Vector2D _T;
 	float _R;
 	robotState.getOdometryUpdate(_T, _R);
-	Noisy<float> t_x, t_y, rot;
+	_T = _T.rotate(position.angle.val());
+	Noisy<float> t_x, t_y;
+	NoisyAngle<float> rot;
 	movementModel(_T, -_R, t_x, t_y, rot);
 	
 	position.pos_x += t_x;
 	position.pos_y += t_y;
 	position.angle += rot;
-	position.angle.angle_norm();
 	
-	LOG_INFO("Motion estimate: %f %f %f", position.pos_x.val(), position.pos_y.val(), position.angle.val());
+	fprintf(stderr, "%+f\t%+f\t%+f\n", _T.x, _T.y, _R);
 	
+	LOG_INFO("Motion estimate: %f %f %f $ %f", position.pos_x.val(), position.pos_y.val(), position.angle.val(), position.belief());
+	
+#if 1
 	Vector2D blueGoal = gameState.isOurColorBlue() ? field.getOurGoal() : field.getOpponentGoal();
 	
 	/*HMatrix const* camTransform = &(robotState.getTransformationFromCamera());
@@ -87,6 +91,7 @@ bool Localization::run(const RobotState     & robotState,
 			
 		}
 	}*/
+	
 	std::vector<VisionObject const *> b_posts = visionFeatures.getVisionObjects(VisionObject::BlueGoalPost);
 	for(std::vector<VisionObject const *>::iterator iter1 = b_posts.begin();
 		iter1 != b_posts.end(); iter1++)
@@ -94,9 +99,9 @@ bool Localization::run(const RobotState     & robotState,
 		for(std::vector<VisionObject const *>::iterator iter2 = iter1+1;
 			iter2 != b_posts.end(); iter2++)
 		{
-			float d = sqdistance((*iter1)->getPosition(), (*iter2)->getPosition());
+			/*float d = sqdistance((*iter1)->getPosition(), (*iter2)->getPosition());
 			if (d < (200*200) && d > (50*50))
-			{
+			{*/
 				Vector2D postL = (*iter1)->getPosition();
 				float confL = (*iter1)->getConfidence();
 				Vector2D postR = (*iter2)->getPosition();
@@ -107,14 +112,14 @@ bool Localization::run(const RobotState     & robotState,
 					swap(confL, confR);
 				}
 				
-				Particle estimate1, estimate2;
+				/*Particle estimateL, estimateR;
 				{
 					float A = postL.length();
 					float t = postL.angle() - postR.angle();
 					float B = postL.length() > postR.length() ? 
 					          A*cos(t) - sqrt((140*140)-(A*sin(t))*(A*sin(t))) :
 					          A*cos(t) + sqrt((140*140)-(A*sin(t))*(A*sin(t)));
-					printf("Left sol %f <- %f\n", B, A);
+					printf("Left sol %f <- %f $ %f\n", B, A, confL);
 					Vector2D _postR = postR.norm(B);
 					
 					Vector2D goal = (postL+_postR)/2;
@@ -122,7 +127,7 @@ bool Localization::run(const RobotState     & robotState,
 					
 					float angle = -angle_diff(goalline.angle(), (float)-M_PI/2);
 					Vector2D posEst = -goal.rotate(angle) + blueGoal;
-					estimate1 = Particle(posEst, norm_angle(angle), 1.0f/confL);
+					estimateL = Particle(posEst, angle, confL);
 				}
 				{
 					float A = postR.length();
@@ -130,7 +135,7 @@ bool Localization::run(const RobotState     & robotState,
 					float B = postR.length() > postL.length() ?
 					          A*cos(t) - sqrt((140*140)-(A*sin(t))*(A*sin(t))) :
 					          A*cos(t) + sqrt((140*140)-(A*sin(t))*(A*sin(t)));
-					printf("Right sol %f <- %f\n", B, A);
+					printf("Right sol %f <- %f $ %f\n", B, A, confR);
 					Vector2D _postL = postL.norm(B);
 					
 					Vector2D goal = (_postL+postR)/2;
@@ -138,16 +143,29 @@ bool Localization::run(const RobotState     & robotState,
 					
 					float angle = -angle_diff(goalline.angle(), (float)-M_PI/2);
 					Vector2D posEst = -goal.rotate(angle) + blueGoal;
-					estimate2 = Particle(posEst, norm_angle(angle), 1.0f/confR);
+					estimateR = Particle(posEst, angle, confR);
 				}
 				
-				Particle estimate = estimate1 & estimate2;
+				Particle estimate = estimateL & estimateR;*/
+				
+				Vector2D goal = (postL+postR)/2;
+				Vector2D goalline = postL - postR;
+				
+				float angle = -angle_diff(goalline.angle(), (float)-M_PI/2);
+				Vector2D posEst = -goal.rotate(angle)*(140.0f/goalline.length()) + blueGoal;
+				printf("%f %f %f\n", confL, confR, sqrt(confL*confR));
+				//TODO: do separate prob calculations for each position component
+				Particle estimate(posEst, angle, sqrt(confL*confR));
 				
 				LOG_SHAPE(Log::Field, Circle(estimate.position(), 4, 0x0080FF, 2));
-				LOG_INFO("BGOAL estimate: %f %f %f $ %f", estimate.pos_x.val(), estimate.pos_y.val(), estimate.angle.val(), estimate.belief());
-				if (!isnan(estimate.pos_x.val()) && !isnan(estimate.pos_y.val()) && !isnan(estimate.angle.val()))
-					position |= estimate;
-			}
+				//LOG_INFO("BGOAL estimateL: %f %f %f $ %f", estimateL.pos_x.val(), estimateL.pos_y.val(), estimateL.angle.val(), estimateL.belief());
+				//LOG_INFO("BGOAL estimateR: %f %f %f $ %f", estimateR.pos_x.val(), estimateR.pos_y.val(), estimateR.angle.val(), estimateR.belief());
+				LOG_INFO("BGOAL estimateT: %f %f %f $ %f", estimate.pos_x.val(), estimate.pos_y.val(), estimate.angle.val(), estimate.belief());
+				if (estimate.isValid())
+					position ^= estimate;
+			/*}
+			else
+				LOG_ERROR("Posts too close");*/
 		}
 	}
 	
@@ -160,39 +178,78 @@ bool Localization::run(const RobotState     & robotState,
 		for(std::vector<VisionObject const *>::iterator iter2 = iter1+1;
 			iter2 != y_posts.end(); iter2++)
 		{
-			float d = sqdistance((*iter1)->getPosition(), (*iter2)->getPosition());
+			/*float d = sqdistance((*iter1)->getPosition(), (*iter2)->getPosition());
 			if (d < (200*200) && d > (50*50))
-			{
+			{*/
 				Vector2D postL = (*iter1)->getPosition();
+				float confL = (*iter1)->getConfidence();
 				Vector2D postR = (*iter2)->getPosition();
+				float confR = (*iter2)->getConfidence();
 				if (angle_diff(postL.angle(), postR.angle()) < 0)
 				{
 					swap(postL, postR);
+					swap(confL, confR);
 				}
-				Vector2D goal = (postL+postL)/2;
 				
-				//float angle = M_PI/2 + acos(((140*140)+postR.sqlength()-postL.sqlength())/(140*postR.length()));
-				//fprintf(stderr, "a %f <- %f\n", angle, ((140*140)+postR.sqlength()-postL.sqlength())/(140*postR.length()));
-				float angle = -M_PI/2 - asin(sin(postL.angle() - postR.angle())/140.0f*postL.length());
-				printf("%f\n", sin(postL.angle() - postR.angle())/140.0f*postL.length());
+				/*Particle estimateL, estimateR;
+				{
+					float A = postL.length();
+					float t = postL.angle() - postR.angle();
+					float B = postL.length() > postR.length() ? 
+					          A*cos(t) - sqrt((140*140)-(A*sin(t))*(A*sin(t))) :
+					          A*cos(t) + sqrt((140*140)-(A*sin(t))*(A*sin(t)));
+					printf("Left sol %f <- %f $ %f\n", B, A, confL);
+					Vector2D _postR = postR.norm(B);
+					
+					Vector2D goal = (postL+_postR)/2;
+					Vector2D goalline = postL - _postR;
+					
+					float angle = -angle_diff(goalline.angle(), (float)M_PI/2);
+					Vector2D posEst = -goal.rotate(angle) + yellowGoal;
+					estimateL = Particle(posEst, angle, confL);
+				}
+				{
+					float A = postR.length();
+					float t = postL.angle() - postR.angle();
+					float B = postR.length() > postL.length() ?
+					          A*cos(t) - sqrt((140*140)-(A*sin(t))*(A*sin(t))) :
+					          A*cos(t) + sqrt((140*140)-(A*sin(t))*(A*sin(t)));
+					printf("Right sol %f <- %f $ %f\n", B, A, confR);
+					Vector2D _postL = postL.norm(B);
+					
+					Vector2D goal = (_postL+postR)/2;
+					Vector2D goalline = _postL - postR;
+					
+					float angle = -angle_diff(goalline.angle(), (float)M_PI/2);
+					Vector2D posEst = -goal.rotate(angle) + yellowGoal;
+					estimateR = Particle(posEst, angle, confR);
+				}
 				
-				Vector2D posEst;
-				posEst.heading(angle);
-				posEst = posEst * goal.length() + field.getYellowGoalPostLeft();
+				Particle estimate = estimateL & estimateR;*/
 				
-				float conf = (*iter1)->getConfidence()*(*iter2)->getConfidence();
-				Particle estimate(Noisy<float>(posEst.x, 1.0f/conf), Noisy<float>(posEst.y, 1.0f/conf), Noisy<float>(norm_angle(M_PI + angle - goal.angle()), 1.0f/conf));
+				Vector2D goal = (postL+postR)/2;
+				Vector2D goalline = postL - postR;
 				
-				LOG_SHAPE(Log::Field, Circle(posEst, 4, 0x8000FF, 2));
-				LOG_INFO("YGOAL estimate: %f %f %f $ %f", estimate.pos_x.val(), estimate.pos_y.val(), estimate.angle.val(), estimate.belief());
-				if (!isnan(estimate.pos_x.val()) && !isnan(estimate.pos_y.val()) && !isnan(estimate.angle.val()))
-					position |= estimate;
-			}
+				float angle = -angle_diff(goalline.angle(), (float)M_PI/2);
+				Vector2D posEst = -goal.rotate(angle)*(140.0f/goalline.length()) + yellowGoal;
+				//TODO: do separate prob calculations for each position component
+				Particle estimate(posEst, angle, sqrt(confL*confR));
+				
+				LOG_SHAPE(Log::Field, Circle(estimate.position(), 4, 0x80FF80, 2));
+				//LOG_INFO("YGOAL estimateL: %f %f %f $ %f", estimateL.pos_x.val(), estimateL.pos_y.val(), estimateL.angle.val(), estimateL.belief());
+				//LOG_INFO("YGOAL estimateR: %f %f %f $ %f", estimateR.pos_x.val(), estimateR.pos_y.val(), estimateR.angle.val(), estimateR.belief());
+				LOG_INFO("YGOAL estimateT: %f %f %f $ %f", estimate.pos_x.val(), estimate.pos_y.val(), estimate.angle.val(), estimate.belief());
+				if (estimate.isValid())
+					position ^= estimate;
+			/*}
+			else
+				LOG_ERROR("Posts too close");*/
 		}
 	}
+#endif
 	
 	pose = position;
-	//fprintf(stderr, "Pose %f %f %f $ %f\n", position.pos_x.val(), position.pos_y.val(), position.angle.val(), position.belief());
+	//LOG_INFO("Pose %f %f %f $ %f\n", position.pos_x.val(), position.pos_y.val(), position.angle.val(), position.belief());
 	
 	LOG_TRACE("Localization run ended.");
 
@@ -201,10 +258,11 @@ bool Localization::run(const RobotState     & robotState,
 
 void Localization::reset(ResetCase resetCase)
 {
-	Noisy<float> saturation(0.0f, 1000.0f);
-	position.pos_x += saturation;
-	position.pos_y += saturation;
-	position.angle += saturation;
+	Noisy<float> resetPos(0.0f, 0.0f);
+	NoisyAngle<float> resetAng(0.0f, 0.0f);
+	position.pos_x += resetPos;
+	position.pos_y += resetPos;
+	position.angle += resetAng;
 }
 
 }

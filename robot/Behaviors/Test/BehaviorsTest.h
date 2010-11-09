@@ -19,7 +19,7 @@ namespace RoboCup2010 {
 
 class BehaviorsTest : public Behaviors {
 public:
-  BehaviorsTest(ConfigFile & configFile, Log & log, Field & field);
+  BehaviorsTest(ConfigFile & configFile, Log & log);
 
   virtual ~BehaviorsTest();
 
@@ -28,7 +28,8 @@ public:
 private:
   ConfigFile & configFile;
   Log & log;
-  Field & field;
+  
+  int count;
 };
 
 }

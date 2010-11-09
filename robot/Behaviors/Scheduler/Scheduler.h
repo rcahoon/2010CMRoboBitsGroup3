@@ -6,6 +6,7 @@
 #include "shared/UsefulMacros.h"
 //#include "Behaviors/Move2AndKick/Move2AndKick.h"
 #include "Behaviors/KickToGoal/KickToGoal.h"
+#include "Behaviors/Test/BehaviorsTest.h"
 #include "Behaviors/GlobalLocalize/GlobalLocalize.h"
 
 #define POSE_CONFIDENCE_THRESH  0.25
@@ -27,7 +28,7 @@ private:
 	PREVENT_COPY_AND_ASSIGNMENT(Scheduler);
 	
 	GlobalLocalize gLoc;
-	KickToGoal kick2goal;
+	BehaviorsTest kick2goal;
 
 	Log & log;
 };
