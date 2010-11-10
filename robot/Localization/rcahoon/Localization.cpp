@@ -64,8 +64,6 @@ bool Localization::run(const RobotState     & robotState,
 	position.pos_y += t_y;
 	position.angle += rot;
 	
-	fprintf(stderr, "%+f\t%+f\t%+f\n", _T.x, _T.y, _R);
-	
 	LOG_INFO("Motion estimate: %f %f %f $ %f", position.pos_x.val(), position.pos_y.val(), position.angle.val(), position.belief());
 	
 #if 1

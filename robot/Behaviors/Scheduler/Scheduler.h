@@ -9,7 +9,7 @@
 #include "Behaviors/Test/BehaviorsTest.h"
 #include "Behaviors/GlobalLocalize/GlobalLocalize.h"
 
-#define POSE_CONFIDENCE_THRESH  0.25
+#define POSE_CONFIDENCE_THRESH  0.10
 
 class ConfigFile;
 class Log;

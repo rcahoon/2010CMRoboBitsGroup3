@@ -1,15 +1,9 @@
 #ifndef _RCAHOON_LOCALIZATION_H_
 #define _RCAHOON_LOCALIZATION_H_
 
-/*#define LINE_VAR  10
-#define GOAL_VAR  20*/
-//#define LINE_VAR 250
-//#define GOAL_VAR 500
 #define NUM_PARTICLES  100
 #define PARTICLE_POSITION_DECAY 1.0f
 #define PARTICLE_ANGLE_DECAY ((float)M_PI/2)
-//#define PARTICLE_POSITION_VAR  0.25f
-//#define PARTICLE_ANGLE_VAR  0.4f
 
 #define BLUE  1
 #define YELLOW  -1
@@ -35,10 +29,10 @@ class NoisyAngle
 {
 protected:
 	T _val;
-	float _conf;
+	float _var;
 	
 public:
-	NoisyAngle() : _val(), _conf(DEFAULT_PROB) {}
+	NoisyAngle() : _val(), _var(DEFAULT_PROB) {}
 	//NoisyAngle(float conf) : _val((T)randomGaussian(0, var)), _var(var) {}
 	NoisyAngle(T val, float conf) : _val(val), _conf(conf)
 	{

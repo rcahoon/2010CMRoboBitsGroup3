@@ -6,6 +6,7 @@
 #include "GameController/GameState.h"
 #include "shared/Field/Field.h"
 #include "shared/Shape/Circle.h"
+#include "shared/Shape/Line.h"
 
 #define COMPONENT VISION
 #define CLASS_LOG_LEVEL LOG_LEVEL_TRACE
@@ -51,12 +52,14 @@ bool WorldModel::run(const RobotState & robotState,
 	for(std::vector<VisionObject const *>::iterator iter = b_gp.begin();
 	    iter != b_gp.end(); iter++)
 	{
+		LOG_SHAPE(Log::Field, Circle(pose.convertRelativeToGlobal((*iter)->getPosition()), 6/(*iter)->getConfidence(), 0xFFFF80, 3));
 		LOG_SHAPE(Log::Field, Circle(pose.convertRelativeToGlobal((*iter)->getPosition()), 6, 0x0000FF, 3));
 	}
 	std::vector<VisionObject const *> y_gp = visionFeatures.getVisionObjects(VisionObject::YellowGoalPost);
 	for(std::vector<VisionObject const *>::iterator iter = y_gp.begin();
 	    iter != y_gp.end(); iter++)
 	{
+		LOG_SHAPE(Log::Field, Circle(pose.convertRelativeToGlobal((*iter)->getPosition()), 6/(*iter)->getConfidence(), 0xFFFF80, 3));
 		LOG_SHAPE(Log::Field, Circle(pose.convertRelativeToGlobal((*iter)->getPosition()), 6, 0xFFFF00, 3));
 	}
 
@@ -92,13 +95,16 @@ bool WorldModel::run(const RobotState & robotState,
 	}
 	ball.setGlobalPosition(pose.convertRelativeToGlobal(ball.getLocalPosition()));
 	worldFeatures.addWorldObject(ball);
+	LOG_SHAPE(Log::Field, Circle(ball.getGlobalPosition(), 6/ball.getConfidence(), 0xFFFF80, 3));
 	LOG_SHAPE(Log::Field, Circle(ball.getGlobalPosition(), 8, 0xFF0000, 4));
 	
 	self.setGlobalPosition(pose.getPosition());
 	self.setConfidence(pose.getConfidence());
 	self.setValid(!pose.isLost());
 	worldFeatures.addWorldObject(self);
+	LOG_SHAPE(Log::Field, Circle(self.getGlobalPosition(), 8/self.getConfidence(), 0xFFFF80, 3));
 	LOG_SHAPE(Log::Field, Circle(self.getGlobalPosition(), 8, 0x00FFFF, 4));
+	LOG_SHAPE(Log::Field, Line(self.getGlobalPosition(), self.getGlobalPosition()+Vector2D(6, 0).rotate(pose.getAngle()), 0x0, 3));
 	
 	//this order of statements (position, angle) is important
 	b_goal.setGlobalPosition(gameState.isOurColorBlue() ? field.getOurGoal() : field.getOpponentGoal());
