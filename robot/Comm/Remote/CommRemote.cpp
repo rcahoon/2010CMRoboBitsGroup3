@@ -20,7 +20,7 @@
 #include "shared/ConfigFile/ConfigFile.h"
 
 #define COMPONENT COMM
-//#define CLASS_LOG_LEVEL LOG_LEVEL_INFO
+#define CLASS_LOG_LEVEL LOG_LEVEL_INFO
 #include "Log/LogSettings.h"
 
 CommRemote::CommRemote(ConfigFile & configFile, Log & _log)
@@ -28,7 +28,8 @@ CommRemote::CommRemote(ConfigFile & configFile, Log & _log)
     maxClientQueue        (configFile.getInt  ("comm/remoteMaxClientQueue", 1)),
     maxPacketSize         (configFile.getInt  ("comm/maxPacketSize", 1024)),
     socketTimeout         (configFile.getFloat("comm/socketTimeout", 1)),
-    robotMessageHeaderSize(configFile.getInt  ("comm/robotMessageHeaderSize", 3)),
+    robotMessageHeaderSize(configFile.getInt  ("comm/robotMessageHeaderSize", 5)),
+    sendBufferSize        (configFile.getInt  ("comm/sendBufferSize", 1024 * 1024)),
     log(_log),
     serverSocket(-1),
     clientSocket(-1),
@@ -37,7 +38,14 @@ CommRemote::CommRemote(ConfigFile & configFile, Log & _log)
     dataMutex(),
     messagesToRobot(),
     messagesFromRobot(),
-    wasConnectedToClient(false) {
+    wasConnectedToClient(false),
+    sendBuffer(NULL),
+    sendBufferOffset(0) {
+  // Create the send buffer
+  if (sendBufferSize > 0) {
+    sendBuffer = new unsigned char[sendBufferSize];
+  }
+
   // Create the TCP socket and bind to the right port
   createTCPSocket();
 
@@ -91,6 +99,11 @@ CommRemote::~CommRemote() {
   messagesFromRobot.clear();
 
   pthread_mutex_unlock(&dataMutex);
+
+//  // Delete the send buffer
+//  if (sendBuffer != NULL) {
+//    delete [] sendBuffer;
+//  }
 }
 
 bool CommRemote::run(Messages & messages, Feedback & feedback) {
@@ -278,6 +291,7 @@ void CommRemote::runThread() {
 
 
     bool sendRobotMessages = true;
+    sendBufferOffset = 0;
 
     // Send all the robot messages
     while (sendRobotMessages) {
@@ -293,6 +307,50 @@ void CommRemote::runThread() {
         sendRobotMessages = false;
       }
       pthread_mutex_unlock(&dataMutex);
+
+//      // Transmit the message
+//      if (message != NULL) {
+//
+//        unsigned int messageSize = robotMessageHeaderSize + message->getSize();
+//
+//        // If we don't have space for the entire message in the buffer,
+//        // send the buffer now
+//        if (sendBufferOffset + messageSize > sendBufferSize) {
+//          // Send data to connected client (if any)
+//          if (clientSocket >= 0) {
+//            bool errorOccurred = sendDataToClient(sendBuffer, sendBufferOffset);
+//            sendBufferOffset = 0;
+//
+//            if (errorOccurred) {
+//              LOG_INFO("Error sending packet to connected client.");
+//              disconnectClient(sockets, maxSocket);
+//            }
+//          }
+//        }
+//
+//        // Copy the message into the buffer
+//        if (sendBufferSize >= messageSize) {
+//          sendBuffer[sendBufferOffset] = (uint8_t)message->getType();
+//
+//          uint32_t size = htonl((uint32_t)message->getSize());
+//          memcpy(sendBuffer + sendBufferOffset + 1, (unsigned char const *)&size, sizeof(size));
+//
+//          memcpy(sendBuffer + sendBufferOffset + robotMessageHeaderSize, message->getData(), message->getSize());
+//
+//          sendBufferOffset += messageSize;
+//        }
+//        // We can't send the message
+//        else {
+//          LOG_WARN("Message is larger than the send buffer.");
+//        }
+//
+//
+//        // Delete the message (even if no client was connected)
+//        delete message;
+//      }
+//      else {
+//        sendRobotMessages = false;
+//      }
 
       // Transmit the message
       if (message != NULL) {
@@ -340,6 +398,22 @@ void CommRemote::runThread() {
       }
 
     }
+
+//    // Do we have data in the send buffer?
+//    if (sendBufferOffset > 0) {
+//      LOG_INFO("Sending data chunk of %d bytes.", sendBufferOffset);
+//
+//      // Send data to connected client (if any)
+//      if (clientSocket >= 0) {
+//        bool errorOccurred = sendDataToClient(sendBuffer, sendBufferOffset);
+//        sendBufferOffset = 0;
+//
+//        if (errorOccurred) {
+//          LOG_INFO("Error sending packet to connected client.");
+//          disconnectClient(sockets, maxSocket);
+//        }
+//      }
+//    }
 
   }
 
