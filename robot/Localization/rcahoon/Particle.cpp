@@ -6,9 +6,10 @@ namespace RCahoon {
 
 void Particle::init(Field& field)
 {
-	pos_x = Noisy<float>(randomDbl(-field.getHalfFieldLength(), field.getHalfFieldLength()), 0.0f);
-	pos_y = Noisy<float>(randomDbl(-field.getHalfFieldWidth(), field.getHalfFieldWidth()), 0.0f);
-	angle = NoisyAngle<float>(randomDbl(0, 2*M_PI), 0.0f);
+	S(0) = randomDbl(-field.getHalfFieldLength(), field.getHalfFieldLength());
+	S(1) = randomDbl(-field.getHalfFieldWidth(), field.getHalfFieldWidth());
+	S(2) = randomDbl(0, 2*M_PI);
+	mcov = Matrix::I<3>() * 100.0f;
 }
 
 /*static inline float pdf(float x, float var)
@@ -17,9 +18,8 @@ void Particle::init(Field& field)
 }*/
 
 //TODO: do sensor fusion correctly
-void Particle::update(Localization& loc, std::vector<VisionObject const *> vis_objs, Noisy<float> t_x, Noisy<float> t_y, NoisyAngle<float> rot)
+void Particle::update(Localization& loc, std::vector<VisionObject const *> vis_objs, Particle delta)
 {
-	//TODO: convert from variances to confidences
 /*	pos_x += t_x;
 	pos_y += t_y;
 	angle += rot;
