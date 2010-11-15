@@ -72,12 +72,13 @@ void LogToRemote::logTextFormatted(int logLevel,
     return;
   }
 
-  RemoteMessageFromRobot *message = new LogTextMessage(logLevel,
-                                                       component,
-                                                       className,
-                                                       functionName,
-                                                       text);
-  remoteMessagesFromRobot.push_back(message);
+  // Disabled for now
+//  RemoteMessageFromRobot *message = new LogTextMessage(logLevel,
+//                                                       component,
+//                                                       className,
+//                                                       functionName,
+//                                                       text);
+//  remoteMessagesFromRobot.push_back(message);
 }
 
 void LogToRemote::logRobotState(const RobotState & robotState) {

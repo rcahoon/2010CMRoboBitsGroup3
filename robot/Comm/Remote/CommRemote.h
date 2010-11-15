@@ -50,6 +50,7 @@ private:
   const unsigned int maxPacketSize;
   const float socketTimeout;
   const unsigned int robotMessageHeaderSize;
+  const unsigned int sendBufferSize;
 
   Log & log;
 
@@ -62,6 +63,9 @@ private:
   std::vector<RemoteMessageFromRobot const *> messagesFromRobot;
 
   bool wasConnectedToClient;
+
+  unsigned char * sendBuffer;
+  int             sendBufferOffset;
 };
 
 #endif /* COMMREMOTE_H_ */
