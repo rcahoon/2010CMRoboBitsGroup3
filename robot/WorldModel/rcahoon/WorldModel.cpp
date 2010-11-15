@@ -19,6 +19,7 @@ WorldModel::WorldModel(ConfigFile & configFile,
                        Field & _field) :
                        log(_log),
                        field(_field),
+                       scanForGoals(false),
                        ball(_log, WorldObject::Ball),
                        b_goal(configFile, _log, 0.0f, true),
                        y_goal(configFile, _log, 0.0f, false),
@@ -40,7 +41,36 @@ bool WorldModel::run(const RobotState & robotState,
                            Messages & messages,
                            WorldFeatures & worldFeatures) {
 
-	worldFeatures.clear();
+	//worldFeatures.clear();
+	
+	std::vector<WorldObject const *> wobjs = worldFeatures.getAllWorldObjects();
+	for(std::vector<WorldObject const *>::iterator iter = wobjs.begin();
+		iter != wobjs.end(); iter++)
+	{
+		(*iter)->cov += movement.cov(0,1,0,1);
+		(*iter)->setLocalPosition(
+	}
+	
+	/*HMatrix const* camTransform = &(robotState.getTransformationFromCamera());
+	
+	std::vector<VisionObject const *> b_goals = visionFeatures.getVisionObjects(VisionObject::BlueGoalBar);
+	if (!b_goals.empty())
+	{
+		for(std::vector<VisionObject const *>::iterator iter = b_goals.begin();
+			iter != b_goals.end(); iter++)
+		{
+			int x1, x2, y1, y2;
+			x1 = (*iter)->getBoundingBoxX1();
+			x2 = (*iter)->getBoundingBoxX2();
+			y1 = (*iter)->getBoundingBoxY1();
+			y2 = (*iter)->getBoundingBoxY2();
+			//(*iter)->getBoundingBox(x1, y1, x2, y2);
+			Vector2D post1 = cameraToWorld(camTransform, Vector2D(x1, y2));
+			Vector2D post2 = cameraToWorld(camTransform, Vector2D(x2, y2));
+			
+			
+		}
+	}*/
 	
 	std::vector<VisionObject const *> lines = visionFeatures.getVisionObjects(VisionObject::Line);
 	for(std::vector<VisionObject const *>::iterator iter = lines.begin();
@@ -48,19 +78,23 @@ bool WorldModel::run(const RobotState & robotState,
 	{
 		LOG_SHAPE(Log::Field, Circle(pose.convertRelativeToGlobal((*iter)->getPosition()), 2, 0x000000, 1));
 	}
-	std::vector<VisionObject const *> b_gp = visionFeatures.getVisionObjects(VisionObject::BlueGoalPost);
-	for(std::vector<VisionObject const *>::iterator iter = b_gp.begin();
-	    iter != b_gp.end(); iter++)
+	
+	if (scanForGoals)
 	{
-		LOG_SHAPE(Log::Field, Circle(pose.convertRelativeToGlobal((*iter)->getPosition()), 6/(*iter)->getConfidence(), 0xFFFF80, 3));
-		LOG_SHAPE(Log::Field, Circle(pose.convertRelativeToGlobal((*iter)->getPosition()), 6, 0x0000FF, 3));
-	}
-	std::vector<VisionObject const *> y_gp = visionFeatures.getVisionObjects(VisionObject::YellowGoalPost);
-	for(std::vector<VisionObject const *>::iterator iter = y_gp.begin();
-	    iter != y_gp.end(); iter++)
-	{
-		LOG_SHAPE(Log::Field, Circle(pose.convertRelativeToGlobal((*iter)->getPosition()), 6/(*iter)->getConfidence(), 0xFFFF80, 3));
-		LOG_SHAPE(Log::Field, Circle(pose.convertRelativeToGlobal((*iter)->getPosition()), 6, 0xFFFF00, 3));
+		std::vector<VisionObject const *> b_gp = visionFeatures.getVisionObjects(VisionObject::BlueGoalPost);
+		for(std::vector<VisionObject const *>::iterator iter = b_gp.begin();
+			iter != b_gp.end(); iter++)
+		{
+			LOG_SHAPE(Log::Field, Circle(pose.convertRelativeToGlobal((*iter)->getPosition()), 6/(*iter)->getConfidence(), 0xFFFF80, 3));
+			LOG_SHAPE(Log::Field, Circle(pose.convertRelativeToGlobal((*iter)->getPosition()), 6, 0x0000FF, 3));
+		}
+		std::vector<VisionObject const *> y_gp = visionFeatures.getVisionObjects(VisionObject::YellowGoalPost);
+		for(std::vector<VisionObject const *>::iterator iter = y_gp.begin();
+			iter != y_gp.end(); iter++)
+		{
+			LOG_SHAPE(Log::Field, Circle(pose.convertRelativeToGlobal((*iter)->getPosition()), 6/(*iter)->getConfidence(), 0xFFFF80, 3));
+			LOG_SHAPE(Log::Field, Circle(pose.convertRelativeToGlobal((*iter)->getPosition()), 6, 0xFFFF00, 3));
+		}
 	}
 
 	std::vector<VisionObject const *> balls = visionFeatures.getVisionObjects(VisionObject::Ball);
@@ -140,6 +174,11 @@ void WorldModel::setRobotConditions(bool gettingUp, bool lifted)
 		y_goal.setValid(false);
 		self.setValid(false);
 	}
+}
+
+void setScanningForGoals(bool scanningForGoals)
+{
+	scanForGoals = scanningForGoals;
 }
 	
 void WorldModel::addKickEffect(const Vector2D & kickEffect)

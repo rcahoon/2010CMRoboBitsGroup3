@@ -15,7 +15,7 @@
 #include "shared/Field/Field.h"
 #include "Vision/VisionObject/VisionObject.h"
 #include <vector>
-#include "Matrix.h"
+#include "shared/Matrix.h"
 
 class Log;
 
@@ -31,11 +31,11 @@ private:
 	
 public:
 	Particle() : S(3,1), mcov(Matrix::I<3>()) {}
-	Particle(Matrix _S, Matrix _cov) : S(_S), mcov(_cov) {
+	Particle(const Matrix& _S, const Matrix& _cov) : S(_S), mcov(_cov) {
 		assert(_cov.rows()==3 && _cov.cols()==3);
 		assert(_S.rows()==3 && _S.cols()==1);
 	}
-	Particle(Vector2D _pos, float _angle, Matrix _cov) : S(3,1), mcov(_cov) {
+	Particle(const Vector2D& _pos, float _angle, const Matrix& _cov) : S(3,1), mcov(_cov) {
 		assert(_cov.rows()==3 && _cov.cols()==3);
 		
 		S(0) = _pos.x; S(1) = _pos.y; S(2) = _angle;
@@ -60,7 +60,7 @@ public:
 	{
 		return S(2);
 	}
-	inline const Matrix cov()
+	inline const Matrix& cov()
 	{
 		return mcov;
 	}
@@ -151,12 +151,15 @@ public:
 		             Pose & pose);
 	
 	virtual void reset(ResetCase resetCase);
+	
+    virtual void updateWorldFeatures(const WorldFeatures & worldFeatures);
+    
+    static Particle movementModel(Vector2D T, float R);
 
 private:
 	Log & log;
 	Field & field;
-	int l_half_length;
-	int l_half_width;
+	
 	/*Particle* particles, *particles_buf;
 	Vector2D* line_map;
 	Vector2D* blue_goal_map;

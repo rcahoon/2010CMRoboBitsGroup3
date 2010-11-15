@@ -2,6 +2,9 @@
 #define WORLDOBJECT_H_
 
 #include "shared/Vector/Vector2D.h"
+#include "shared/Matrix.h"
+
+using namespace RCahoon;
 
 class Log;
 
@@ -96,7 +99,7 @@ public:
    *
    * @return the confidence of the object (higher is better)
    */
-  float getConfidence() const;
+  const Matrix& getCovariance() const;
 
   /**
    * Is the object currently visible?
@@ -145,7 +148,7 @@ public:
    *
    * @param _confidence the confidence of the object
    */
-  void setConfidence(const float _confidence);
+  void setCovariation(const Matrix& _covariance);
 
   /**
    * Sets whether the object is currently visible.
@@ -217,7 +220,7 @@ private:
   Vector2D localPosition;
   Vector2D globalPosition;
 
-  float confidence;
+  Matrix covariance;
 
   bool visible, valid, suspicious;
 

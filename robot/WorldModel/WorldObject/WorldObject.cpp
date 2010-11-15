@@ -12,7 +12,7 @@ WorldObject::WorldObject(Log & _log,
     source(WorldObject::UnknownSource),
     localPosition(0, 0),
     globalPosition(0, 0),
-    confidence(0),
+    covariance(Matrix::I<2>()*DEFAULT_VARIANCE),
     visible(false),
     valid(false),
     suspicious(false),
@@ -25,7 +25,7 @@ WorldObject::WorldObject(const WorldObject & other)
     source(other.source),
     localPosition(other.localPosition),
     globalPosition(other.globalPosition),
-    confidence(other.confidence),
+    covariance(other.covariance),
     visible(other.visible),
     valid(other.valid),
     suspicious(other.suspicious),
@@ -51,8 +51,8 @@ Vector2D const & WorldObject::getGlobalPosition() const {
   return globalPosition;
 }
 
-float WorldObject::getConfidence() const {
-  return confidence;
+float WorldObject::getCovariance() const {
+  return covariance;
 }
 
 bool WorldObject::isVisible() const {
@@ -79,8 +79,8 @@ void WorldObject::setGlobalPosition(const Vector2D & _globalPosition) {
   globalPosition = _globalPosition;
 }
 
-void WorldObject::setConfidence(const float _confidence) {
-  confidence = _confidence;
+void WorldObject::setCovariance(const float _covariance) {
+  covariance = _covariance;
 }
 
 void WorldObject::setVisible(const bool _visible) {
@@ -122,14 +122,14 @@ void WorldObject::clear() {
   source = WorldObject::UnknownSource;
   localPosition.x  = localPosition.y  = 0;
   globalPosition.x = globalPosition.y = 0;
-  confidence = 0;
+  covariance = Matrix::I<2>()*DEFAULT_VARIANCE;
   visible = valid = suspicious = newHypothesis = false;
 }
 
 void WorldObject::copyFrom(const WorldObject & other) {
   localPosition  = other.localPosition;
   globalPosition = other.globalPosition;
-  confidence     = other.confidence;
+  covariance     = other.covariance;
   visible        = other.visible;
   valid          = other.valid;
   suspicious     = other.suspicious;

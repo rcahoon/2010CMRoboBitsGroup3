@@ -20,8 +20,6 @@ namespace RCahoon {
 Localization::Localization(ConfigFile & configFile, Log & _log, Field & _field) :
 	log(_log),
 	field(_field),
-	l_half_length(_field.getHalfFieldLength()),
-	l_half_width(_field.getHalfFieldWidth()),
 	position()
 {
 	reset(none);
@@ -33,12 +31,12 @@ Localization::~Localization()
 
 Vector2D& Localization::fieldBound(Vector2D& position)
 {
-	bound(position.x, -l_half_length, l_half_length);
-	bound(position.y, -l_half_width, l_half_width);
+	bound(position.x, -field.getHalfFieldLength(), field.getHalfFieldLength());
+	bound(position.y, -field.getHalfFieldWidth(), field.getHalfFieldWidth());
 	return position;
 }
 
-Particle movementModel(Vector2D T, float R)
+Particle Localization::movementModel(Vector2D T, float R)
 {
 	Matrix cov(3,3);
 	cov(0,0) = abs(T.x) * MV_POS_VAR;
@@ -52,41 +50,30 @@ bool Localization::run(const RobotState     & robotState,
                        const VisionFeatures & visionFeatures,
                        Pose & pose)
 {
-	LOG_TRACE("Localization run started.");
+	LOG_TRACE("Localization motion update started.");
 
 	Vector2D _T;
 	float _R;
 	robotState.getOdometryUpdate(_T, _R);
 	position *= movementModel(_T, -_R);
 	
-	LOG_INFO("Motion estimate: %f %f %f $ %f", position.x(), position.y(), position.angle(), position.cov().trace());
+	LOG_INFO("Motion update: %f %f %f $ %f", position.x(), position.y(), position.angle(), position.cov().trace());
 	position.cov().print();
 	
-#if 1
+	pose = position;
+	
+	LOG_TRACE("Localization motion update ended.");
+
+	return false;
+}
+
+void Localization::updateWorldFeatures(const WorldFeatures & worldFeatures)
+{
+	LOG_TRACE("Localization observation update started.");
+	
 	Vector2D blueGoal = gameState.isOurColorBlue() ? field.getOurGoal() : field.getOpponentGoal();
 	
-	/*HMatrix const* camTransform = &(robotState.getTransformationFromCamera());
-	
-	std::vector<VisionObject const *> b_goals = visionFeatures.getVisionObjects(VisionObject::BlueGoalBar);
-	if (!b_goals.empty())
-	{
-		for(std::vector<VisionObject const *>::iterator iter = b_goals.begin();
-			iter != b_goals.end(); iter++)
-		{
-			int x1, x2, y1, y2;
-			x1 = (*iter)->getBoundingBoxX1();
-			x2 = (*iter)->getBoundingBoxX2();
-			y1 = (*iter)->getBoundingBoxY1();
-			y2 = (*iter)->getBoundingBoxY2();
-			//(*iter)->getBoundingBox(x1, y1, x2, y2);
-			Vector2D post1 = cameraToWorld(camTransform, Vector2D(x1, y2));
-			Vector2D post2 = cameraToWorld(camTransform, Vector2D(x2, y2));
-			
-			
-		}
-	}*/
-	
-	std::vector<VisionObject const *> b_posts = visionFeatures.getVisionObjects(VisionObject::BlueGoalPost);
+	std::vector<WorldObject const *> b_posts = visionFeatures.getVisionObjects(VisionObject::BlueGoalPost);
 	for(std::vector<VisionObject const *>::iterator iter1 = b_posts.begin();
 		iter1 != b_posts.end(); iter1++)
 	{
@@ -231,20 +218,14 @@ bool Localization::run(const RobotState     & robotState,
 				position |= estimate;
 		}
 	}
-#endif
 	
-	pose = position;
-	LOG_INFO("Pose %f %f %f $ %f\n", position.x(), position.y(), position.angle(), position.cov().trace());
-	
-	LOG_TRACE("Localization run ended.");
-
-	return false;
+	LOG_TRACE("Localization observation update ended.");
 }
 
 void Localization::reset(ResetCase resetCase)
 {
 	//TODO: no magic constants!
-	position += Particle(Matrix(3,1), Matrix::I<3>()*300);
+	position += Particle(Matrix(3,1), Matrix::I<3>()*DEFAULT_VARIANCE);
 }
 
 }

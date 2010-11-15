@@ -37,11 +37,15 @@ public:
 	virtual void addKickEffect(const Vector2D & kickEffect);
 
 	virtual void invalidateBall();
+	
+	virtual void setScanningForGoals(bool scanningForGoals);
 
 private:
 	Log& log;
 	
 	Field& field;
+	
+	bool scanForGoals;
 	
 	VelocityWorldObject ball;
 	GoalWorldObject b_goal, y_goal;
