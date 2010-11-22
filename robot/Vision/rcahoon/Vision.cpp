@@ -526,6 +526,10 @@ void Vision::findObjects(const HMatrix* transform, VisionFeatures & outputVision
 		{
 			r.type = VisionObject::YellowGoalBar;
 		}
+		else if ((r.y2 - r.y1) / (r.x2 - r.x1) < 1.f )
+		{
+			continue;
+		}
 		
 		addVisionObject(r.type, r.area,
 			r.x1, r.y1, r.x2, r.y2, r.w_cenx/r.area,
@@ -545,6 +549,10 @@ void Vision::findObjects(const HMatrix* transform, VisionFeatures & outputVision
 		//if ((r.y2 - r.y1) < (r.x2 - r.x1))
 		{
 			r.type = VisionObject::YellowGoalBar;
+		}
+		else if ((r.y2 - r.y1) / (r.x2 - r.x1) < 1.f )
+		{
+			continue;
 		}
 		
 		addVisionObject(r.type, r.area,

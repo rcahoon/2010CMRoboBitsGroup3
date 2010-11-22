@@ -51,7 +51,7 @@ Vector2D const & WorldObject::getGlobalPosition() const {
   return globalPosition;
 }
 
-float WorldObject::getCovariance() const {
+const Matrix& WorldObject::getCovariance() const {
   return covariance;
 }
 
@@ -79,7 +79,7 @@ void WorldObject::setGlobalPosition(const Vector2D & _globalPosition) {
   globalPosition = _globalPosition;
 }
 
-void WorldObject::setCovariance(const float _covariance) {
+void WorldObject::setCovariance(const Matrix& _covariance) {
   covariance = _covariance;
 }
 

@@ -4,6 +4,8 @@
 #include "shared/Vector/Vector2D.h"
 #include "shared/Matrix.h"
 
+#define DEFAULT_VARIANCE  300
+
 using namespace RCahoon;
 
 class Log;
@@ -148,7 +150,7 @@ public:
    *
    * @param _confidence the confidence of the object
    */
-  void setCovariation(const Matrix& _covariance);
+  void setCovariance(const Matrix& _covariance);
 
   /**
    * Sets whether the object is currently visible.

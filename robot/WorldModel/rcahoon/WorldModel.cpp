@@ -1,5 +1,6 @@
 #include "WorldModel.h"
 #include "WorldModel/WorldFeatures.h"
+#include "WorldModel/WorldObject/GoalPostWorldObject.h"
 #include "Vision/VisionObject/VisionObject.h"
 #include "Vision/VisionFeatures.h"
 #include "Localization/Pose.h"
@@ -29,9 +30,9 @@ WorldModel::WorldModel(ConfigFile & configFile,
 WorldModel::~WorldModel() {
 }
 
-float ballMotionModel(Vector2D vel)
+const Matrix WorldModel::ballMotionModel(Vector2D vel)
 {
-	return vel.length() * BALL_VELOCITY_CONF;
+	return Matrix::I<2>() * vel.length() * BALL_VELOCITY_COV_SCALE;
 }
 
 bool WorldModel::run(const RobotState & robotState,
@@ -40,16 +41,6 @@ bool WorldModel::run(const RobotState & robotState,
                      const Pose & pose,
                            Messages & messages,
                            WorldFeatures & worldFeatures) {
-
-	//worldFeatures.clear();
-	
-	std::vector<WorldObject const *> wobjs = worldFeatures.getAllWorldObjects();
-	for(std::vector<WorldObject const *>::iterator iter = wobjs.begin();
-		iter != wobjs.end(); iter++)
-	{
-		(*iter)->cov += movement.cov(0,1,0,1);
-		(*iter)->setLocalPosition(
-	}
 	
 	/*HMatrix const* camTransform = &(robotState.getTransformationFromCamera());
 	
@@ -72,50 +63,27 @@ bool WorldModel::run(const RobotState & robotState,
 		}
 	}*/
 	
-	std::vector<VisionObject const *> lines = visionFeatures.getVisionObjects(VisionObject::Line);
-	for(std::vector<VisionObject const *>::iterator iter = lines.begin();
-	    iter != lines.end(); iter++)
-	{
-		LOG_SHAPE(Log::Field, Circle(pose.convertRelativeToGlobal((*iter)->getPosition()), 2, 0x000000, 1));
-	}
-	
-	if (scanForGoals)
-	{
-		std::vector<VisionObject const *> b_gp = visionFeatures.getVisionObjects(VisionObject::BlueGoalPost);
-		for(std::vector<VisionObject const *>::iterator iter = b_gp.begin();
-			iter != b_gp.end(); iter++)
-		{
-			LOG_SHAPE(Log::Field, Circle(pose.convertRelativeToGlobal((*iter)->getPosition()), 6/(*iter)->getConfidence(), 0xFFFF80, 3));
-			LOG_SHAPE(Log::Field, Circle(pose.convertRelativeToGlobal((*iter)->getPosition()), 6, 0x0000FF, 3));
-		}
-		std::vector<VisionObject const *> y_gp = visionFeatures.getVisionObjects(VisionObject::YellowGoalPost);
-		for(std::vector<VisionObject const *>::iterator iter = y_gp.begin();
-			iter != y_gp.end(); iter++)
-		{
-			LOG_SHAPE(Log::Field, Circle(pose.convertRelativeToGlobal((*iter)->getPosition()), 6/(*iter)->getConfidence(), 0xFFFF80, 3));
-			LOG_SHAPE(Log::Field, Circle(pose.convertRelativeToGlobal((*iter)->getPosition()), 6, 0xFFFF00, 3));
-		}
-	}
-
 	std::vector<VisionObject const *> balls = visionFeatures.getVisionObjects(VisionObject::Ball);
 	if (balls.empty())
 	{
 		if (ball.isValid())
 		{
 			ball.setSuspicious(true);
-			ball.setLocalPosition(ball.getLocalPosition() + ball.getVelocity());
-			ball.setConfidence(ball.getConfidence() * ballMotionModel(ball.getVelocity()));
+			ball.setGlobalPosition(ball.getGlobalPosition() + ball.getVelocity());
+			ball.setLocalPosition(pose.convertGlobalToRelative(ball.getGlobalPosition()));
+			ball.setCovariance(ball.getCovariance() + ballMotionModel(ball.getVelocity()));
 			ball.setVelocity(ball.getVelocity() * BALL_VELOCITY_DECAY);
 		}
-		ball.setConfidence(ball.getConfidence() * BALL_CONFIDENCE_DECAY);
+		ball.setCovariance(ball.getCovariance() + Matrix::I<2>()*BALL_COVARIANCE_DECAY);
 	}
 	else
 	{
 		std::vector<VisionObject const *>::iterator iter = balls.begin();
+		//TODO: start with estimated position, so we stick with that if we get a really noisy vision measurement
 		const VisionObject * bestBall = *iter;
 		for(; iter != balls.end(); iter++)
 		{
-			if (bestBall->getConfidence() < (*iter)->getConfidence())
+			if (bestBall->getConfidence() > (*iter)->getConfidence())
 				bestBall = *iter;
 		}
 		
@@ -124,19 +92,20 @@ bool WorldModel::run(const RobotState & robotState,
 		else
 			ball.setVelocity(Vector2D());
 		ball.setLocalPosition(bestBall->getPosition());
-		ball.setConfidence(bestBall->getConfidence());
+		ball.setGlobalPosition(pose.convertRelativeToGlobal(ball.getLocalPosition()));
+		//TODO: set covariance correctly (should actually switch bestball to be a worldobject, see above)
+		ball.setCovariance(Matrix::I<2>()/bestBall->getConfidence() + pose.getCovariance()(0,1,0,1));
 		ball.setVisible(true);
 	}
-	ball.setGlobalPosition(pose.convertRelativeToGlobal(ball.getLocalPosition()));
 	worldFeatures.addWorldObject(ball);
-	LOG_SHAPE(Log::Field, Circle(ball.getGlobalPosition(), 6/ball.getConfidence(), 0xFFFF80, 3));
+	LOG_SHAPE(Log::Field, Circle(ball.getGlobalPosition(), (ball.getCovariance().trace()/3), 0xFFFF80, 3));
 	LOG_SHAPE(Log::Field, Circle(ball.getGlobalPosition(), 8, 0xFF0000, 4));
 	
 	self.setGlobalPosition(pose.getPosition());
-	self.setConfidence(pose.getConfidence());
+	self.setCovariance(pose.getCovariance()(0,1,0,1));
 	self.setValid(!pose.isLost());
 	worldFeatures.addWorldObject(self);
-	LOG_SHAPE(Log::Field, Circle(self.getGlobalPosition(), 8/self.getConfidence(), 0xFFFF80, 3));
+	LOG_SHAPE(Log::Field, Circle(self.getGlobalPosition(), (self.getCovariance().trace()/3), 0xFFFF80, 3));
 	LOG_SHAPE(Log::Field, Circle(self.getGlobalPosition(), 8, 0x00FFFF, 4));
 	LOG_SHAPE(Log::Field, Line(self.getGlobalPosition(), self.getGlobalPosition()+Vector2D(6, 0).rotate(pose.getAngle()), 0x0, 3));
 	
@@ -144,7 +113,7 @@ bool WorldModel::run(const RobotState & robotState,
 	b_goal.setGlobalPosition(gameState.isOurColorBlue() ? field.getOurGoal() : field.getOpponentGoal());
 	b_goal.setLocalPosition(pose.convertGlobalToRelative(b_goal.getGlobalPosition()));
 	b_goal.setLocalAngle(pose.convertGlobalAngleToRelative(0.0f));
-	b_goal.setConfidence(pose.getConfidence());
+	b_goal.setCovariance(pose.getCovariance()(0,1,0,1));
 	bool BGoalVisible = !visionFeatures.getVisionObjects(VisionObject::BlueGoalBar).empty() || !visionFeatures.getVisionObjects(VisionObject::BlueGoalPost).empty();
 	b_goal.setVisible(BGoalVisible);
 	worldFeatures.addWorldObject(b_goal);
@@ -154,7 +123,7 @@ bool WorldModel::run(const RobotState & robotState,
 	y_goal.setGlobalPosition(gameState.isOurColorBlue() ? field.getOpponentGoal() : field.getOurGoal());
 	y_goal.setLocalPosition(pose.convertGlobalToRelative(y_goal.getGlobalPosition()));
 	y_goal.setLocalAngle(pose.convertGlobalAngleToRelative(0.0f));
-	y_goal.setConfidence(pose.getConfidence());
+	y_goal.setCovariance(pose.getCovariance()(0,1,0,1));
 	bool YGoalVisible = !visionFeatures.getVisionObjects(VisionObject::YellowGoalBar).empty() || !visionFeatures.getVisionObjects(VisionObject::YellowGoalPost).empty();
 	y_goal.setVisible(YGoalVisible);
 	worldFeatures.addWorldObject(y_goal);
@@ -176,7 +145,7 @@ void WorldModel::setRobotConditions(bool gettingUp, bool lifted)
 	}
 }
 
-void setScanningForGoals(bool scanningForGoals)
+void WorldModel::setScanningForGoals(bool scanningForGoals)
 {
 	scanForGoals = scanningForGoals;
 }

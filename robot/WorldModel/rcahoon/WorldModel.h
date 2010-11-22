@@ -7,9 +7,9 @@
 #include "WorldModel/WorldObject/VelocityWorldObject.h"
 #include "shared/Vector/Vector2D.h"
 
-#define BALL_VELOCITY_CONF  0.08
+#define BALL_VELOCITY_COV_SCALE  0.08
 #define BALL_VELOCITY_DECAY  0.7
-#define BALL_CONFIDENCE_DECAY 0.987
+#define BALL_COVARIANCE_DECAY 5
 
 class Log;
 class Field;
@@ -50,7 +50,8 @@ private:
 	VelocityWorldObject ball;
 	GoalWorldObject b_goal, y_goal;
 	WorldObject self;
-
+	
+	static const Matrix ballMotionModel(Vector2D vel);
 };
 
 }

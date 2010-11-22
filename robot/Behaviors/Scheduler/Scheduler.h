@@ -9,7 +9,7 @@
 #include "Behaviors/Test/BehaviorsTest.h"
 #include "Behaviors/GlobalLocalize/GlobalLocalize.h"
 
-#define POSE_CONFIDENCE_THRESH  0.10
+#define POSE_COVARIANCE_THRESH  15
 
 class ConfigFile;
 class Log;
@@ -27,8 +27,16 @@ public:
 private:
 	PREVENT_COPY_AND_ASSIGNMENT(Scheduler);
 	
+	enum State
+	{
+		LOCALIZE,
+		ATTACK
+	};
+	
 	GlobalLocalize gLoc;
-	BehaviorsTest kick2goal;
+	KickToGoal kick2goal;
+	
+	State state;
 
 	Log & log;
 };

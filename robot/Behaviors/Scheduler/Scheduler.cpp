@@ -15,6 +15,7 @@ Scheduler::Scheduler(ConfigFile & configFile, Log & _log)
 	: BehaviorBase(),
 	  gLoc(configFile, _log),
 	  kick2goal(configFile, _log),
+	  state(LOCALIZE),
 	  log(_log) {
 }
 
@@ -22,21 +23,25 @@ Scheduler::~Scheduler() {
 }
 
 bool Scheduler::run(BEHAVIOR_PARAMS) {
+	bool ret = false;
+	switch(state)
+	{
+	case LOCALIZE:
+		LOG_INFO("Running Global Localization");
+		ret = gLoc.run(BEHAVIOR_CALL);
+	break;
+	case ATTACK:
+		LOG_INFO("Running goal behavior");
+		ret = kick2goal.run(BEHAVIOR_CALL);
+	break;
+	}
+	
+	if (ret)
+	{
+		state = (pose.getCovariance().trace()/3 > POSE_COVARIANCE_THRESH) ? LOCALIZE : ATTACK;
+	}
 
 	//setKickEffect(const Vector2D & kickEffect);
-	
-	if (pose.getConfidence() < POSE_CONFIDENCE_THRESH)
-	{
-		LOG_INFO("Running Global Localization");
-		gLoc.run(BEHAVIOR_CALL);
-	}
-	else
-	{
-		LOG_INFO("Running goal behavior");
-		kick2goal.run(BEHAVIOR_CALL);
-		
-		gLoc.reset();
-	}
 	
 	if (!robotState.isRobotOnGround())
 		feedback.setRobotIsLifted();

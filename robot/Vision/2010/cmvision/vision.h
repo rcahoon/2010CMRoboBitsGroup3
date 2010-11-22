@@ -32,6 +32,8 @@ const int bits_y = 4;
 const int bits_u = 8;
 const int bits_v = 8;
 
+#define GOAL 1
+
 #define MIN_EXP_REGION_SIZE  8
 #define MIN_EXP_RUN_LENGTH    6
 
@@ -113,13 +115,55 @@ public:
   void expandTMap(int x,int y,cmap_t c);
   void expandTMap(cmap_t c);
 
+  /*******************************************************
+     * Declare mutators for private vision bounding box variables
+     *******************************************************/
+    int getxMin();
+    int getyMin();
+    int getxMax();
+    int getyMax();
+
+    int getHorMin();
+    int getHorMax();
+    int getbLeft();
+    int getbRight();
+    int gettLeft();
+    int gettRight();
+
+    int getScanLine();
+
+    int getBallPresent();
+
+    int vertLineMin(int pos);
+    int vertLineMax(int pos);
+    int horLineMin(int pos);
+    int horLineMax(int pos);
+
+    int maxValue(int* array, int length);
+    int minValue(int* array, int length);
+    int fuzzyModeHorMin(int* array, int length);
+    int fuzzyModeHorMax(int* array, int length);
+    int fuzzyModeVert(int* array, int length);
+    int getAdj(int x, int y);
+    void removeOutliers(int* array, int length);
+    /*******************************************************
+     *******************************************************/
+
   // Debugging
   uint32_t getStateHash();
   void dump();
 
+
 private:
   SegmentedImage segmentedImage;
   RGB *segmentedColors;
+
+  /*******************************************************
+   * Declare private vision variables for bounding box.
+   *******************************************************/
+  int xMin, yMin, xMax, yMax, ballPresent, goalPresent;
+  /*******************************************************
+   *******************************************************/
 
   void setupSegmentedImage();
 };

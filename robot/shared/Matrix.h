@@ -61,25 +61,28 @@ class Matrix {
     return v[offset(row, col)];
   }
   /*Matrix operator ()(unsigned rmin, unsigned rmax, unsigned cmin, unsigned cmax) {
-    assert(rmax < mrows);
-    assert(rmin < rmax);
-    assert(cmax < mcols);
-    assert(cmin < cmax);
+    assert(rmax <= mrows);
+    assert(rmin <= rmax);
+    assert(cmax <= mcols);
+    assert(cmin <= cmax);
     
-    unsigned rsize = rmax - rmin;
-    unsigned csize = cmax - cmin;
-    return Matrix(&v[offset(rmin, cmin)], rsize, csize);
-  }
-  const Matrix operator ()(unsigned rmin, unsigned rmax, unsigned cmin, unsigned cmax) const {
-    assert(rmax < mrows);
-    assert(rmin < rmax);
-    assert(cmax < mcols);
-    assert(cmin < cmax);
+    unsigned rsize = rmax-rmin+1;
+    unsigned csize = cmax-cmin+1;
     
-    unsigned rsize = rmax - rmin;
-    unsigned csize = cmax - cmin;
     return Matrix(&v[offset(rmin, cmin)], rsize, csize);
   }*/
+  const Matrix operator ()(unsigned rmin, unsigned rmax, unsigned cmin, unsigned cmax) const {
+    assert(rmax <= mrows);
+    assert(rmin <= rmax);
+    assert(cmax <= mcols);
+    assert(cmin <= cmax);
+    
+    unsigned rsize = rmax-rmin+1;
+    unsigned csize = cmax-cmin+1;
+    
+    //return Matrix(&v[offset(rmin, cmin)], rsize, csize);
+    return Matrix(rsize, csize, &v[offset(rmin, cmin)]);
+  }
 
   Matrix& operator =(float value) {
     fill(value);
@@ -261,14 +264,7 @@ class Matrix {
     }
   }
   
-  template<unsigned size>
-  static Matrix I()
-  {
-    Matrix eye(size,size);
-    for(unsigned i=0; i<size; i++)
-      eye(i,i) = 1.0;
-    return eye;
-  }
+  template<unsigned size> class I;
 
  protected:
   inline unsigned offset(unsigned row, unsigned col) const {
@@ -291,6 +287,17 @@ class Matrix {
   {
     for(unsigned i=0; i<mrows*mcols; i++)
       v[i] = val;
+  }
+};
+
+template<unsigned size>
+class Matrix::I : public Matrix
+{
+public:
+  I() : Matrix(size,size)
+  {
+    for(unsigned i=0; i<size; i++)
+      (*this)(i,i) = 1.0f;
   }
 };
 

@@ -28,6 +28,8 @@ KickToGoal::~KickToGoal() {
 bool KickToGoal::run(BEHAVIOR_PARAMS) {
 
 	static int count = 0;
+	
+	feedback.setScanningForGoals(false);
 
 	while(true)
 	{
@@ -37,21 +39,23 @@ bool KickToGoal::run(BEHAVIOR_PARAMS) {
 		{
 		case TO_BALL:
 			if (servoToBall(BEHAVIOR_CALL)) state = CENTER_GOAL;
-			else return false;
+			else return true;
 		break;
 		case CHECK_GOAL:
-			goalAngle = worldFeatures.getFirstWorldObject(WorldObject::BlueGoal)->getLocalPosition().angle();
+			command.getMotionCommand().headAngles(0.0f, 0.0f, 0.5f);
+			goalAngle = worldFeatures.getFirstWorldObject(WorldObject::YellowGoal)->getLocalPosition().angle();
 			if (fabs(goalAngle) < 0.2) state = KICK;
 			else state = CENTER_GOAL;
 		break;
 		case CENTER_GOAL:
-			goalAngle = worldFeatures.getFirstWorldObject(WorldObject::BlueGoal)->getLocalPosition().angle();
+			command.getMotionCommand().headAngles(0.0f, 0.0f, 0.5f);
+			goalAngle = worldFeatures.getFirstWorldObject(WorldObject::YellowGoal)->getLocalPosition().angle();
 			if (goalAngle > 0.0f)
 				command.getMotionCommand().walk(0, -3, 0.3);
 			else
 				command.getMotionCommand().walk(0, 3, -0.3);
 			if (fabs(goalAngle) < 0.2) state = TO_BALL;
-			else return false;
+			else return true;
 		break;
 		case KICK:
 			command.getMotionCommand().stopWalk();
@@ -66,6 +70,7 @@ bool KickToGoal::run(BEHAVIOR_PARAMS) {
 		break;
 		case WAIT:
 			if (!--count) state = TO_BALL;
+			return false;
 		break;
 		}
 	}

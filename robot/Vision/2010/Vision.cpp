@@ -5,12 +5,19 @@
 #include "Vision/2010/Vision.h"
 #include "Vision/2010/cmvision/vision.h"
 #include "Vision/VisionObject/VisionObject.h"
+#include "Vision/VisionObject/GoalPostVisionObject.h"
 #include "Agent/RobotState.h"
 #include "shared/ConfigFile/ConfigFile.h"
 #include "Vision/VisionObject/ConvexHullVisionObject.h"
+#include "shared/Shape/Rectangle.h"
+#include "Vision/SegmentedImage/SegmentedImage.h"
+
+
 
 #define COMPONENT VISION
 #define CLASS_LOG_LEVEL LOG_LEVEL_TRACE
+#define WIDTH 320
+#define HEIGHT 240
 #include "Log/LogSettings.h"
 
 namespace RoboCup2010 {
@@ -74,13 +81,38 @@ bool Vision::run(const RobotState & robotState,
   startTime = log.getTimestamp();
 #endif
   // Retrieve the transformation matrix from the camera
-  HMatrix const* transformationFromCamera = &(robotState.getTransformationFromCamera());
+//  HMatrix const* transformationFromCamera = &(robotState.getTransformationFromCamera());
 #ifdef LOG_TRACE_ACTIVE
   elapsed = log.getTimestamp() - startTime;
 #endif
   LOG_TRACE("Retrieving transformation matrix from RobotState took %d ms.", elapsed);
 
+  /**************************************************************************************
+  *
+  **************************************************************************************/
+
   // Insert object detectors here
+
+ VisionObject* ball = new VisionObject (log, VisionObject::Ball);
+ ball->setBoundingBox(cmv.getxMin(),cmv.getyMin(),cmv.getxMax(),cmv.getyMax());
+ ball->setConfidence(cmv.getBallPresent());
+
+
+ VisionObject* leftPost = new GoalPostVisionObject(log, GOAL==1, GoalPostVisionObject::Left);
+ leftPost->setBoundingBox(cmv.getHorMin(), cmv.gettLeft(), cmv.getHorMin(), cmv.getbLeft());
+
+ VisionObject* rightPost = new GoalPostVisionObject(log, GOAL==1, GoalPostVisionObject::Right);
+ rightPost->setBoundingBox(cmv.getHorMax(), cmv.gettRight(), cmv.getHorMax(), cmv.getbRight());
+
+
+ //LOG_TRACE("%d %d %d %d",cmv.getxMin(),cmv.getyMin(),cmv.getxMax(),cmv.getyMax());
+outputVisionFeatures.addVisionObject(*ball);
+outputVisionFeatures.addVisionObject(*leftPost);
+outputVisionFeatures.addVisionObject(*rightPost);
+
+  /**************************************************************************************
+  *
+  **************************************************************************************/
 
 #ifdef LOG_TRACE_ACTIVE
   startTime = log.getTimestamp();

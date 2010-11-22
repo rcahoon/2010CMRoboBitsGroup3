@@ -1,5 +1,6 @@
 #include "Pose.h"
 #include "shared/num_util.h"
+#include <assert.h>
 
 // Define the logging constants
 #define COMPONENT LOCALIZATION
@@ -8,19 +9,21 @@
 
 Pose::Pose(const Vector2D & _position,
            const float _angle,
-           const float _confidence,
-           const bool _lost){
-  position = _position;
-  angle = _angle;
-  confidence = _confidence;
-  lost = _lost;
+           const Matrix& _covariance,
+           const bool _lost)
+         : position(_position),
+           angle(_angle),
+           covariance(_covariance),
+           lost(_lost) {
+  
+  assert(_covariance.rows()==3 && _covariance.cols()==3);
 }
 
-Pose::Pose(const Pose & other){
-  position = other.position;
-  angle = other.angle;
-  confidence = other.confidence;
-  lost = other.lost;
+Pose::Pose(const Pose & other)
+         : position(other.position),
+           angle(other.angle),
+           covariance(other.covariance),
+           lost(other.lost) {
 }
 
 Pose::~Pose() {
@@ -47,12 +50,12 @@ void Pose::setAngle(const float _angle){
   angle = _angle;
 }
 
-float Pose::getConfidence() const{
-  return confidence;
+const Matrix& Pose::getCovariance() const{
+  return covariance;
 }
 
-void Pose::setConfidence(const float _confidence){
-  confidence = _confidence;
+void Pose::setCovariance(const Matrix& _covariance){
+  covariance = _covariance;
 }
 
 bool Pose::isLost() const{
@@ -96,27 +99,9 @@ float Pose::convertGlobalAngleToRelative(float globalAngle) const {
 Pose & Pose::operator=(const Pose & other) {
   position = other.position;
   angle = other.angle;
-  confidence = other.confidence;
+  covariance = other.covariance;
   lost = other.lost;
 
   return *this;
-}
-
-void Pose::setGuess(int num, float x, float y, float theta)
-{
-  if (num < 0 || num >= POSE_NUM_RANDOM_SAMPLES)
-	  return;
-  guesses[num].x = x;
-  guesses[num].y = y;
-  guesses[num].theta = theta;
-}
-
-void Pose::getGuess(int num, float* x, float* y, float* theta) const
-{
-  if (num < 0 || num >= POSE_NUM_RANDOM_SAMPLES)
-	  return;
-  *x = guesses[num].x;
-  *y = guesses[num].y;
-  *theta = guesses[num].theta;
 }
 

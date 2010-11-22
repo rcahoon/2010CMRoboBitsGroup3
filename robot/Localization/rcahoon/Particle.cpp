@@ -4,23 +4,16 @@
 
 namespace RCahoon {
 
-void Particle::init(Field& field)
-{
-	S(0) = randomDbl(-field.getHalfFieldLength(), field.getHalfFieldLength());
-	S(1) = randomDbl(-field.getHalfFieldWidth(), field.getHalfFieldWidth());
-	S(2) = randomDbl(0, 2*M_PI);
-	mcov = Matrix::I<3>() * 100.0f;
-}
-
 /*static inline float pdf(float x, float var)
 {
 	return var/(var+x*x);
 }*/
 
-//TODO: do sensor fusion correctly
-void Particle::update(Localization& loc, std::vector<VisionObject const *> vis_objs, Particle delta)
+/*//TODO: do sensor fusion correctly
+void Particle::update(Localization& loc, std::vector<WorldObject const *> world_objs, Particle delta)
 {
-/*	pos_x += t_x;
+//TODO: change to worldobjects
+	pos_x += t_x;
 	pos_y += t_y;
 	angle += rot;
 	
@@ -93,7 +86,7 @@ void Particle::update(Localization& loc, std::vector<VisionObject const *> vis_o
 			printf("%.2f %.2f %.2f\t| %.2f %.2f %.2f\t| %.2f %.2f %.2f\n",
 			       pos_x.val(), pos_y.val(), angle.val(), grad.x, grad.y, moment, dpos_x, dpos_y, dang);
 		}
-	}*/
-}
+	}
+}*/
 
 }

@@ -14,7 +14,8 @@ namespace RoboCup2010 {
 GlobalLocalize::GlobalLocalize(ConfigFile & configFile, Log & _log)
 	: BehaviorBase(),
 	  log(_log),
-	  state(INIT) {
+	  headAngle(0.0f),
+	  scan_dir(1.0f) {
 }
 
 GlobalLocalize::~GlobalLocalize() {
@@ -26,31 +27,17 @@ bool GlobalLocalize::run(BEHAVIOR_PARAMS) {
 	command.useBottomCamera(false);
 	
 	command.getMotionCommand().stopWalk();
-
-	LOG_DEBUG("State: %d", state);
-	switch(state)
+	
+	command.getMotionCommand().headAngles(headAngle, 0.2, 0.5f);
+	headAngle += scan_dir*SCAN_INCREMENT;
+	
+	if (scan_dir*headAngle > 1.5f)
 	{
-	case INIT:
-		/*float angleB = worldFeatures.getFirstWorldObject(WorldObject::BlueGoal)->getLocalPosition().angle();
-		float angleY = worldFeatures.getFirstWorldObject(WorldObject::YellowGoal)->getLocalPosition().angle();
-		command.getMotionCommand().headAngles(abs_min(angleB, angleY), 0.0f, 0.5f);*/
-		headAngle = -1.5f;
-		scan_dir = 1;
-		state = SCAN;
-	break;
-	case SCAN:
-		if (scan_dir*headAngle > 1.5f) scan_dir *= -1;
-
-		command.getMotionCommand().headAngles(headAngle, 0.2, 0.5f);
-		headAngle += scan_dir*SCAN_INCREMENT;
-	break;
+		scan_dir *= -1;
+		return true;
 	}
-
-	return false;
-}
-
-void GlobalLocalize::reset() {
-	state = INIT;
+	else
+		return false;
 }
 
 } // end namespace

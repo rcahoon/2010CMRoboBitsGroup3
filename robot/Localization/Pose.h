@@ -2,19 +2,15 @@
 #define POSE_H_
 
 #include "shared/Vector/Vector2D.h"
+#include "WorldModel/WorldObject/WorldObject.h"
 
 #define POSE_NUM_RANDOM_SAMPLES 10
-
-typedef struct
-{
-	float x, y, theta;
-} PoseGuess;
 
 class Pose {
 public:
   Pose(const Vector2D & _position = Vector2D(0, 0),
        const float _angle = 0,
-       const float _confidence = 0,
+       const Matrix& _covariance = Matrix::I<3>()*DEFAULT_VARIANCE,
        const bool _lost = true);
 
   /**
@@ -31,8 +27,8 @@ public:
   float getAngle() const;
   void setAngle(const float _angle);
 
-  float getConfidence() const;
-  void setConfidence(const float _confidence);
+  const Matrix& getCovariance() const;
+  void setCovariance(const Matrix& _covariance);
 
   bool isLost() const;
   void setLost(const bool _lost);
@@ -43,9 +39,6 @@ public:
   Vector2D convertGlobalToRelative(const Vector2D & globalCoords) const;
   float convertGlobalAngleToRelative(const float globalAngle) const;
 
-  void setGuess(int num, float x, float y, float theta);
-  void getGuess(int num, float* x, float* y, float* theta) const;
-
   /**
    * Allow assignment.
    */
@@ -54,9 +47,8 @@ public:
 private:
   Vector2D position;
   float    angle;
-  float    confidence;
+  Matrix   covariance;
   bool     lost;
-  PoseGuess guesses[POSE_NUM_RANDOM_SAMPLES];
 };
 
 #endif

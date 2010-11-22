@@ -5,7 +5,7 @@
 #include "Behaviors/shared/FSM.h"
 #include "shared/UsefulMacros.h"
 
-#define SCAN_INCREMENT  0.02f
+#define SCAN_INCREMENT  0.04f
 
 class ConfigFile;
 class Log;
@@ -19,18 +19,11 @@ public:
 	virtual ~GlobalLocalize();
 
 	virtual bool run(BEHAVIOR_PARAMS);
-	
-	void reset();
 
 private:
 	PREVENT_COPY_AND_ASSIGNMENT(GlobalLocalize);
 	
 	Log & log;
-	
-	enum States {
-		INIT,
-		SCAN
-	} state;
 	
 	float headAngle;
 	float scan_dir;

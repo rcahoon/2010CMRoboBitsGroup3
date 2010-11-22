@@ -5,6 +5,13 @@
 #define MV_POS_VAR 1.0f
 #define MV_ANGLE_VAR 1.0f;
 
+#define COVAR_THRESH  15.0f
+#define COVAR_DECAY  0.2f
+
+#define DIST_THRESH  50
+
+#define MAX_OBJ_COUNT  30
+
 #define BLUE  1
 #define YELLOW  -1
 
@@ -13,11 +20,11 @@
 #include "shared/random.h"
 #include "shared/Vector/Vector2D.h"
 #include "shared/Field/Field.h"
+#include "WorldModel/WorldObject/WorldObject.h"
 #include "Vision/VisionObject/VisionObject.h"
 #include <vector>
 #include "shared/Matrix.h"
-
-class Log;
+#include "Log/Log.h"
 
 namespace RCahoon {
 
@@ -28,21 +35,20 @@ class Particle
 private:
 	Matrix S;
 	Matrix mcov;
+	bool fresh;
 	
 public:
-	Particle() : S(3,1), mcov(Matrix::I<3>()) {}
-	Particle(const Matrix& _S, const Matrix& _cov) : S(_S), mcov(_cov) {
+	Particle(const Matrix& _S, const Matrix& _cov) : S(_S), mcov(_cov), fresh(true) {
 		assert(_cov.rows()==3 && _cov.cols()==3);
 		assert(_S.rows()==3 && _S.cols()==1);
 	}
-	Particle(const Vector2D& _pos, float _angle, const Matrix& _cov) : S(3,1), mcov(_cov) {
+	Particle(const Vector2D& _pos = Vector2D(0,0), float _angle = 0, const Matrix& _cov = Matrix::I<3>()*DEFAULT_VARIANCE) : S(3,1), mcov(_cov), fresh(true) {
 		assert(_cov.rows()==3 && _cov.cols()==3);
 		
 		S(0) = _pos.x; S(1) = _pos.y; S(2) = _angle;
 	}
 	
-	void init(Field& field);
-	void update(Localization& loc, std::vector<VisionObject const *> vis_objs, Particle delta);
+	//void update(Localization& loc, std::vector<WorldObject const *> vis_objs, Particle delta);
 	
 	inline float x() const
 	{
@@ -60,14 +66,34 @@ public:
 	{
 		return S(2);
 	}
-	inline const Matrix& cov()
+	inline const Matrix& state() const
+	{
+		return S;
+	}
+	inline const Matrix& cov() const
 	{
 		return mcov;
 	}
-	/*float belief() const
+	
+	inline void setFresh(bool _f)
 	{
-		return 1.0f/mcov.trace();
-	}*/
+		fresh = _f;
+	}
+	inline bool getFresh() const
+	{
+		return fresh;
+	}
+	
+	bool operator < (const Particle& b) const
+	{
+		//TODO:
+		return mcov.trace() > b.mcov.trace();
+	}
+	bool operator > (const Particle& b) const
+	{
+		//TODO
+		return mcov.trace() < b.mcov.trace();
+	}
 	
 	// global-coordinates addition operators
 	inline Particle& operator += (const Particle& b)
@@ -116,7 +142,8 @@ public:
 	
 	inline operator Pose() const
 	{
-		return Pose(position(), angle(), mcov.trace());
+		//TODO: set isLost intelligently
+		return Pose(position(), angle(), mcov, false);
 	}
 	
 	bool isValid() const
@@ -151,9 +178,8 @@ public:
 		             Pose & pose);
 	
 	virtual void reset(ResetCase resetCase);
+	virtual void setScanningForGoals(bool scanning);
 	
-    virtual void updateWorldFeatures(const WorldFeatures & worldFeatures);
-    
     static Particle movementModel(Vector2D T, float R);
 
 private:
@@ -168,10 +194,17 @@ private:
 	Vector2D& LINE_MAP(Vector2D position);*/
 	
 	Vector2D& fieldBound(Vector2D& position);
+	void goalLocalize(std::vector<Particle>& estimates, std::vector<Particle>& posts, float goalAngle, Vector2D goalPosition);
+	void updateGoalPosts(std::vector<Particle>& gposts, const std::vector<VisionObject const *> & vposts, const Particle& odometry);
 	
-	/**/Particle position;
+	std::vector<Particle> gbposts;
+	std::vector<Particle> gyposts;
 	
-friend class Particle;
+	bool scanForGoals;
+	
+	bool isBlue;
+	
+	std::vector<Particle> particles;
 };
 
 }
